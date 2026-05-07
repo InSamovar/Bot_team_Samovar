@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>План кухни</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Samovar Kitchen</p>
+          <h1>План на завтра</h1>
+        </div>
+        <button class="ghost-button" id="resetButton" type="button">Сбросить</button>
+      </header>
+
+      <section class="section">
+        <h2>Что готовим</h2>
+        <div class="dish-list" id="dishList"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <h2>Ингредиенты</h2>
+          <span id="selectedCount">0 блюд</span>
+        </div>
+        <div class="recipe-list" id="recipeList"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <h2>Список покупок</h2>
+          <span id="shoppingCount">0 позиций</span>
+        </div>
+        <div class="shopping-list" id="shoppingList"></div>
+      </section>
+
+      <footer class="footer-actions">
+        <button class="primary-button" id="saveButton" type="button">Сохранить план</button>
+      </footer>
+    </main>
+
+    <template id="dishTemplate">
+      <label class="dish-row">
+        <input class="dish-checkbox" type="checkbox">
+        <span class="dish-name"></span>
+        <select class="scale-select" aria-label="Объем приготовления">
+          <option value="1">Полный объем</option>
+          <option value="0.75">25% меньше</option>
+          <option value="0.5">50% меньше</option>
+          <option value="0.25">75% меньше</option>
+        </select>
+      </label>
+    </template>
+
+    <template id="recipeTemplate">
+      <article class="recipe-block">
+        <div class="recipe-title-row">
+          <h3></h3>
+          <span></span>
+        </div>
+        <div class="ingredient-grid"></div>
+      </article>
+    </template>
+
+    <template id="ingredientTemplate">
+      <label class="ingredient-row">
+        <span class="ingredient-name"></span>
+        <span class="quantity-wrap">
+          <input class="quantity-input" inputmode="decimal">
+          <span class="unit-label"></span>
+        </span>
+      </label>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
+
