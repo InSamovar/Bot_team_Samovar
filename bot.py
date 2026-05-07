@@ -4,9 +4,11 @@ import asyncio
 import json
 import os
 from dataclasses import asdict, dataclass, field
+from datetime import datetime
 from fractions import Fraction
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
@@ -37,6 +39,7 @@ from recipes import RECIPES, SCALE_OPTIONS
 DATA_DIR = Path("data")
 MORNING_PLAN_FILE = DATA_DIR / "morning_plan.json"
 SHOPPING_LIST_FILE = DATA_DIR / "shopping_list.json"
+DEFAULT_TIMEZONE = "Asia/Bangkok"
 
 
 @dataclass
@@ -290,6 +293,7 @@ def serializable_plan(plan: UserPlan) -> dict[str, Any]:
 
 def serializable_shopping_list(plan: UserPlan) -> dict[str, Any]:
     return {
+        "purchaseDate": today_label(),
         "items": [asdict(item) for item in plan.shopping_items if item.enabled],
     }
 
@@ -297,11 +301,13 @@ def serializable_shopping_list(plan: UserPlan) -> dict[str, Any]:
 def save_webapp_payload(payload: dict[str, Any]) -> None:
     recipes = payload.get("recipes", [])
     shopping_list = payload.get("shoppingList", [])
+    purchase_date = payload.get("purchaseDate") or today_label()
 
     save_json(MORNING_PLAN_FILE, {"recipes": recipes})
     save_json(
         SHOPPING_LIST_FILE,
         {
+            "purchaseDate": purchase_date,
             "items": [
                 {
                     "name": item.get("name", ""),
@@ -314,6 +320,10 @@ def save_webapp_payload(payload: dict[str, Any]) -> None:
             ]
         },
     )
+
+
+def today_label() -> str:
+    return datetime.now(ZoneInfo(DEFAULT_TIMEZONE)).strftime("%d.%m.%Y")
 
 
 def format_saved_morning_plan() -> str:
@@ -336,7 +346,8 @@ def format_saved_shopping_list() -> str:
         return "Список покупок пока пустой."
 
     items = [ShoppingItem(**item) for item in payload["items"]]
-    return format_shopping_list(items)
+    purchase_date = payload.get("purchaseDate") or "не указана"
+    return f"Дата закупки: {purchase_date}\n\n{format_shopping_list(items)}"
 
 
 async def main() -> None:

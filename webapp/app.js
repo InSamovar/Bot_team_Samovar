@@ -202,6 +202,7 @@ function savePlan() {
   const payload = {
     recipes: Object.values(state.plans),
     shoppingList: buildShoppingList(),
+    purchaseDate: formatPurchaseDate(new Date()),
     savedAt: new Date().toISOString(),
   };
 
@@ -247,6 +248,14 @@ function normalizeInput(value) {
 function formatAmount(item) {
   const amount = item.quantity === "" ? "" : formatQuantity(Number(item.quantity));
   return `${amount}${item.unit ? ` ${item.unit}` : ""}${item.note ? ` (${item.note})` : ""}`.trim();
+}
+
+function formatPurchaseDate(date) {
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(date);
 }
 
 function plural(count, one, few, many) {
