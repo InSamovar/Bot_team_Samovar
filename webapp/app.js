@@ -34,7 +34,7 @@ const tg = window.Telegram?.WebApp;
 const state = {
   selected: {},
   plans: {},
-  productStatuses: {},
+  stockByProduct: {},
 };
 
 const dishList = document.querySelector("#dishList");
@@ -100,7 +100,7 @@ function selectRecipe(key, scale) {
 
 function renderAll() {
   renderRecipes();
-  renderShopping();
+  renderProductCheck();
   const count = Object.keys(state.selected).length;
   selectedCount.textContent = plural(count, "блюдо", "блюда", "блюд");
 }
@@ -133,7 +133,7 @@ function renderRecipes() {
       input.disabled = ingredient.quantity === "" && !ingredient.unit;
       input.addEventListener("input", () => {
         state.plans[recipeKey].ingredients[index].quantity = normalizeInput(input.value);
-        renderShopping();
+        renderProductCheck();
       });
       grid.appendChild(ingredientNode);
     });
@@ -142,10 +142,11 @@ function renderRecipes() {
   });
 }
 
-function renderShopping() {
-  const items = buildShoppingList();
+function renderProductCheck() {
+  const items = buildProductNeedList();
+  const uncheckedCount = items.filter((item) => !hasStockValue(item)).length;
+  const buyCount = buildShoppingList().length;
   shoppingList.innerHTML = "";
-  const buyCount = items.filter((item) => productStatusKey(item) && state.productStatuses[productStatusKey(item)] === "buy").length;
   shoppingCount.textContent = `${plural(items.length, "позиция", "позиции", "позиций")} / купить ${buyCount}`;
 
   if (!items.length) {
@@ -154,29 +155,34 @@ function renderShopping() {
   }
 
   items.forEach((item) => {
-    const key = productStatusKey(item);
-    const status = state.productStatuses[key] || "check";
+    const key = productKey(item);
+    const stockValue = state.stockByProduct[key] ?? "";
+    const toBuy = calculateToBuy(item, stockValue);
     const row = document.createElement("div");
-    row.className = "shopping-row";
+    row.className = `stock-row${stockValue === "" ? " is-unchecked" : ""}`;
     row.innerHTML = `
-      <div>
+      <div class="stock-main">
         <span class="shopping-name">${escapeHtml(item.name)}</span>
-        <span class="shopping-meta">${escapeHtml(formatAmount(item))}</span>
+        <span class="shopping-meta">Нужно: ${escapeHtml(formatAmount(item))}</span>
       </div>
-      <div class="status-group" role="group" aria-label="Статус продукта">
-        ${statusButtonMarkup(key, status, "check", "Проверить")}
-        ${statusButtonMarkup(key, status, "in_stock", "Есть")}
-        ${statusButtonMarkup(key, status, "buy", "Купить")}
-      </div>
+      <label class="stock-input-wrap">
+        <span>Есть</span>
+        <input class="stock-input" inputmode="decimal" value="${escapeHtml(stockValue)}" placeholder="0">
+        <span>${escapeHtml(item.unit)}</span>
+      </label>
+      <div class="buy-result">${escapeHtml(formatToBuy(item, toBuy))}</div>
     `;
-    row.querySelectorAll(".status-button").forEach((button) => {
-      button.addEventListener("click", () => {
-        state.productStatuses[key] = button.dataset.status;
-        renderShopping();
-      });
+
+    const input = row.querySelector(".stock-input");
+    input.addEventListener("input", () => {
+      state.stockByProduct[key] = normalizeInput(input.value);
+      renderProductCheck();
     });
     shoppingList.appendChild(row);
   });
+
+  saveButton.disabled = uncheckedCount > 0;
+  saveButton.textContent = uncheckedCount > 0 ? `Проверить продукты: ${uncheckedCount}` : "Сохранить план";
 }
 
 function scaleRecipe(recipe, scale) {
@@ -194,20 +200,20 @@ function scaleRecipe(recipe, scale) {
   };
 }
 
-function buildShoppingList() {
+function buildProductNeedList() {
   const items = new Map();
   Object.values(state.plans).forEach((plan) => {
     plan.ingredients.forEach((ingredient) => {
-      const key = `${ingredient.name}|${ingredient.unit}|${ingredient.note}`;
-      const amount = Number(String(ingredient.quantity).replace(",", "."));
+      const key = productKey(ingredient);
+      const amount = parseAmount(ingredient.quantity);
       if (!items.has(key)) {
         items.set(key, { ...ingredient, quantity: Number.isFinite(amount) ? amount : ingredient.quantity });
         return;
       }
 
       const current = items.get(key);
-      if (Number.isFinite(amount) && Number.isFinite(Number(current.quantity))) {
-        current.quantity = Number(current.quantity) + amount;
+      if (Number.isFinite(amount) && Number.isFinite(parseAmount(current.quantity))) {
+        current.quantity = parseAmount(current.quantity) + amount;
       }
     });
   });
@@ -215,11 +221,40 @@ function buildShoppingList() {
   return Array.from(items.values()).filter((item) => item.quantity !== "" || item.note);
 }
 
+function buildProductCheckList() {
+  return buildProductNeedList().map((item) => {
+    const inStock = state.stockByProduct[productKey(item)] ?? "";
+    return {
+      ...item,
+      neededQuantity: item.quantity,
+      inStockQuantity: inStock,
+      toBuyQuantity: calculateToBuy(item, inStock),
+    };
+  });
+}
+
+function buildShoppingList() {
+  return buildProductCheckList()
+    .filter((item) => Number(item.toBuyQuantity) > 0)
+    .map((item) => ({
+      name: item.name,
+      quantity: item.toBuyQuantity,
+      unit: item.unit,
+      note: item.note,
+    }));
+}
+
 function savePlan() {
+  const unchecked = buildProductNeedList().filter((item) => !hasStockValue(item));
+  if (unchecked.length) {
+    alert("Заполните остатки по всем продуктам перед сохранением.");
+    return;
+  }
+
   const payload = {
     recipes: Object.values(state.plans),
     productCheck: buildProductCheckList(),
-    shoppingList: buildConfirmedShoppingList(),
+    shoppingList: buildShoppingList(),
     purchaseDate: formatPurchaseDate(new Date()),
     savedAt: new Date().toISOString(),
   };
@@ -237,10 +272,32 @@ function savePlan() {
 function resetPlan() {
   state.selected = {};
   state.plans = {};
-  state.productStatuses = {};
+  state.stockByProduct = {};
+  saveButton.disabled = false;
+  saveButton.textContent = "Сохранить план";
   localStorage.removeItem("samovarKitchenPlan");
   renderDishes();
   renderAll();
+}
+
+function hasStockValue(item) {
+  return state.stockByProduct[productKey(item)] !== undefined && state.stockByProduct[productKey(item)] !== "";
+}
+
+function calculateToBuy(item, stockValue) {
+  const needed = parseAmount(item.quantity);
+  const inStock = parseAmount(stockValue);
+  if (!Number.isFinite(needed) || !Number.isFinite(inStock)) {
+    return 0;
+  }
+  return Math.max(0, needed - inStock);
+}
+
+function formatToBuy(item, quantity) {
+  if (!Number.isFinite(Number(quantity)) || Number(quantity) <= 0) {
+    return "Купить: не нужно";
+  }
+  return `Купить: ${formatQuantity(Number(quantity))}${item.unit ? ` ${item.unit}` : ""}`;
 }
 
 function formatPortions(value) {
@@ -251,6 +308,9 @@ function formatPortions(value) {
 }
 
 function formatQuantity(value) {
+  if (typeof value === "string") {
+    return value;
+  }
   if (Number.isInteger(value)) {
     return String(value);
   }
@@ -264,29 +324,18 @@ function normalizeInput(value) {
   return value.replace(/[^\d.,]/g, "").replace(",", ".");
 }
 
+function parseAmount(value) {
+  const parsed = Number(String(value).replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : NaN;
+}
+
 function formatAmount(item) {
-  const amount = item.quantity === "" ? "" : formatQuantity(Number(item.quantity));
+  const amount = item.quantity === "" ? "" : formatQuantity(item.quantity);
   return `${amount}${item.unit ? ` ${item.unit}` : ""}${item.note ? ` (${item.note})` : ""}`.trim();
 }
 
-function buildProductCheckList() {
-  return buildShoppingList().map((item) => ({
-    ...item,
-    status: state.productStatuses[productStatusKey(item)] || "check",
-  }));
-}
-
-function buildConfirmedShoppingList() {
-  return buildProductCheckList().filter((item) => item.status === "buy");
-}
-
-function productStatusKey(item) {
+function productKey(item) {
   return `${item.name}|${item.unit}|${item.note}`;
-}
-
-function statusButtonMarkup(key, currentStatus, status, label) {
-  const activeClass = currentStatus === status ? " is-active" : "";
-  return `<button class="status-button${activeClass}" type="button" data-key="${escapeHtml(key)}" data-status="${status}">${label}</button>`;
 }
 
 function formatPurchaseDate(date) {
@@ -312,3 +361,4 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+

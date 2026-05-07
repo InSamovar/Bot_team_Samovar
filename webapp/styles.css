@@ -39,7 +39,8 @@ select {
 .recipe-title-row,
 .dish-row,
 .ingredient-row,
-.shopping-row {
+.shopping-row,
+.stock-row {
   display: flex;
   align-items: center;
 }
@@ -191,7 +192,8 @@ h3 {
   font-size: 14px;
 }
 
-.shopping-row {
+.shopping-row,
+.stock-row {
   justify-content: space-between;
   gap: 12px;
   min-height: 48px;
@@ -203,28 +205,47 @@ h3 {
   font-weight: 650;
 }
 
-.status-group {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(72px, 1fr));
-  gap: 5px;
-  flex: 0 0 min(320px, 48%);
+.stock-row {
+  align-items: stretch;
 }
 
-.status-button {
-  min-height: 34px;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: #fff;
+.stock-row.is-unchecked {
+  border-color: #d9b56f;
+}
+
+.stock-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.stock-input-wrap {
+  display: grid;
+  grid-template-columns: auto minmax(68px, 96px) auto;
+  align-items: center;
+  gap: 7px;
   color: var(--muted);
   font-size: 13px;
   font-weight: 700;
-  cursor: pointer;
 }
 
-.status-button.is-active {
-  border-color: var(--accent);
-  background: #eaf5ef;
+.stock-input {
+  width: 100%;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 0 9px;
+  text-align: right;
+  background: #fff;
+}
+
+.buy-result {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 136px;
   color: var(--accent-strong);
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .empty-state {
@@ -264,6 +285,11 @@ h3 {
   color: #fff;
 }
 
+.primary-button:disabled {
+  background: #9aa39a;
+  cursor: not-allowed;
+}
+
 .primary-button:active {
   background: var(--accent-strong);
 }
@@ -298,13 +324,18 @@ h3 {
     grid-template-columns: minmax(68px, 96px) minmax(24px, auto);
   }
 
-  .shopping-row {
+  .shopping-row,
+  .stock-row {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .status-group {
-    flex-basis: auto;
-    width: 100%;
+  .stock-input-wrap {
+    grid-template-columns: auto minmax(90px, 1fr) auto;
+  }
+
+  .buy-result {
+    justify-content: flex-start;
+    min-width: 0;
   }
 }
