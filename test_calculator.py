@@ -17,10 +17,12 @@ class CalculatorTest(TestCase):
 
     def test_scales_casserole_to_half_volume(self) -> None:
         recipe = scale_recipe(RECIPES["casserole"], Fraction(1, 2), "50% меньше")
+        ingredients = {ingredient.name: ingredient for ingredient in recipe.ingredients}
 
         self.assertEqual(recipe.portions_label, "примерно 4-5 порций")
-        self.assertEqual(recipe.ingredients[0].display_quantity, "2.5")
-        self.assertEqual(recipe.ingredients[2].display_quantity, "150")
+        self.assertEqual(ingredients["куриная грудка"].display_quantity, "2.5")
+        self.assertEqual(ingredients["картошка"].display_quantity, "1100")
+        self.assertEqual(ingredients["сыр"].display_quantity, "150")
 
     def test_builds_shopping_list_from_scaled_recipes(self) -> None:
         soup = scale_recipe(RECIPES["chicken_soup"], Fraction(1, 1), "Полный объем")

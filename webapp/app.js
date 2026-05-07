@@ -15,6 +15,7 @@ const recipes = {
     portions: 9,
     ingredients: [
       { name: "куриная грудка", quantity: 5, unit: "шт" },
+      { name: "картошка", quantity: 2200, unit: "г" },
       { name: "грибы", quantity: 1, unit: "бокс" },
       { name: "сыр", quantity: 300, unit: "г" },
       { name: "майонез", quantity: 4, unit: "ст. ложки", note: "примерно 70 г на полный объем" },
@@ -263,4 +264,3 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-

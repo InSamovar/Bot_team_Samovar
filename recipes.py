@@ -22,6 +22,7 @@ RECIPES: dict[str, Recipe] = {
         portions=9,
         ingredients=(
             Ingredient("куриная грудка", Fraction(5), "шт"),
+            Ingredient("картошка", Fraction(2200), "г"),
             Ingredient("грибы", Fraction(1), "бокс"),
             Ingredient("сыр", Fraction(300), "г"),
             Ingredient("майонез", Fraction(4), "ст. ложки", "примерно 70 г на полный объем"),
@@ -36,4 +37,3 @@ SCALE_OPTIONS = {
     "3": ("50% меньше", Fraction(1, 2)),
     "4": ("75% меньше", Fraction(1, 4)),
 }
-

@@ -2,36 +2,37 @@
   "recipes": [
     {
       "name": "Куриный суп",
-      "portions_label": "16 порций",
-      "scale_label": "Полный объем",
+      "scale": 1,
+      "scaleLabel": "Полный объем",
+      "portionsLabel": "16 порций",
       "ingredients": [
         {
           "name": "куриные ножки",
-          "display_quantity": "4",
+          "quantity": "5",
           "unit": "шт",
           "note": ""
         },
         {
           "name": "картошка",
-          "display_quantity": "1250",
+          "quantity": "1250",
           "unit": "г",
           "note": ""
         },
         {
           "name": "морковь",
-          "display_quantity": "1",
+          "quantity": "1",
           "unit": "шт",
           "note": ""
         },
         {
           "name": "лук",
-          "display_quantity": "1",
+          "quantity": "1",
           "unit": "головка",
           "note": ""
         },
         {
           "name": "зеленый лук",
-          "display_quantity": "",
+          "quantity": "",
           "unit": "",
           "note": "для подачи"
         }
@@ -39,30 +40,31 @@
     },
     {
       "name": "Запеканка",
-      "portions_label": "9 порций",
-      "scale_label": "Полный объем",
+      "scale": 1,
+      "scaleLabel": "Полный объем",
+      "portionsLabel": "9 порций",
       "ingredients": [
         {
           "name": "куриная грудка",
-          "display_quantity": "5",
+          "quantity": "5",
           "unit": "шт",
           "note": ""
         },
         {
           "name": "грибы",
-          "display_quantity": "1",
+          "quantity": "1",
           "unit": "бокс",
           "note": ""
         },
         {
           "name": "сыр",
-          "display_quantity": "300",
+          "quantity": "300",
           "unit": "г",
           "note": ""
         },
         {
           "name": "майонез",
-          "display_quantity": "4",
+          "quantity": "4",
           "unit": "ст. ложки",
           "note": "примерно 70 г на полный объем"
         }
