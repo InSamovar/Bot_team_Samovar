@@ -40,31 +40,37 @@
     },
     {
       "name": "Запеканка",
-      "scale": 1,
-      "scaleLabel": "Полный объем",
-      "portionsLabel": "9 порций",
+      "scale": 0.5,
+      "scaleLabel": "50% меньше",
+      "portionsLabel": "примерно 4-5 порций",
       "ingredients": [
         {
           "name": "куриная грудка",
-          "quantity": "5",
+          "quantity": "2.5",
           "unit": "шт",
           "note": ""
         },
         {
+          "name": "картошка",
+          "quantity": "1100",
+          "unit": "г",
+          "note": ""
+        },
+        {
           "name": "грибы",
-          "quantity": "1",
+          "quantity": "0.5",
           "unit": "бокс",
           "note": ""
         },
         {
           "name": "сыр",
-          "quantity": "300",
+          "quantity": "150",
           "unit": "г",
           "note": ""
         },
         {
           "name": "майонез",
-          "quantity": "4",
+          "quantity": "2",
           "unit": "ст. ложки",
           "note": "примерно 70 г на полный объем"
         }

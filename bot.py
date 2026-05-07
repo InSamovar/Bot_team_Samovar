@@ -301,9 +301,10 @@ def serializable_shopping_list(plan: UserPlan) -> dict[str, Any]:
 def save_webapp_payload(payload: dict[str, Any]) -> None:
     recipes = payload.get("recipes", [])
     shopping_list = payload.get("shoppingList", [])
+    product_check = payload.get("productCheck", [])
     purchase_date = payload.get("purchaseDate") or today_label()
 
-    save_json(MORNING_PLAN_FILE, {"recipes": recipes})
+    save_json(MORNING_PLAN_FILE, {"recipes": recipes, "productCheck": product_check})
     save_json(
         SHOPPING_LIST_FILE,
         {

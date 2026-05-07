@@ -34,6 +34,7 @@ const tg = window.Telegram?.WebApp;
 const state = {
   selected: {},
   plans: {},
+  productStatuses: {},
 };
 
 const dishList = document.querySelector("#dishList");
@@ -144,20 +145,36 @@ function renderRecipes() {
 function renderShopping() {
   const items = buildShoppingList();
   shoppingList.innerHTML = "";
-  shoppingCount.textContent = plural(items.length, "позиция", "позиции", "позиций");
+  const buyCount = items.filter((item) => productStatusKey(item) && state.productStatuses[productStatusKey(item)] === "buy").length;
+  shoppingCount.textContent = `${plural(items.length, "позиция", "позиции", "позиций")} / купить ${buyCount}`;
 
   if (!items.length) {
-    shoppingList.innerHTML = '<div class="empty-state">Список соберется из выбранных блюд</div>';
+    shoppingList.innerHTML = '<div class="empty-state">Продукты появятся после выбора блюд</div>';
     return;
   }
 
   items.forEach((item) => {
+    const key = productStatusKey(item);
+    const status = state.productStatuses[key] || "check";
     const row = document.createElement("div");
     row.className = "shopping-row";
     row.innerHTML = `
-      <span class="shopping-name">${escapeHtml(item.name)}</span>
-      <span class="shopping-meta">${escapeHtml(formatAmount(item))}</span>
+      <div>
+        <span class="shopping-name">${escapeHtml(item.name)}</span>
+        <span class="shopping-meta">${escapeHtml(formatAmount(item))}</span>
+      </div>
+      <div class="status-group" role="group" aria-label="Статус продукта">
+        ${statusButtonMarkup(key, status, "check", "Проверить")}
+        ${statusButtonMarkup(key, status, "in_stock", "Есть")}
+        ${statusButtonMarkup(key, status, "buy", "Купить")}
+      </div>
     `;
+    row.querySelectorAll(".status-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.productStatuses[key] = button.dataset.status;
+        renderShopping();
+      });
+    });
     shoppingList.appendChild(row);
   });
 }
@@ -201,7 +218,8 @@ function buildShoppingList() {
 function savePlan() {
   const payload = {
     recipes: Object.values(state.plans),
-    shoppingList: buildShoppingList(),
+    productCheck: buildProductCheckList(),
+    shoppingList: buildConfirmedShoppingList(),
     purchaseDate: formatPurchaseDate(new Date()),
     savedAt: new Date().toISOString(),
   };
@@ -219,6 +237,7 @@ function savePlan() {
 function resetPlan() {
   state.selected = {};
   state.plans = {};
+  state.productStatuses = {};
   localStorage.removeItem("samovarKitchenPlan");
   renderDishes();
   renderAll();
@@ -248,6 +267,26 @@ function normalizeInput(value) {
 function formatAmount(item) {
   const amount = item.quantity === "" ? "" : formatQuantity(Number(item.quantity));
   return `${amount}${item.unit ? ` ${item.unit}` : ""}${item.note ? ` (${item.note})` : ""}`.trim();
+}
+
+function buildProductCheckList() {
+  return buildShoppingList().map((item) => ({
+    ...item,
+    status: state.productStatuses[productStatusKey(item)] || "check",
+  }));
+}
+
+function buildConfirmedShoppingList() {
+  return buildProductCheckList().filter((item) => item.status === "buy");
+}
+
+function productStatusKey(item) {
+  return `${item.name}|${item.unit}|${item.note}`;
+}
+
+function statusButtonMarkup(key, currentStatus, status, label) {
+  const activeClass = currentStatus === status ? " is-active" : "";
+  return `<button class="status-button${activeClass}" type="button" data-key="${escapeHtml(key)}" data-status="${status}">${label}</button>`;
 }
 
 function formatPurchaseDate(date) {

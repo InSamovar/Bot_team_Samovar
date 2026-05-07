@@ -199,7 +199,32 @@ h3 {
 }
 
 .shopping-name {
+  display: block;
   font-weight: 650;
+}
+
+.status-group {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(72px, 1fr));
+  gap: 5px;
+  flex: 0 0 min(320px, 48%);
+}
+
+.status-button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.status-button.is-active {
+  border-color: var(--accent);
+  background: #eaf5ef;
+  color: var(--accent-strong);
 }
 
 .empty-state {
@@ -272,5 +297,14 @@ h3 {
   .quantity-wrap {
     grid-template-columns: minmax(68px, 96px) minmax(24px, auto);
   }
-}
 
+  .shopping-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .status-group {
+    flex-basis: auto;
+    width: 100%;
+  }
+}
