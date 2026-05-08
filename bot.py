@@ -40,6 +40,7 @@ DATA_DIR = Path("data")
 MORNING_PLAN_FILE = DATA_DIR / "morning_plan.json"
 SHOPPING_LIST_FILE = DATA_DIR / "shopping_list.json"
 HISTORY_FILE = DATA_DIR / "history.json"
+USER_SETTINGS_FILE = DATA_DIR / "user_settings.json"
 DEFAULT_TIMEZONE = "Asia/Bangkok"
 
 
@@ -54,6 +55,88 @@ class UserPlan:
 
 
 user_plans: dict[int, UserPlan] = {}
+
+
+BOT_TEXT = {
+    "ru": {
+        "open_app": "Открыть Mini App",
+        "morning_plan": "План на утро",
+        "shopping_list": "Список покупок",
+        "history": "История",
+        "language": "Язык",
+        "start": (
+            "Привет. Я помогу собрать план приготовления и список покупок.\n\n"
+            "Команды:\n"
+            "/plan - собрать новый план\n"
+            "/morning_plan - план на утро\n"
+            "/shopping_list - список покупок\n"
+            "/history - история планов"
+        ),
+        "open_app_prompt": "Удобнее собрать план в Mini App:",
+        "saved": "План из Mini App сохранен.",
+        "choose_language": "Выберите язык:",
+        "language_saved": "Язык сохранен.",
+        "empty_morning": "План на утро пока пустой.",
+        "empty_shopping": "Список покупок пока пустой.",
+        "empty_history": "История пока пустая.",
+        "morning_title": "План на утро",
+        "shopping_title": "Список покупок",
+        "created_date": "Дата создания",
+        "purchase_date": "Дата закупки",
+        "purchased": "Куплено",
+        "dish": "Блюдо",
+        "volume": "Объем",
+        "status": "Ст",
+        "position": "Позиция",
+        "quantity": "Кол-во",
+        "tap_to_purchase": "Нажмите на позицию ниже, чтобы отметить покупку.",
+        "history_title": "История планов:",
+        "dishes": "Блюда",
+        "shopping_positions": "Позиций к покупке",
+        "not_set": "не указана",
+        "updated": "Обновлено",
+        "not_found": "Позиция не найдена",
+    },
+    "en": {
+        "open_app": "Open Mini App",
+        "morning_plan": "Morning plan",
+        "shopping_list": "Shopping list",
+        "history": "History",
+        "language": "Language",
+        "start": (
+            "Hi. I will help prepare the cooking plan and shopping list.\n\n"
+            "Commands:\n"
+            "/plan - create a new plan\n"
+            "/morning_plan - morning plan\n"
+            "/shopping_list - shopping list\n"
+            "/history - plan history"
+        ),
+        "open_app_prompt": "It is easier to create the plan in the Mini App:",
+        "saved": "Mini App plan saved.",
+        "choose_language": "Choose language:",
+        "language_saved": "Language saved.",
+        "empty_morning": "Morning plan is empty.",
+        "empty_shopping": "Shopping list is empty.",
+        "empty_history": "History is empty.",
+        "morning_title": "Morning plan",
+        "shopping_title": "Shopping list",
+        "created_date": "Created",
+        "purchase_date": "Purchase date",
+        "purchased": "Purchased",
+        "dish": "Dish",
+        "volume": "Volume",
+        "status": "St",
+        "position": "Item",
+        "quantity": "Qty",
+        "tap_to_purchase": "Tap an item below to mark it as purchased.",
+        "history_title": "Plan history:",
+        "dishes": "Dishes",
+        "shopping_positions": "Items to buy",
+        "not_set": "not set",
+        "updated": "Updated",
+        "not_found": "Item not found",
+    },
+}
 
 
 def load_env() -> None:
@@ -89,6 +172,37 @@ def append_history(entry: dict[str, Any]) -> None:
 
     history.append(entry)
     save_json(HISTORY_FILE, history)
+
+
+def get_user_lang(user_id: int | None) -> str:
+    settings = load_json(USER_SETTINGS_FILE)
+    if not isinstance(settings, dict) or user_id is None:
+        return "ru"
+
+    lang = settings.get(str(user_id), {}).get("lang")
+    return lang if lang in BOT_TEXT else "ru"
+
+
+def set_user_lang(user_id: int, lang: str) -> None:
+    settings = load_json(USER_SETTINGS_FILE)
+    if not isinstance(settings, dict):
+        settings = {}
+
+    settings[str(user_id)] = {"lang": lang if lang in BOT_TEXT else "ru"}
+    save_json(USER_SETTINGS_FILE, settings)
+
+
+def t(lang: str, key: str) -> str:
+    return BOT_TEXT.get(lang, BOT_TEXT["ru"]).get(key, BOT_TEXT["ru"][key])
+
+
+def webapp_url_for_lang(lang: str) -> str | None:
+    webapp_url = os.getenv("WEBAPP_URL")
+    if not webapp_url:
+        return None
+
+    separator = "&" if "?" in webapp_url else "?"
+    return f"{webapp_url}{separator}lang={lang}"
 
 
 def recipe_keyboard(selected: list[str]) -> InlineKeyboardMarkup:
@@ -170,17 +284,31 @@ def shopping_edit_keyboard(items: list[ShoppingItem]) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
-def main_keyboard() -> ReplyKeyboardMarkup | None:
-    webapp_url = os.getenv("WEBAPP_URL")
-    if not webapp_url:
-        return None
+def language_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Русский", callback_data="language:ru"),
+                InlineKeyboardButton(text="English", callback_data="language:en"),
+            ]
+        ]
+    )
 
+
+def main_keyboard(lang: str) -> ReplyKeyboardMarkup | None:
+    webapp_url = webapp_url_for_lang(lang)
+    keyboard = []
+    if webapp_url:
+        keyboard.append([KeyboardButton(text=t(lang, "open_app"), web_app=WebAppInfo(url=webapp_url))])
+
+    keyboard.extend(
+        [
+            [KeyboardButton(text=t(lang, "morning_plan")), KeyboardButton(text=t(lang, "shopping_list"))],
+            [KeyboardButton(text=t(lang, "history")), KeyboardButton(text=t(lang, "language"))],
+        ]
+    )
     return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Открыть Mini App", web_app=WebAppInfo(url=webapp_url))],
-            [KeyboardButton(text="План на утро"), KeyboardButton(text="Список покупок")],
-            [KeyboardButton(text="История")],
-        ],
+        keyboard=keyboard,
         resize_keyboard=True,
     )
 
@@ -382,18 +510,18 @@ def today_label() -> str:
     return datetime.now(ZoneInfo(DEFAULT_TIMEZONE)).strftime("%d.%m.%Y")
 
 
-def format_saved_morning_plan() -> str:
+def format_saved_morning_plan(lang: str = "ru") -> str:
     payload = load_json(MORNING_PLAN_FILE)
     if not payload or not payload.get("recipes"):
-        return "План на утро пока пустой."
+        return t(lang, "empty_morning")
 
-    created_date = payload.get("createdDate") or "не указана"
+    created_date = payload.get("createdDate") or t(lang, "not_set")
     sections = [
-        "План на утро",
-        f"Дата создания: {created_date}",
+        t(lang, "morning_title"),
+        f"{t(lang, 'created_date')}: {created_date}",
         "",
         "```",
-        "N  Блюдо                     Объем",
+        f"N  {t(lang, 'dish'):<25} {t(lang, 'volume')}",
         "-- ------------------------- ----------------",
     ]
     for index, recipe in enumerate(payload["recipes"], start=1):
@@ -412,23 +540,23 @@ def load_shopping_payload() -> dict[str, Any] | None:
     return payload
 
 
-def format_saved_shopping_list() -> str:
+def format_saved_shopping_list(lang: str = "ru") -> str:
     payload = load_shopping_payload()
     if not payload:
-        return "Список покупок пока пустой."
+        return t(lang, "empty_shopping")
 
-    created_date = payload.get("createdDate") or "не указана"
-    purchase_date = payload.get("purchaseDate") or "не указана"
+    created_date = payload.get("createdDate") or t(lang, "not_set")
+    purchase_date = payload.get("purchaseDate") or t(lang, "not_set")
     items = payload["items"]
     purchased_count = sum(1 for item in items if item.get("purchased"))
     sections = [
-        "Список покупок",
-        f"Дата создания: {created_date}",
-        f"Дата закупки: {purchase_date}",
-        f"Куплено: {purchased_count}/{len(items)}",
+        t(lang, "shopping_title"),
+        f"{t(lang, 'created_date')}: {created_date}",
+        f"{t(lang, 'purchase_date')}: {purchase_date}",
+        f"{t(lang, 'purchased')}: {purchased_count}/{len(items)}",
         "",
         "```",
-        "N  Ст  Позиция                 Кол-во",
+        f"N  {t(lang, 'status'):<3} {t(lang, 'position'):<23} {t(lang, 'quantity')}",
         "-- --- ----------------------- ----------",
     ]
 
@@ -438,7 +566,7 @@ def format_saved_shopping_list() -> str:
         sections.append(f"{index:<2} {status:<3} {item.get('name', '')[:23]:<23} {quantity}")
 
     sections.append("```")
-    sections.append("Нажмите на позицию ниже, чтобы отметить покупку.")
+    sections.append(t(lang, "tap_to_purchase"))
     return "\n".join(sections)
 
 
@@ -453,10 +581,11 @@ def shopping_tracking_keyboard(payload: dict[str, Any]) -> InlineKeyboardMarkup:
     for index, item in enumerate(payload.get("items", [])):
         mark = "✓" if item.get("purchased") else "□"
         quantity = format_item_quantity(item)
+        item_number = f"{index + 1:02d}"
         buttons.append(
             [
                 InlineKeyboardButton(
-                    text=f"{mark} {item.get('name', '')} {quantity}".strip(),
+                    text=f"{mark} {item_number} | {item.get('name', '')} | {quantity}".strip(),
                     callback_data=f"purchase_toggle:{index}",
                 )
             ]
@@ -476,20 +605,20 @@ def toggle_purchased(index: int) -> bool:
     return True
 
 
-def format_history(limit: int = 5) -> str:
+def format_history(lang: str = "ru", limit: int = 5) -> str:
     history = load_json(HISTORY_FILE)
     if not isinstance(history, list) or not history:
-        return "История пока пустая."
+        return t(lang, "empty_history")
 
-    sections = ["История планов:"]
+    sections = [t(lang, "history_title")]
     for index, entry in enumerate(reversed(history[-limit:]), start=1):
         recipes = entry.get("recipes", [])
         shopping_list = entry.get("shoppingList", [])
         recipe_names = ", ".join(recipe.get("name", "") for recipe in recipes) or "без блюд"
         sections.append("")
-        sections.append(f"{index}. Дата создания: {entry.get('createdDate', 'не указана')}")
-        sections.append(f"   Блюда: {recipe_names}")
-        sections.append(f"   Позиций к покупке: {len(shopping_list)}")
+        sections.append(f"{index}. {t(lang, 'created_date')}: {entry.get('createdDate', t(lang, 'not_set'))}")
+        sections.append(f"   {t(lang, 'dishes')}: {recipe_names}")
+        sections.append(f"   {t(lang, 'shopping_positions')}: {len(shopping_list)}")
 
     return "\n".join(sections)
 
@@ -505,39 +634,42 @@ async def main() -> None:
 
     @dp.message(Command("start"))
     async def handle_start(message: Message) -> None:
+        lang = get_user_lang(message.from_user.id)
         await message.answer(
-            "Привет. Я помогу собрать план приготовления и список покупок.\n\n"
-            "Команды:\n"
-            "/plan - собрать новый план\n"
-            "/morning_plan - план на утро\n"
-            "/shopping_list - список покупок\n"
-            "/history - история планов",
-            reply_markup=main_keyboard(),
+            t(lang, "start"),
+            reply_markup=main_keyboard(lang),
         )
 
     @dp.message(Command("plan"))
     async def handle_plan(message: Message) -> None:
+        lang = get_user_lang(message.from_user.id)
         webapp_url = os.getenv("WEBAPP_URL")
         if webapp_url:
-            await message.answer("Удобнее собрать план в Mini App:", reply_markup=main_keyboard())
+            await message.answer(t(lang, "open_app_prompt"), reply_markup=main_keyboard(lang))
         else:
             await start_plan(message)
 
     @dp.message(Command("morning_plan"))
     async def handle_morning_plan(message: Message) -> None:
-        await message.answer(format_saved_morning_plan())
+        await message.answer(format_saved_morning_plan(get_user_lang(message.from_user.id)))
 
     @dp.message(Command("shopping_list"))
     async def handle_shopping_list(message: Message) -> None:
+        lang = get_user_lang(message.from_user.id)
         payload = load_shopping_payload()
         await message.answer(
-            format_saved_shopping_list(),
+            format_saved_shopping_list(lang),
             reply_markup=shopping_tracking_keyboard(payload) if payload else None,
         )
 
     @dp.message(Command("history"))
     async def handle_history(message: Message) -> None:
-        await message.answer(format_history())
+        await message.answer(format_history(get_user_lang(message.from_user.id)))
+
+    @dp.message(Command("language"))
+    async def handle_language(message: Message) -> None:
+        lang = get_user_lang(message.from_user.id)
+        await message.answer(t(lang, "choose_language"), reply_markup=language_keyboard())
 
     @dp.message(F.web_app_data)
     async def handle_webapp_data(message: Message) -> None:
@@ -547,44 +679,74 @@ async def main() -> None:
             await message.answer("Не получилось прочитать данные Mini App.")
             return
 
+        lang = get_user_lang(message.from_user.id)
         save_webapp_payload(payload)
         shopping_payload = load_shopping_payload()
         await message.answer(
-            "План из Mini App сохранен.\n\n"
-            f"{format_saved_morning_plan()}\n\n"
-            f"{format_saved_shopping_list()}",
+            f"{t(lang, 'saved')}\n\n"
+            f"{format_saved_morning_plan(lang)}\n\n"
+            f"{format_saved_shopping_list(lang)}",
             reply_markup=shopping_tracking_keyboard(shopping_payload) if shopping_payload else None,
         )
 
     @dp.message(F.text == "План на утро")
     async def handle_morning_plan_button(message: Message) -> None:
-        await message.answer(format_saved_morning_plan())
+        await message.answer(format_saved_morning_plan("ru"))
+
+    @dp.message(F.text == "Morning plan")
+    async def handle_morning_plan_button_en(message: Message) -> None:
+        await message.answer(format_saved_morning_plan("en"))
 
     @dp.message(F.text == "Список покупок")
     async def handle_shopping_list_button(message: Message) -> None:
         payload = load_shopping_payload()
         await message.answer(
-            format_saved_shopping_list(),
+            format_saved_shopping_list("ru"),
+            reply_markup=shopping_tracking_keyboard(payload) if payload else None,
+        )
+
+    @dp.message(F.text == "Shopping list")
+    async def handle_shopping_list_button_en(message: Message) -> None:
+        payload = load_shopping_payload()
+        await message.answer(
+            format_saved_shopping_list("en"),
             reply_markup=shopping_tracking_keyboard(payload) if payload else None,
         )
 
     @dp.message(F.text == "История")
     async def handle_history_button(message: Message) -> None:
-        await message.answer(format_history())
+        await message.answer(format_history("ru"))
+
+    @dp.message(F.text == "History")
+    async def handle_history_button_en(message: Message) -> None:
+        await message.answer(format_history("en"))
+
+    @dp.message(F.text.in_({"Язык", "Language"}))
+    async def handle_language_button(message: Message) -> None:
+        lang = get_user_lang(message.from_user.id)
+        await message.answer(t(lang, "choose_language"), reply_markup=language_keyboard())
 
     @dp.callback_query(F.data.startswith("purchase_toggle:"))
     async def handle_purchase_toggle(callback: CallbackQuery) -> None:
+        lang = get_user_lang(callback.from_user.id)
         index = int(callback.data.split(":", 1)[1])
         if not toggle_purchased(index):
-            await callback.answer("Позиция не найдена", show_alert=True)
+            await callback.answer(t(lang, "not_found"), show_alert=True)
             return
 
         payload = load_shopping_payload()
         await callback.message.edit_text(
-            format_saved_shopping_list(),
+            format_saved_shopping_list(lang),
             reply_markup=shopping_tracking_keyboard(payload) if payload else None,
         )
-        await callback.answer("Обновлено")
+        await callback.answer(t(lang, "updated"))
+
+    @dp.callback_query(F.data.startswith("language:"))
+    async def handle_language_select(callback: CallbackQuery) -> None:
+        lang = callback.data.split(":", 1)[1]
+        set_user_lang(callback.from_user.id, lang)
+        await callback.message.answer(t(lang, "language_saved"), reply_markup=main_keyboard(lang))
+        await callback.answer()
 
     @dp.message(F.text)
     async def handle_text(message: Message) -> None:

@@ -1,92 +1,154 @@
 const recipes = {
   chicken_soup: {
-    name: "Куриный суп",
+    name: { ru: "Куриный суп", en: "Chicken soup" },
     category: "hot",
     icon: "🍲",
     portions: 16,
     ingredients: [
-      { name: "куриные ножки", quantity: 5, unit: "шт" },
-      { name: "картошка", quantity: 1250, unit: "г" },
-      { name: "морковь", quantity: 1, unit: "шт" },
-      { name: "лук", quantity: 1, unit: "головка" },
-      { name: "зеленый лук", quantity: 1, unit: "пачка" },
+      { name: { ru: "куриные ножки", en: "chicken legs" }, quantity: 5, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "картошка", en: "potatoes" }, quantity: 1250, unit: { ru: "г", en: "g" } },
+      { name: { ru: "морковь", en: "carrot" }, quantity: 1, unit: { ru: "шт", en: "pc" } },
+      { name: { ru: "лук", en: "onion" }, quantity: 1, unit: { ru: "головка", en: "head" } },
+      { name: { ru: "зеленый лук", en: "green onions" }, quantity: 1, unit: { ru: "пачка", en: "pack" } },
     ],
   },
   casserole: {
-    name: "Запеканка",
+    name: { ru: "Запеканка", en: "Casserole" },
     category: "hot",
     icon: "🥘",
     portions: 9,
     ingredients: [
-      { name: "куриная грудка", quantity: 5, unit: "шт" },
-      { name: "картошка", quantity: 2200, unit: "г" },
-      { name: "грибы", quantity: 1, unit: "бокс" },
-      { name: "сыр", quantity: 300, unit: "г" },
-      { name: "майонез", quantity: "1/3", unit: "банка" },
+      { name: { ru: "куриная грудка", en: "chicken breast" }, quantity: 5, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "картошка", en: "potatoes" }, quantity: 2200, unit: { ru: "г", en: "g" } },
+      { name: { ru: "грибы", en: "mushrooms" }, quantity: 1, unit: { ru: "бокс", en: "box" } },
+      { name: { ru: "сыр", en: "cheese" }, quantity: 300, unit: { ru: "г", en: "g" } },
+      { name: { ru: "майонез", en: "mayonnaise" }, quantity: "1/3", unit: { ru: "банка", en: "jar" } },
     ],
   },
   borscht: {
-    name: "Борщ",
+    name: { ru: "Борщ", en: "Borscht" },
     category: "hot",
     icon: "🥣",
     portions: 14,
     ingredients: [
-      { name: "куриные ножки", quantity: 7, unit: "шт" },
-      { name: "свекла", quantity: 1000, unit: "г" },
-      { name: "капуста", quantity: 1, unit: "шт" },
-      { name: "морковь", quantity: 1, unit: "шт" },
-      { name: "картошка", quantity: 1300, unit: "г" },
-      { name: "лук", quantity: 1, unit: "шт" },
-      { name: "чеснок", quantity: 10, unit: "шт" },
-      { name: "томатная паста", quantity: 2, unit: "ст. ложки" },
-      { name: "уксус", quantity: 3, unit: "ст. ложки" },
-      { name: "соль", quantity: 5.5, unit: "ст. ложки" },
+      { name: { ru: "куриные ножки", en: "chicken legs" }, quantity: 7, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "свекла", en: "beetroot" }, quantity: 1000, unit: { ru: "г", en: "g" } },
+      { name: { ru: "капуста", en: "cabbage" }, quantity: 1, unit: { ru: "шт", en: "pc" } },
+      { name: { ru: "морковь", en: "carrot" }, quantity: 1, unit: { ru: "шт", en: "pc" } },
+      { name: { ru: "картошка", en: "potatoes" }, quantity: 1300, unit: { ru: "г", en: "g" } },
+      { name: { ru: "лук", en: "onion" }, quantity: 1, unit: { ru: "шт", en: "pc" } },
+      { name: { ru: "чеснок", en: "garlic" }, quantity: 10, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "томатная паста", en: "tomato paste" }, quantity: 2, unit: { ru: "ст. ложки", en: "tbsp" } },
+      { name: { ru: "уксус", en: "vinegar" }, quantity: 3, unit: { ru: "ст. ложки", en: "tbsp" } },
+      { name: { ru: "соль", en: "salt" }, quantity: 5.5, unit: { ru: "ст. ложки", en: "tbsp" } },
     ],
   },
   mashed_potatoes: {
-    name: "Картофельное пюре",
+    name: { ru: "Картофельное пюре", en: "Mashed potatoes" },
     category: "hot",
     icon: "🥔",
     portions: 5,
     ingredients: [
-      { name: "картошка", quantity: 1000, unit: "г" },
-      { name: "молоко", quantity: 150, unit: "г" },
-      { name: "масло сливочное", quantity: 40, unit: "г" },
-      { name: "соль", quantity: 6, unit: "г" },
+      { name: { ru: "картошка", en: "potatoes" }, quantity: 1000, unit: { ru: "г", en: "g" } },
+      { name: { ru: "молоко", en: "milk" }, quantity: 150, unit: { ru: "г", en: "g" } },
+      { name: { ru: "масло сливочное", en: "butter" }, quantity: 40, unit: { ru: "г", en: "g" } },
+      { name: { ru: "соль", en: "salt" }, quantity: 6, unit: { ru: "г", en: "g" } },
     ],
   },
   chicken_cutlets: {
-    name: "Куриные котлеты",
+    name: { ru: "Куриные котлеты", en: "Chicken cutlets" },
     category: "hot",
     icon: "🍗",
     portions: 18,
     ingredients: [
-      { name: "куриная грудка", quantity: 2000, unit: "г" },
-      { name: "лук", quantity: 533, unit: "г" },
-      { name: "масло сливочное", quantity: 127, unit: "г" },
-      { name: "подсолнечное масло", quantity: 47, unit: "г" },
-      { name: "соль", quantity: 19, unit: "г" },
-      { name: "яйца", quantity: 2, unit: "шт" },
+      { name: { ru: "куриная грудка", en: "chicken breast" }, quantity: 2000, unit: { ru: "г", en: "g" } },
+      { name: { ru: "лук", en: "onion" }, quantity: 533, unit: { ru: "г", en: "g" } },
+      { name: { ru: "масло сливочное", en: "butter" }, quantity: 127, unit: { ru: "г", en: "g" } },
+      { name: { ru: "подсолнечное масло", en: "sunflower oil" }, quantity: 47, unit: { ru: "г", en: "g" } },
+      { name: { ru: "соль", en: "salt" }, quantity: 19, unit: { ru: "г", en: "g" } },
+      { name: { ru: "яйца", en: "eggs" }, quantity: 2, unit: { ru: "шт", en: "pcs" } },
     ],
   },
 };
 
 const categories = [
-  { key: "hot", label: "Горячее", icon: "🔥" },
-  { key: "pancakes", label: "Блины", icon: "🥞" },
-  { key: "dumplings", label: "Пельмени/Вареники", icon: "🥟" },
-  { key: "salads", label: "Салаты", icon: "🥗" },
-  { key: "desserts", label: "Десерты", icon: "🍰" },
+  { key: "hot", label: { ru: "Горячее", en: "Hot dishes" }, icon: "🔥" },
+  { key: "pancakes", label: { ru: "Блины", en: "Pancakes" }, icon: "🥞" },
+  { key: "dumplings", label: { ru: "Пельмени/Вареники", en: "Dumplings" }, icon: "🥟" },
+  { key: "salads", label: { ru: "Салаты", en: "Salads" }, icon: "🥗" },
+  { key: "desserts", label: { ru: "Десерты", en: "Desserts" }, icon: "🍰" },
 ];
 
 const scaleLabels = {
-  1: "Полный объем",
-  0.75: "25% меньше",
-  0.5: "50% меньше",
-  0.25: "75% меньше",
+  1: { ru: "Полный объем", en: "Full batch" },
+  0.75: { ru: "25% меньше", en: "25% less" },
+  0.5: { ru: "50% меньше", en: "50% less" },
+  0.25: { ru: "75% меньше", en: "75% less" },
+};
+
+const i18n = {
+  ru: {
+    title: "План на завтра",
+    reset: "Сбросить",
+    whatCook: "Что готовим",
+    ingredients: "Ингредиенты",
+    productCheck: "Проверка продуктов",
+    selectedEmpty: "Выберите блюда выше",
+    emptyCategory: "В этой вкладке пока нет блюд",
+    productsEmpty: "Продукты появятся после выбора блюд",
+    needed: "Нужно",
+    inStock: "Есть",
+    buy: "Купить",
+    buyNone: "Купить: не нужно",
+    save: "Сохранить план",
+    saving: "Сохраняю...",
+    checkProducts: "Проверить продукты",
+    fillStock: "Заполните остатки по всем продуктам перед сохранением.",
+    tooLarge: "План слишком большой для отправки в Telegram. Сохраните меньше блюд за один раз.",
+    sendError: "Не получилось отправить план в Telegram. Попробуйте открыть Mini App из бота еще раз.",
+    savedBrowser: "План сохранен в браузере",
+    dishOne: "блюдо",
+    dishFew: "блюда",
+    dishMany: "блюд",
+    itemOne: "позиция",
+    itemFew: "позиции",
+    itemMany: "позиций",
+    portions: "порций",
+    approx: "примерно",
+  },
+  en: {
+    title: "Plan for tomorrow",
+    reset: "Reset",
+    whatCook: "What to cook",
+    ingredients: "Ingredients",
+    productCheck: "Product check",
+    selectedEmpty: "Select dishes above",
+    emptyCategory: "No dishes in this tab yet",
+    productsEmpty: "Products will appear after selecting dishes",
+    needed: "Needed",
+    inStock: "In stock",
+    buy: "Buy",
+    buyNone: "Buy: not needed",
+    save: "Save plan",
+    saving: "Saving...",
+    checkProducts: "Check products",
+    fillStock: "Fill in stock amounts for all products before saving.",
+    tooLarge: "The plan is too large to send to Telegram. Save fewer dishes at once.",
+    sendError: "Could not send the plan to Telegram. Open the Mini App from the bot and try again.",
+    savedBrowser: "Plan saved in browser",
+    dishOne: "dish",
+    dishFew: "dishes",
+    dishMany: "dishes",
+    itemOne: "item",
+    itemFew: "items",
+    itemMany: "items",
+    portions: "portions",
+    approx: "about",
+  },
 };
 
 const tg = window.Telegram?.WebApp;
+const lang = new URLSearchParams(window.location.search).get("lang") === "en" ? "en" : "ru";
 const state = {
   selected: {},
   plans: {},
@@ -108,11 +170,26 @@ init();
 function init() {
   tg?.ready();
   tg?.expand();
+  applyLanguage();
   renderCategoryTabs();
   renderDishes();
   renderAll();
   saveButton.addEventListener("click", savePlan);
   resetButton.addEventListener("click", resetPlan);
+}
+
+function applyLanguage() {
+  document.documentElement.lang = lang;
+  document.querySelector("h1").textContent = tt("title");
+  resetButton.textContent = tt("reset");
+  const headings = document.querySelectorAll(".section h2");
+  headings[0].textContent = tt("whatCook");
+  headings[1].textContent = tt("ingredients");
+  headings[2].textContent = tt("productCheck");
+  saveButton.textContent = tt("save");
+  document.querySelectorAll(".scale-select option").forEach((option) => {
+    option.textContent = localize(scaleLabels[option.value]);
+  });
 }
 
 function renderCategoryTabs() {
@@ -122,7 +199,7 @@ function renderCategoryTabs() {
     const button = document.createElement("button");
     button.className = `category-tab${state.activeCategory === category.key ? " is-active" : ""}`;
     button.type = "button";
-    button.innerHTML = `<span>${category.icon}</span><span>${escapeHtml(category.label)}</span><small>${count}</small>`;
+    button.innerHTML = `<span>${category.icon}</span><span>${escapeHtml(localize(category.label))}</span><small>${count}</small>`;
     button.addEventListener("click", () => {
       state.activeCategory = category.key;
       renderCategoryTabs();
@@ -138,7 +215,7 @@ function renderDishes() {
   const visibleRecipes = Object.entries(recipes).filter(([, recipe]) => recipe.category === state.activeCategory);
 
   if (!visibleRecipes.length) {
-    dishList.innerHTML = '<div class="empty-state">В этой вкладке пока нет блюд</div>';
+    dishList.innerHTML = `<div class="empty-state">${escapeHtml(tt("emptyCategory"))}</div>`;
     return;
   }
 
@@ -152,7 +229,7 @@ function renderDishes() {
 
     row.dataset.key = key;
     icon.textContent = recipe.icon;
-    name.textContent = recipe.name;
+    name.textContent = localize(recipe.name);
     checkbox.checked = Boolean(state.selected[key]);
     scale.value = String(state.selected[key]?.scale ?? 1);
     scale.disabled = !checkbox.checked;
@@ -186,7 +263,7 @@ function renderAll() {
   renderRecipes();
   renderProductCheck();
   const count = Object.keys(state.selected).length;
-  selectedCount.textContent = plural(count, "блюдо", "блюда", "блюд");
+  selectedCount.textContent = plural(count, tt("dishOne"), tt("dishFew"), tt("dishMany"));
 }
 
 function renderRecipes() {
@@ -194,7 +271,7 @@ function renderRecipes() {
   const entries = Object.entries(state.plans);
 
   if (!entries.length) {
-    recipeList.innerHTML = '<div class="empty-state">Выберите блюда выше</div>';
+    recipeList.innerHTML = `<div class="empty-state">${escapeHtml(tt("selectedEmpty"))}</div>`;
     return;
   }
 
@@ -231,10 +308,10 @@ function renderProductCheck() {
   const uncheckedCount = items.filter((item) => !hasStockValue(item)).length;
   const buyCount = buildShoppingList().length;
   shoppingList.innerHTML = "";
-  shoppingCount.textContent = `${plural(items.length, "позиция", "позиции", "позиций")} / купить ${buyCount}`;
+  shoppingCount.textContent = `${plural(items.length, tt("itemOne"), tt("itemFew"), tt("itemMany"))} / ${tt("buy").toLowerCase()} ${buyCount}`;
 
   if (!items.length) {
-    shoppingList.innerHTML = '<div class="empty-state">Продукты появятся после выбора блюд</div>';
+    shoppingList.innerHTML = `<div class="empty-state">${escapeHtml(tt("productsEmpty"))}</div>`;
     return;
   }
 
@@ -248,10 +325,10 @@ function renderProductCheck() {
     row.innerHTML = `
       <div class="stock-main">
         <span class="shopping-name">${escapeHtml(item.name)}</span>
-        <span class="shopping-meta">Нужно: ${escapeHtml(formatAmount(item))}</span>
+        <span class="shopping-meta">${tt("needed")}: ${escapeHtml(formatAmount(item))}</span>
       </div>
       <label class="stock-input-wrap">
-        <span>Есть</span>
+        <span>${tt("inStock")}</span>
         <input class="stock-input" inputmode="decimal" value="${escapeHtml(stockValue)}" placeholder="0">
         <span>${escapeHtml(item.unit)}</span>
       </label>
@@ -272,15 +349,15 @@ function renderProductCheck() {
 
 function scaleRecipe(recipe, scale) {
   return {
-    name: recipe.name,
+    name: localize(recipe.name),
     scale,
-    scaleLabel: scaleLabels[scale],
+    scaleLabel: localize(scaleLabels[scale]),
     portionsLabel: formatPortions(recipe.portions * scale),
     ingredients: recipe.ingredients.map((ingredient) => ({
-      name: ingredient.name,
+      name: localize(ingredient.name),
       quantity: ingredient.quantity === "" ? "" : formatQuantity(parseAmount(ingredient.quantity) * scale),
-      unit: ingredient.unit,
-      note: ingredient.note || "",
+      unit: localize(ingredient.unit),
+      note: ingredient.note ? localize(ingredient.note) : "",
     })),
   };
 }
@@ -332,7 +409,7 @@ function buildShoppingList() {
 function savePlan() {
   const unchecked = buildProductNeedList().filter((item) => !hasStockValue(item));
   if (unchecked.length) {
-    alert("Заполните остатки по всем продуктам перед сохранением.");
+    alert(tt("fillStock"));
     return;
   }
 
@@ -366,20 +443,20 @@ function savePlan() {
   if (tg) {
     const telegramPayload = JSON.stringify(compactPayload);
     if (telegramPayload.length > 3900) {
-      alert("План слишком большой для отправки в Telegram. Сохраните меньше блюд за один раз.");
+      alert(tt("tooLarge"));
       return;
     }
 
     try {
-      saveButton.textContent = "Сохраняю...";
+      saveButton.textContent = tt("saving");
       tg.sendData(telegramPayload);
       tg.close();
     } catch (error) {
-      saveButton.textContent = "Сохранить план";
-      alert("Не получилось отправить план в Telegram. Попробуйте открыть Mini App из бота еще раз.");
+      saveButton.textContent = tt("save");
+      alert(tt("sendError"));
     }
   } else {
-    alert("План сохранен в браузере");
+    alert(tt("savedBrowser"));
   }
 }
 
@@ -397,7 +474,7 @@ function resetPlan() {
   state.stockByProduct = {};
   state.activeCategory = "hot";
   saveButton.disabled = false;
-  saveButton.textContent = "Сохранить план";
+  saveButton.textContent = tt("save");
   localStorage.removeItem("samovarKitchenPlan");
   renderCategoryTabs();
   renderDishes();
@@ -427,23 +504,23 @@ function updateSaveState() {
   const items = buildProductNeedList();
   const uncheckedCount = items.filter((item) => !hasStockValue(item)).length;
   const buyCount = buildShoppingList().length;
-  shoppingCount.textContent = `${plural(items.length, "позиция", "позиции", "позиций")} / купить ${buyCount}`;
+  shoppingCount.textContent = `${plural(items.length, tt("itemOne"), tt("itemFew"), tt("itemMany"))} / ${tt("buy").toLowerCase()} ${buyCount}`;
   saveButton.disabled = uncheckedCount > 0;
-  saveButton.textContent = uncheckedCount > 0 ? `Проверить продукты: ${uncheckedCount}` : "Сохранить план";
+  saveButton.textContent = uncheckedCount > 0 ? `${tt("checkProducts")}: ${uncheckedCount}` : tt("save");
 }
 
 function formatToBuy(item, quantity) {
   if (!Number.isFinite(Number(quantity)) || Number(quantity) <= 0) {
-    return "Купить: не нужно";
+    return tt("buyNone");
   }
-  return `Купить: ${formatQuantity(Number(quantity))}${item.unit ? ` ${item.unit}` : ""}`;
+  return `${tt("buy")}: ${formatQuantity(Number(quantity))}${item.unit ? ` ${item.unit}` : ""}`;
 }
 
 function formatPortions(value) {
   if (Number.isInteger(value)) {
-    return `${value} порций`;
+    return `${value} ${tt("portions")}`;
   }
-  return `примерно ${Math.floor(value)}-${Math.ceil(value)} порций`;
+  return `${tt("approx")} ${Math.floor(value)}-${Math.ceil(value)} ${tt("portions")}`;
 }
 
 function formatQuantity(value) {
@@ -491,7 +568,7 @@ function productKey(item) {
 }
 
 function formatDisplayDate(date) {
-  return new Intl.DateTimeFormat("ru-RU", {
+  return new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "ru-RU", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -500,6 +577,17 @@ function formatDisplayDate(date) {
 
 function formatPurchaseDate(date) {
   return formatDisplayDate(date);
+}
+
+function tt(key) {
+  return i18n[lang][key] || i18n.ru[key];
+}
+
+function localize(value) {
+  if (value && typeof value === "object") {
+    return value[lang] || value.ru || value.en || "";
+  }
+  return value || "";
 }
 
 function asSimpleFraction(value) {
