@@ -336,23 +336,59 @@ function savePlan() {
     return;
   }
 
-  const payload = {
-    recipes: Object.values(state.plans),
+  const fullPayload = {
+    recipes: buildPlanSummary(),
     productCheck: buildProductCheckList(),
     shoppingList: buildShoppingList(),
     createdDate: formatDisplayDate(new Date()),
     purchaseDate: formatPurchaseDate(new Date()),
     savedAt: new Date().toISOString(),
   };
+  const compactPayload = {
+    v: 2,
+    cd: fullPayload.createdDate,
+    pd: fullPayload.purchaseDate,
+    at: fullPayload.savedAt,
+    r: fullPayload.recipes.map((recipe) => ({
+      n: recipe.name,
+      sl: recipe.scaleLabel,
+      pl: recipe.portionsLabel,
+    })),
+    s: fullPayload.shoppingList.map((item) => ({
+      n: item.name,
+      q: formatQuantity(Number(item.quantity)),
+      u: item.unit,
+    })),
+  };
 
-  localStorage.setItem("samovarKitchenPlan", JSON.stringify(payload));
+  localStorage.setItem("samovarKitchenPlan", JSON.stringify(fullPayload));
 
   if (tg) {
-    tg.sendData(JSON.stringify(payload));
-    tg.close();
+    const telegramPayload = JSON.stringify(compactPayload);
+    if (telegramPayload.length > 3900) {
+      alert("План слишком большой для отправки в Telegram. Сохраните меньше блюд за один раз.");
+      return;
+    }
+
+    try {
+      saveButton.textContent = "Сохраняю...";
+      tg.sendData(telegramPayload);
+      tg.close();
+    } catch (error) {
+      saveButton.textContent = "Сохранить план";
+      alert("Не получилось отправить план в Telegram. Попробуйте открыть Mini App из бота еще раз.");
+    }
   } else {
     alert("План сохранен в браузере");
   }
+}
+
+function buildPlanSummary() {
+  return Object.values(state.plans).map((plan) => ({
+    name: plan.name,
+    scaleLabel: plan.scaleLabel,
+    portionsLabel: plan.portionsLabel,
+  }));
 }
 
 function resetPlan() {

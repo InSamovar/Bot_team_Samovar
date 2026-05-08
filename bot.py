@@ -312,12 +312,12 @@ def serializable_shopping_list(plan: UserPlan) -> dict[str, Any]:
 
 
 def save_webapp_payload(payload: dict[str, Any]) -> None:
-    recipes = payload.get("recipes", [])
-    shopping_list = payload.get("shoppingList", [])
+    recipes = normalize_webapp_recipes(payload)
+    shopping_list = normalize_webapp_shopping_list(payload)
     product_check = payload.get("productCheck", [])
-    created_date = payload.get("createdDate") or today_label()
-    purchase_date = payload.get("purchaseDate") or created_date
-    saved_at = payload.get("savedAt") or datetime.now(ZoneInfo(DEFAULT_TIMEZONE)).isoformat()
+    created_date = payload.get("createdDate") or payload.get("cd") or today_label()
+    purchase_date = payload.get("purchaseDate") or payload.get("pd") or created_date
+    saved_at = payload.get("savedAt") or payload.get("at") or datetime.now(ZoneInfo(DEFAULT_TIMEZONE)).isoformat()
     history_entry = {
         "id": saved_at,
         "createdDate": created_date,
@@ -346,6 +346,35 @@ def save_webapp_payload(payload: dict[str, Any]) -> None:
         },
     )
     append_history(history_entry)
+
+
+def normalize_webapp_recipes(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    if payload.get("recipes"):
+        return payload["recipes"]
+
+    return [
+        {
+            "name": item.get("n", ""),
+            "scaleLabel": item.get("sl", ""),
+            "portionsLabel": item.get("pl", ""),
+        }
+        for item in payload.get("r", [])
+    ]
+
+
+def normalize_webapp_shopping_list(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    if payload.get("shoppingList"):
+        return payload["shoppingList"]
+
+    return [
+        {
+            "name": item.get("n", ""),
+            "quantity": item.get("q", ""),
+            "unit": item.get("u", ""),
+            "note": item.get("note", ""),
+        }
+        for item in payload.get("s", [])
+    ]
 
 
 def today_label() -> str:
