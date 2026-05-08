@@ -19,6 +19,7 @@
 
       <section class="section">
         <h2>Что готовим</h2>
+        <div class="category-tabs" id="categoryTabs"></div>
         <div class="dish-list" id="dishList"></div>
       </section>
 
@@ -46,6 +47,7 @@
     <template id="dishTemplate">
       <label class="dish-row">
         <input class="dish-checkbox" type="checkbox">
+        <span class="dish-icon"></span>
         <span class="dish-name"></span>
         <select class="scale-select" aria-label="Объем приготовления">
           <option value="1">Полный объем</option>

@@ -1,6 +1,8 @@
 const recipes = {
   chicken_soup: {
     name: "Куриный суп",
+    category: "hot",
+    icon: "🍲",
     portions: 16,
     ingredients: [
       { name: "куриные ножки", quantity: 5, unit: "шт" },
@@ -12,6 +14,8 @@ const recipes = {
   },
   casserole: {
     name: "Запеканка",
+    category: "hot",
+    icon: "🥘",
     portions: 9,
     ingredients: [
       { name: "куриная грудка", quantity: 5, unit: "шт" },
@@ -21,7 +25,59 @@ const recipes = {
       { name: "майонез", quantity: "1/3", unit: "банка" },
     ],
   },
+  borscht: {
+    name: "Борщ",
+    category: "hot",
+    icon: "🥣",
+    portions: 14,
+    ingredients: [
+      { name: "куриные ножки", quantity: 7, unit: "шт" },
+      { name: "свекла", quantity: 1000, unit: "г" },
+      { name: "капуста", quantity: 1, unit: "шт" },
+      { name: "морковь", quantity: 1, unit: "шт" },
+      { name: "картошка", quantity: 1300, unit: "г" },
+      { name: "лук", quantity: 1, unit: "шт" },
+      { name: "чеснок", quantity: 10, unit: "шт" },
+      { name: "томатная паста", quantity: 2, unit: "ст. ложки" },
+      { name: "уксус", quantity: 3, unit: "ст. ложки" },
+      { name: "соль", quantity: 5.5, unit: "ст. ложки" },
+    ],
+  },
+  mashed_potatoes: {
+    name: "Картофельное пюре",
+    category: "hot",
+    icon: "🥔",
+    portions: 5,
+    ingredients: [
+      { name: "картошка", quantity: 1000, unit: "г" },
+      { name: "молоко", quantity: 150, unit: "г" },
+      { name: "масло сливочное", quantity: 40, unit: "г" },
+      { name: "соль", quantity: 6, unit: "г" },
+    ],
+  },
+  chicken_cutlets: {
+    name: "Куриные котлеты",
+    category: "hot",
+    icon: "🍗",
+    portions: 18,
+    ingredients: [
+      { name: "куриная грудка", quantity: 2000, unit: "г" },
+      { name: "лук", quantity: 533, unit: "г" },
+      { name: "масло сливочное", quantity: 127, unit: "г" },
+      { name: "подсолнечное масло", quantity: 47, unit: "г" },
+      { name: "соль", quantity: 19, unit: "г" },
+      { name: "яйца", quantity: 2, unit: "шт" },
+    ],
+  },
 };
+
+const categories = [
+  { key: "hot", label: "Горячее", icon: "🔥" },
+  { key: "pancakes", label: "Блины", icon: "🥞" },
+  { key: "dumplings", label: "Пельмени/Вареники", icon: "🥟" },
+  { key: "salads", label: "Салаты", icon: "🥗" },
+  { key: "desserts", label: "Десерты", icon: "🍰" },
+];
 
 const scaleLabels = {
   1: "Полный объем",
@@ -35,8 +91,10 @@ const state = {
   selected: {},
   plans: {},
   stockByProduct: {},
+  activeCategory: "hot",
 };
 
+const categoryTabs = document.querySelector("#categoryTabs");
 const dishList = document.querySelector("#dishList");
 const recipeList = document.querySelector("#recipeList");
 const shoppingList = document.querySelector("#shoppingList");
@@ -50,24 +108,50 @@ init();
 function init() {
   tg?.ready();
   tg?.expand();
+  renderCategoryTabs();
   renderDishes();
   renderAll();
   saveButton.addEventListener("click", savePlan);
   resetButton.addEventListener("click", resetPlan);
 }
 
+function renderCategoryTabs() {
+  categoryTabs.innerHTML = "";
+  categories.forEach((category) => {
+    const count = Object.values(recipes).filter((recipe) => recipe.category === category.key).length;
+    const button = document.createElement("button");
+    button.className = `category-tab${state.activeCategory === category.key ? " is-active" : ""}`;
+    button.type = "button";
+    button.innerHTML = `<span>${category.icon}</span><span>${escapeHtml(category.label)}</span><small>${count}</small>`;
+    button.addEventListener("click", () => {
+      state.activeCategory = category.key;
+      renderCategoryTabs();
+      renderDishes();
+    });
+    categoryTabs.appendChild(button);
+  });
+}
+
 function renderDishes() {
   dishList.innerHTML = "";
   const template = document.querySelector("#dishTemplate");
+  const visibleRecipes = Object.entries(recipes).filter(([, recipe]) => recipe.category === state.activeCategory);
 
-  Object.entries(recipes).forEach(([key, recipe]) => {
+  if (!visibleRecipes.length) {
+    dishList.innerHTML = '<div class="empty-state">В этой вкладке пока нет блюд</div>';
+    return;
+  }
+
+  visibleRecipes.forEach(([key, recipe]) => {
     const node = template.content.cloneNode(true);
     const row = node.querySelector(".dish-row");
     const checkbox = node.querySelector(".dish-checkbox");
+    const icon = node.querySelector(".dish-icon");
     const name = node.querySelector(".dish-name");
     const scale = node.querySelector(".scale-select");
 
     row.dataset.key = key;
+    icon.textContent = recipe.icon;
     name.textContent = recipe.name;
     checkbox.checked = Boolean(state.selected[key]);
     scale.value = String(state.selected[key]?.scale ?? 1);
@@ -275,9 +359,11 @@ function resetPlan() {
   state.selected = {};
   state.plans = {};
   state.stockByProduct = {};
+  state.activeCategory = "hot";
   saveButton.disabled = false;
   saveButton.textContent = "Сохранить план";
   localStorage.removeItem("samovarKitchenPlan");
+  renderCategoryTabs();
   renderDishes();
   renderAll();
 }
