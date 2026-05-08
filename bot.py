@@ -340,6 +340,7 @@ def save_webapp_payload(payload: dict[str, Any]) -> None:
                     "unit": item.get("unit", ""),
                     "note": item.get("note", ""),
                     "enabled": True,
+                    "purchased": False,
                 }
                 for item in shopping_list
             ]
@@ -386,27 +387,93 @@ def format_saved_morning_plan() -> str:
     if not payload or not payload.get("recipes"):
         return "План на утро пока пустой."
 
-    sections = ["План на утро:"]
     created_date = payload.get("createdDate") or "не указана"
-    sections.append(f"Дата создания: {created_date}")
-    sections.append("")
-    for recipe in payload["recipes"]:
+    sections = [
+        "План на утро",
+        f"Дата создания: {created_date}",
+        "",
+        "```",
+        "N  Блюдо                     Объем",
+        "-- ------------------------- ----------------",
+    ]
+    for index, recipe in enumerate(payload["recipes"], start=1):
         scale_label = recipe.get("scale_label") or recipe.get("scaleLabel", "")
         portions_label = recipe.get("portions_label") or recipe.get("portionsLabel", "")
-        sections.append(f"- {recipe['name']} - {scale_label}, {portions_label}")
+        sections.append(f"{index:<2} {recipe['name'][:25]:<25} {portions_label}")
 
+    sections.append("```")
     return "\n".join(sections)
 
 
-def format_saved_shopping_list() -> str:
+def load_shopping_payload() -> dict[str, Any] | None:
     payload = load_json(SHOPPING_LIST_FILE)
     if not payload or not payload.get("items"):
+        return None
+    return payload
+
+
+def format_saved_shopping_list() -> str:
+    payload = load_shopping_payload()
+    if not payload:
         return "Список покупок пока пустой."
 
-    items = [ShoppingItem(**item) for item in payload["items"]]
     created_date = payload.get("createdDate") or "не указана"
     purchase_date = payload.get("purchaseDate") or "не указана"
-    return f"Дата создания: {created_date}\nДата закупки: {purchase_date}\n\n{format_shopping_list(items)}"
+    items = payload["items"]
+    purchased_count = sum(1 for item in items if item.get("purchased"))
+    sections = [
+        "Список покупок",
+        f"Дата создания: {created_date}",
+        f"Дата закупки: {purchase_date}",
+        f"Куплено: {purchased_count}/{len(items)}",
+        "",
+        "```",
+        "N  Ст  Позиция                 Кол-во",
+        "-- --- ----------------------- ----------",
+    ]
+
+    for index, item in enumerate(items, start=1):
+        status = "OK" if item.get("purchased") else "--"
+        quantity = format_item_quantity(item)
+        sections.append(f"{index:<2} {status:<3} {item.get('name', '')[:23]:<23} {quantity}")
+
+    sections.append("```")
+    sections.append("Нажмите на позицию ниже, чтобы отметить покупку.")
+    return "\n".join(sections)
+
+
+def format_item_quantity(item: dict[str, Any]) -> str:
+    quantity = str(item.get("quantity", "")).strip()
+    unit = str(item.get("unit", "")).strip()
+    return f"{quantity} {unit}".strip()
+
+
+def shopping_tracking_keyboard(payload: dict[str, Any]) -> InlineKeyboardMarkup:
+    buttons = []
+    for index, item in enumerate(payload.get("items", [])):
+        mark = "✓" if item.get("purchased") else "□"
+        quantity = format_item_quantity(item)
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text=f"{mark} {item.get('name', '')} {quantity}".strip(),
+                    callback_data=f"purchase_toggle:{index}",
+                )
+            ]
+        )
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def toggle_purchased(index: int) -> bool:
+    payload = load_shopping_payload()
+    if not payload or index >= len(payload.get("items", [])):
+        return False
+
+    item = payload["items"][index]
+    item["purchased"] = not item.get("purchased", False)
+    save_json(SHOPPING_LIST_FILE, payload)
+    return True
 
 
 def format_history(limit: int = 5) -> str:
@@ -462,7 +529,11 @@ async def main() -> None:
 
     @dp.message(Command("shopping_list"))
     async def handle_shopping_list(message: Message) -> None:
-        await message.answer(format_saved_shopping_list())
+        payload = load_shopping_payload()
+        await message.answer(
+            format_saved_shopping_list(),
+            reply_markup=shopping_tracking_keyboard(payload) if payload else None,
+        )
 
     @dp.message(Command("history"))
     async def handle_history(message: Message) -> None:
@@ -477,10 +548,12 @@ async def main() -> None:
             return
 
         save_webapp_payload(payload)
+        shopping_payload = load_shopping_payload()
         await message.answer(
             "План из Mini App сохранен.\n\n"
             f"{format_saved_morning_plan()}\n\n"
-            f"{format_saved_shopping_list()}"
+            f"{format_saved_shopping_list()}",
+            reply_markup=shopping_tracking_keyboard(shopping_payload) if shopping_payload else None,
         )
 
     @dp.message(F.text == "План на утро")
@@ -489,11 +562,29 @@ async def main() -> None:
 
     @dp.message(F.text == "Список покупок")
     async def handle_shopping_list_button(message: Message) -> None:
-        await message.answer(format_saved_shopping_list())
+        payload = load_shopping_payload()
+        await message.answer(
+            format_saved_shopping_list(),
+            reply_markup=shopping_tracking_keyboard(payload) if payload else None,
+        )
 
     @dp.message(F.text == "История")
     async def handle_history_button(message: Message) -> None:
         await message.answer(format_history())
+
+    @dp.callback_query(F.data.startswith("purchase_toggle:"))
+    async def handle_purchase_toggle(callback: CallbackQuery) -> None:
+        index = int(callback.data.split(":", 1)[1])
+        if not toggle_purchased(index):
+            await callback.answer("Позиция не найдена", show_alert=True)
+            return
+
+        payload = load_shopping_payload()
+        await callback.message.edit_text(
+            format_saved_shopping_list(),
+            reply_markup=shopping_tracking_keyboard(payload) if payload else None,
+        )
+        await callback.answer("Обновлено")
 
     @dp.message(F.text)
     async def handle_text(message: Message) -> None:
