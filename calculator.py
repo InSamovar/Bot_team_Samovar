@@ -172,6 +172,9 @@ def format_quantity(value: Fraction) -> str:
     if value.denominator == 1:
         return str(value.numerator)
 
+    if value.denominator in {2, 3, 4, 5, 6, 8, 10, 12} and value.numerator < value.denominator:
+        return f"{value.numerator}/{value.denominator}"
+
     decimal = float(value)
     if decimal < 10:
         return f"{decimal:.1f}".rstrip("0").rstrip(".")

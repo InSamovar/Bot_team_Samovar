@@ -14,7 +14,7 @@ RECIPES: dict[str, Recipe] = {
             Ingredient("картошка", Fraction(1250), "г"),
             Ingredient("морковь", Fraction(1), "шт"),
             Ingredient("лук", Fraction(1), "головка"),
-            Ingredient("зеленый лук", None, "", "для подачи"),
+            Ingredient("зеленый лук", Fraction(1), "пачка"),
         ),
     ),
     "casserole": Recipe(
@@ -25,7 +25,7 @@ RECIPES: dict[str, Recipe] = {
             Ingredient("картошка", Fraction(2200), "г"),
             Ingredient("грибы", Fraction(1), "бокс"),
             Ingredient("сыр", Fraction(300), "г"),
-            Ingredient("майонез", Fraction(4), "ст. ложки", "примерно 70 г на полный объем"),
+            Ingredient("майонез", Fraction(1, 3), "банка"),
         ),
     ),
 }

@@ -7,7 +7,7 @@ const recipes = {
       { name: "картошка", quantity: 1250, unit: "г" },
       { name: "морковь", quantity: 1, unit: "шт" },
       { name: "лук", quantity: 1, unit: "головка" },
-      { name: "зеленый лук", quantity: "", unit: "", note: "для подачи" },
+      { name: "зеленый лук", quantity: 1, unit: "пачка" },
     ],
   },
   casserole: {
@@ -18,7 +18,7 @@ const recipes = {
       { name: "картошка", quantity: 2200, unit: "г" },
       { name: "грибы", quantity: 1, unit: "бокс" },
       { name: "сыр", quantity: 300, unit: "г" },
-      { name: "майонез", quantity: 4, unit: "ст. ложки", note: "примерно 70 г на полный объем" },
+      { name: "майонез", quantity: "1/3", unit: "банка" },
     ],
   },
 };
@@ -160,6 +160,7 @@ function renderProductCheck() {
     const toBuy = calculateToBuy(item, stockValue);
     const row = document.createElement("div");
     row.className = `stock-row${stockValue === "" ? " is-unchecked" : ""}`;
+    row.dataset.productKey = key;
     row.innerHTML = `
       <div class="stock-main">
         <span class="shopping-name">${escapeHtml(item.name)}</span>
@@ -176,13 +177,13 @@ function renderProductCheck() {
     const input = row.querySelector(".stock-input");
     input.addEventListener("input", () => {
       state.stockByProduct[key] = normalizeInput(input.value);
-      renderProductCheck();
+      updateStockRow(row, item, input.value);
+      updateSaveState();
     });
     shoppingList.appendChild(row);
   });
 
-  saveButton.disabled = uncheckedCount > 0;
-  saveButton.textContent = uncheckedCount > 0 ? `Проверить продукты: ${uncheckedCount}` : "Сохранить план";
+  updateSaveState();
 }
 
 function scaleRecipe(recipe, scale) {
@@ -193,7 +194,7 @@ function scaleRecipe(recipe, scale) {
     portionsLabel: formatPortions(recipe.portions * scale),
     ingredients: recipe.ingredients.map((ingredient) => ({
       name: ingredient.name,
-      quantity: ingredient.quantity === "" ? "" : formatQuantity(Number(ingredient.quantity) * scale),
+      quantity: ingredient.quantity === "" ? "" : formatQuantity(parseAmount(ingredient.quantity) * scale),
       unit: ingredient.unit,
       note: ingredient.note || "",
     })),
@@ -255,6 +256,7 @@ function savePlan() {
     recipes: Object.values(state.plans),
     productCheck: buildProductCheckList(),
     shoppingList: buildShoppingList(),
+    createdDate: formatDisplayDate(new Date()),
     purchaseDate: formatPurchaseDate(new Date()),
     savedAt: new Date().toISOString(),
   };
@@ -293,6 +295,21 @@ function calculateToBuy(item, stockValue) {
   return Math.max(0, needed - inStock);
 }
 
+function updateStockRow(row, item, stockValue) {
+  const toBuy = calculateToBuy(item, stockValue);
+  row.classList.toggle("is-unchecked", stockValue === "");
+  row.querySelector(".buy-result").textContent = formatToBuy(item, toBuy);
+}
+
+function updateSaveState() {
+  const items = buildProductNeedList();
+  const uncheckedCount = items.filter((item) => !hasStockValue(item)).length;
+  const buyCount = buildShoppingList().length;
+  shoppingCount.textContent = `${plural(items.length, "позиция", "позиции", "позиций")} / купить ${buyCount}`;
+  saveButton.disabled = uncheckedCount > 0;
+  saveButton.textContent = uncheckedCount > 0 ? `Проверить продукты: ${uncheckedCount}` : "Сохранить план";
+}
+
 function formatToBuy(item, quantity) {
   if (!Number.isFinite(Number(quantity)) || Number(quantity) <= 0) {
     return "Купить: не нужно";
@@ -314,6 +331,10 @@ function formatQuantity(value) {
   if (Number.isInteger(value)) {
     return String(value);
   }
+  const fraction = asSimpleFraction(value);
+  if (fraction) {
+    return fraction;
+  }
   if (value < 10) {
     return String(Number(value.toFixed(1)));
   }
@@ -321,10 +342,19 @@ function formatQuantity(value) {
 }
 
 function normalizeInput(value) {
-  return value.replace(/[^\d.,]/g, "").replace(",", ".");
+  return value.replace(/[^\d.,/]/g, "").replace(",", ".");
 }
 
 function parseAmount(value) {
+  if (String(value).includes("/")) {
+    const [rawNumerator, rawDenominator] = String(value).split("/");
+    const numerator = Number(rawNumerator);
+    const denominator = Number(rawDenominator);
+    if (Number.isFinite(numerator) && Number.isFinite(denominator) && denominator !== 0) {
+      return numerator / denominator;
+    }
+  }
+
   const parsed = Number(String(value).replace(",", "."));
   return Number.isFinite(parsed) ? parsed : NaN;
 }
@@ -338,12 +368,27 @@ function productKey(item) {
   return `${item.name}|${item.unit}|${item.note}`;
 }
 
-function formatPurchaseDate(date) {
+function formatDisplayDate(date) {
   return new Intl.DateTimeFormat("ru-RU", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   }).format(date);
+}
+
+function formatPurchaseDate(date) {
+  return formatDisplayDate(date);
+}
+
+function asSimpleFraction(value) {
+  const denominators = [2, 3, 4, 5, 6, 8, 10, 12];
+  for (const denominator of denominators) {
+    const numerator = Math.round(value * denominator);
+    if (numerator > 0 && numerator < denominator && Math.abs(value - numerator / denominator) < 0.001) {
+      return `${numerator}/${denominator}`;
+    }
+  }
+  return "";
 }
 
 function plural(count, one, few, many) {
@@ -361,4 +406,3 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-

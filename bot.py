@@ -39,6 +39,7 @@ from recipes import RECIPES, SCALE_OPTIONS
 DATA_DIR = Path("data")
 MORNING_PLAN_FILE = DATA_DIR / "morning_plan.json"
 SHOPPING_LIST_FILE = DATA_DIR / "shopping_list.json"
+HISTORY_FILE = DATA_DIR / "history.json"
 DEFAULT_TIMEZONE = "Asia/Bangkok"
 
 
@@ -79,6 +80,15 @@ def load_json(path: Path) -> Any | None:
         return None
 
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def append_history(entry: dict[str, Any]) -> None:
+    history = load_json(HISTORY_FILE)
+    if not isinstance(history, list):
+        history = []
+
+    history.append(entry)
+    save_json(HISTORY_FILE, history)
 
 
 def recipe_keyboard(selected: list[str]) -> InlineKeyboardMarkup:
@@ -169,6 +179,7 @@ def main_keyboard() -> ReplyKeyboardMarkup | None:
         keyboard=[
             [KeyboardButton(text="Открыть Mini App", web_app=WebAppInfo(url=webapp_url))],
             [KeyboardButton(text="План на утро"), KeyboardButton(text="Список покупок")],
+            [KeyboardButton(text="История")],
         ],
         resize_keyboard=True,
     )
@@ -287,12 +298,14 @@ def ingredient_increment(unit: str) -> Fraction:
 
 def serializable_plan(plan: UserPlan) -> dict[str, Any]:
     return {
+        "createdDate": today_label(),
         "recipes": [asdict(recipe) for recipe in plan.scaled_recipes],
     }
 
 
 def serializable_shopping_list(plan: UserPlan) -> dict[str, Any]:
     return {
+        "createdDate": today_label(),
         "purchaseDate": today_label(),
         "items": [asdict(item) for item in plan.shopping_items if item.enabled],
     }
@@ -302,12 +315,23 @@ def save_webapp_payload(payload: dict[str, Any]) -> None:
     recipes = payload.get("recipes", [])
     shopping_list = payload.get("shoppingList", [])
     product_check = payload.get("productCheck", [])
-    purchase_date = payload.get("purchaseDate") or today_label()
+    created_date = payload.get("createdDate") or today_label()
+    purchase_date = payload.get("purchaseDate") or created_date
+    saved_at = payload.get("savedAt") or datetime.now(ZoneInfo(DEFAULT_TIMEZONE)).isoformat()
+    history_entry = {
+        "id": saved_at,
+        "createdDate": created_date,
+        "purchaseDate": purchase_date,
+        "recipes": recipes,
+        "productCheck": product_check,
+        "shoppingList": shopping_list,
+    }
 
-    save_json(MORNING_PLAN_FILE, {"recipes": recipes, "productCheck": product_check})
+    save_json(MORNING_PLAN_FILE, {"createdDate": created_date, "recipes": recipes, "productCheck": product_check})
     save_json(
         SHOPPING_LIST_FILE,
         {
+            "createdDate": created_date,
             "purchaseDate": purchase_date,
             "items": [
                 {
@@ -321,6 +345,7 @@ def save_webapp_payload(payload: dict[str, Any]) -> None:
             ]
         },
     )
+    append_history(history_entry)
 
 
 def today_label() -> str:
@@ -333,6 +358,9 @@ def format_saved_morning_plan() -> str:
         return "План на утро пока пустой."
 
     sections = ["План на утро:"]
+    created_date = payload.get("createdDate") or "не указана"
+    sections.append(f"Дата создания: {created_date}")
+    sections.append("")
     for recipe in payload["recipes"]:
         scale_label = recipe.get("scale_label") or recipe.get("scaleLabel", "")
         portions_label = recipe.get("portions_label") or recipe.get("portionsLabel", "")
@@ -347,8 +375,27 @@ def format_saved_shopping_list() -> str:
         return "Список покупок пока пустой."
 
     items = [ShoppingItem(**item) for item in payload["items"]]
+    created_date = payload.get("createdDate") or "не указана"
     purchase_date = payload.get("purchaseDate") or "не указана"
-    return f"Дата закупки: {purchase_date}\n\n{format_shopping_list(items)}"
+    return f"Дата создания: {created_date}\nДата закупки: {purchase_date}\n\n{format_shopping_list(items)}"
+
+
+def format_history(limit: int = 5) -> str:
+    history = load_json(HISTORY_FILE)
+    if not isinstance(history, list) or not history:
+        return "История пока пустая."
+
+    sections = ["История планов:"]
+    for index, entry in enumerate(reversed(history[-limit:]), start=1):
+        recipes = entry.get("recipes", [])
+        shopping_list = entry.get("shoppingList", [])
+        recipe_names = ", ".join(recipe.get("name", "") for recipe in recipes) or "без блюд"
+        sections.append("")
+        sections.append(f"{index}. Дата создания: {entry.get('createdDate', 'не указана')}")
+        sections.append(f"   Блюда: {recipe_names}")
+        sections.append(f"   Позиций к покупке: {len(shopping_list)}")
+
+    return "\n".join(sections)
 
 
 async def main() -> None:
@@ -367,7 +414,8 @@ async def main() -> None:
             "Команды:\n"
             "/plan - собрать новый план\n"
             "/morning_plan - план на утро\n"
-            "/shopping_list - список покупок",
+            "/shopping_list - список покупок\n"
+            "/history - история планов",
             reply_markup=main_keyboard(),
         )
 
@@ -386,6 +434,10 @@ async def main() -> None:
     @dp.message(Command("shopping_list"))
     async def handle_shopping_list(message: Message) -> None:
         await message.answer(format_saved_shopping_list())
+
+    @dp.message(Command("history"))
+    async def handle_history(message: Message) -> None:
+        await message.answer(format_history())
 
     @dp.message(F.web_app_data)
     async def handle_webapp_data(message: Message) -> None:
@@ -409,6 +461,10 @@ async def main() -> None:
     @dp.message(F.text == "Список покупок")
     async def handle_shopping_list_button(message: Message) -> None:
         await message.answer(format_saved_shopping_list())
+
+    @dp.message(F.text == "История")
+    async def handle_history_button(message: Message) -> None:
+        await message.answer(format_history())
 
     @dp.message(F.text)
     async def handle_text(message: Message) -> None:
