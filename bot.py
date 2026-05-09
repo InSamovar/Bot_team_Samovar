@@ -91,6 +91,13 @@ BOT_TEXT = {
         "quantity": "Кол-во",
         "tap_to_purchase": "Нажмите на позицию ниже, чтобы отметить покупку.",
         "history_title": "История планов:",
+        "choose_date": "Выберите дату:",
+        "choose_plan_date": "План по дате",
+        "choose_shopping_date": "Покупки по дате",
+        "latest": "Последний",
+        "no_records_for_date": "На эту дату записей нет.",
+        "shopping_for_date": "Список покупок за дату",
+        "plans_for_date": "Планы на дату",
         "dishes": "Блюда",
         "shopping_positions": "Позиций к покупке",
         "not_set": "не указана",
@@ -130,6 +137,13 @@ BOT_TEXT = {
         "quantity": "Qty",
         "tap_to_purchase": "Tap an item below to mark it as purchased.",
         "history_title": "Plan history:",
+        "choose_date": "Choose date:",
+        "choose_plan_date": "Plan by date",
+        "choose_shopping_date": "Shopping by date",
+        "latest": "Latest",
+        "no_records_for_date": "No records for this date.",
+        "shopping_for_date": "Shopping list for date",
+        "plans_for_date": "Plans for date",
         "dishes": "Dishes",
         "shopping_positions": "Items to buy",
         "not_set": "not set",
@@ -585,13 +599,34 @@ def shopping_tracking_keyboard(payload: dict[str, Any]) -> InlineKeyboardMarkup:
         buttons.append(
             [
                 InlineKeyboardButton(
-                    text=f"{mark} {item_number} | {item.get('name', '')} | {quantity}".strip(),
+                    text=f"{item_number}  {mark}  {item.get('name', '')}  {quantity}".strip(),
                     callback_data=f"purchase_toggle:{index}",
                 )
             ]
         )
 
+    buttons.append([InlineKeyboardButton(text="📅", callback_data="history_shopping_dates")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def plan_history_keyboard(lang: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=f"📅 {t(lang, 'choose_plan_date')}", callback_data="history_plan_dates")]
+        ]
+    )
+
+
+def date_picker_keyboard(kind: str, lang: str) -> InlineKeyboardMarkup:
+    rows = []
+    for date in history_dates():
+        rows.append([InlineKeyboardButton(text=date, callback_data=f"history_{kind}:{date}")])
+
+    if not rows:
+        rows.append([InlineKeyboardButton(text=t(lang, "empty_history"), callback_data="noop")])
+
+    rows.append([InlineKeyboardButton(text=t(lang, "latest"), callback_data=f"history_{kind}:latest")])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
 def toggle_purchased(index: int) -> bool:
@@ -605,9 +640,110 @@ def toggle_purchased(index: int) -> bool:
     return True
 
 
-def format_history(lang: str = "ru", limit: int = 5) -> str:
+def load_history() -> list[dict[str, Any]]:
     history = load_json(HISTORY_FILE)
-    if not isinstance(history, list) or not history:
+    return history if isinstance(history, list) else []
+
+
+def history_dates() -> list[str]:
+    dates = {entry.get("createdDate") for entry in load_history() if entry.get("createdDate")}
+    return sorted(dates, key=date_sort_key, reverse=True)
+
+
+def date_sort_key(value: str) -> tuple[int, int, int]:
+    try:
+        day, month, year = value.split(".")
+        return int(year), int(month), int(day)
+    except ValueError:
+        return 0, 0, 0
+
+
+def history_entries_for_date(date: str) -> list[dict[str, Any]]:
+    return [entry for entry in load_history() if entry.get("createdDate") == date]
+
+
+def format_history_plans_for_date(date: str, lang: str = "ru") -> str:
+    entries = history_entries_for_date(date)
+    if not entries:
+        return t(lang, "no_records_for_date")
+
+    sections = [t(lang, "plans_for_date"), f"{t(lang, 'created_date')}: {date}", ""]
+    for entry_index, entry in enumerate(entries, start=1):
+        sections.append(f"{entry_index}. {entry.get('id', '')[:16]}")
+        sections.append("```")
+        sections.append(f"N  {t(lang, 'dish'):<25} {t(lang, 'volume')}")
+        sections.append("-- ------------------------- ----------------")
+        for recipe_index, recipe in enumerate(entry.get("recipes", []), start=1):
+            portions_label = recipe.get("portions_label") or recipe.get("portionsLabel") or recipe.get("pl", "")
+            sections.append(f"{recipe_index:<2} {recipe.get('name', recipe.get('n', ''))[:25]:<25} {portions_label}")
+        sections.append("```")
+
+    return "\n".join(sections)
+
+
+def aggregate_shopping_for_date(date: str) -> list[dict[str, str]]:
+    aggregated: dict[tuple[str, str], float] = {}
+    display_quantities: dict[tuple[str, str], str] = {}
+    for entry in history_entries_for_date(date):
+        for item in entry.get("shoppingList", []):
+            name = item.get("name", item.get("n", ""))
+            unit = item.get("unit", item.get("u", ""))
+            quantity = str(item.get("quantity", item.get("q", ""))).strip()
+            key = (name, unit)
+            parsed = parse_number(quantity)
+            if parsed is None:
+                display_quantities[key] = quantity
+                aggregated.setdefault(key, 0)
+            else:
+                aggregated[key] = aggregated.get(key, 0) + parsed
+
+    items = []
+    for (name, unit), quantity in aggregated.items():
+        if quantity:
+            display_quantity = format_float(quantity)
+        else:
+            display_quantity = display_quantities.get((name, unit), "")
+        items.append({"name": name, "quantity": display_quantity, "unit": unit})
+    return items
+
+
+def parse_number(value: str) -> float | None:
+    try:
+        return float(value.replace(",", "."))
+    except ValueError:
+        return None
+
+
+def format_float(value: float) -> str:
+    if value.is_integer():
+        return str(int(value))
+    return f"{value:.2f}".rstrip("0").rstrip(".")
+
+
+def format_history_shopping_for_date(date: str, lang: str = "ru") -> str:
+    entries = history_entries_for_date(date)
+    if not entries:
+        return t(lang, "no_records_for_date")
+
+    items = aggregate_shopping_for_date(date)
+    sections = [
+        t(lang, "shopping_for_date"),
+        f"{t(lang, 'created_date')}: {date}",
+        "",
+        "```",
+        f"N  {t(lang, 'position'):<23} {t(lang, 'quantity')}",
+        "-- ----------------------- ----------",
+    ]
+    for index, item in enumerate(items, start=1):
+        quantity = f"{item['quantity']} {item['unit']}".strip()
+        sections.append(f"{index:<2} {item['name'][:23]:<23} {quantity}")
+    sections.append("```")
+    return "\n".join(sections)
+
+
+def format_history(lang: str = "ru", limit: int = 5) -> str:
+    history = load_history()
+    if not history:
         return t(lang, "empty_history")
 
     sections = [t(lang, "history_title")]
@@ -651,7 +787,8 @@ async def main() -> None:
 
     @dp.message(Command("morning_plan"))
     async def handle_morning_plan(message: Message) -> None:
-        await message.answer(format_saved_morning_plan(get_user_lang(message.from_user.id)))
+        lang = get_user_lang(message.from_user.id)
+        await message.answer(format_saved_morning_plan(lang), reply_markup=plan_history_keyboard(lang))
 
     @dp.message(Command("shopping_list"))
     async def handle_shopping_list(message: Message) -> None:
@@ -664,7 +801,8 @@ async def main() -> None:
 
     @dp.message(Command("history"))
     async def handle_history(message: Message) -> None:
-        await message.answer(format_history(get_user_lang(message.from_user.id)))
+        lang = get_user_lang(message.from_user.id)
+        await message.answer(format_history(lang), reply_markup=date_picker_keyboard("plan", lang))
 
     @dp.message(Command("language"))
     async def handle_language(message: Message) -> None:
@@ -691,11 +829,11 @@ async def main() -> None:
 
     @dp.message(F.text == "План на утро")
     async def handle_morning_plan_button(message: Message) -> None:
-        await message.answer(format_saved_morning_plan("ru"))
+        await message.answer(format_saved_morning_plan("ru"), reply_markup=plan_history_keyboard("ru"))
 
     @dp.message(F.text == "Morning plan")
     async def handle_morning_plan_button_en(message: Message) -> None:
-        await message.answer(format_saved_morning_plan("en"))
+        await message.answer(format_saved_morning_plan("en"), reply_markup=plan_history_keyboard("en"))
 
     @dp.message(F.text == "Список покупок")
     async def handle_shopping_list_button(message: Message) -> None:
@@ -715,11 +853,11 @@ async def main() -> None:
 
     @dp.message(F.text == "История")
     async def handle_history_button(message: Message) -> None:
-        await message.answer(format_history("ru"))
+        await message.answer(format_history("ru"), reply_markup=date_picker_keyboard("plan", "ru"))
 
     @dp.message(F.text == "History")
     async def handle_history_button_en(message: Message) -> None:
-        await message.answer(format_history("en"))
+        await message.answer(format_history("en"), reply_markup=date_picker_keyboard("plan", "en"))
 
     @dp.message(F.text.in_({"Язык", "Language"}))
     async def handle_language_button(message: Message) -> None:
@@ -740,6 +878,48 @@ async def main() -> None:
             reply_markup=shopping_tracking_keyboard(payload) if payload else None,
         )
         await callback.answer(t(lang, "updated"))
+
+    @dp.callback_query(F.data == "history_plan_dates")
+    async def handle_history_plan_dates(callback: CallbackQuery) -> None:
+        lang = get_user_lang(callback.from_user.id)
+        await callback.message.edit_text(t(lang, "choose_date"), reply_markup=date_picker_keyboard("plan", lang))
+        await callback.answer()
+
+    @dp.callback_query(F.data == "history_shopping_dates")
+    async def handle_history_shopping_dates(callback: CallbackQuery) -> None:
+        lang = get_user_lang(callback.from_user.id)
+        await callback.message.edit_text(t(lang, "choose_date"), reply_markup=date_picker_keyboard("shopping", lang))
+        await callback.answer()
+
+    @dp.callback_query(F.data.startswith("history_plan:"))
+    async def handle_history_plan_date(callback: CallbackQuery) -> None:
+        lang = get_user_lang(callback.from_user.id)
+        date = callback.data.split(":", 1)[1]
+        if date == "latest":
+            await callback.message.edit_text(format_saved_morning_plan(lang), reply_markup=plan_history_keyboard(lang))
+        else:
+            await callback.message.edit_text(
+                format_history_plans_for_date(date, lang),
+                reply_markup=date_picker_keyboard("plan", lang),
+            )
+        await callback.answer()
+
+    @dp.callback_query(F.data.startswith("history_shopping:"))
+    async def handle_history_shopping_date(callback: CallbackQuery) -> None:
+        lang = get_user_lang(callback.from_user.id)
+        date = callback.data.split(":", 1)[1]
+        if date == "latest":
+            payload = load_shopping_payload()
+            await callback.message.edit_text(
+                format_saved_shopping_list(lang),
+                reply_markup=shopping_tracking_keyboard(payload) if payload else None,
+            )
+        else:
+            await callback.message.edit_text(
+                format_history_shopping_for_date(date, lang),
+                reply_markup=date_picker_keyboard("shopping", lang),
+            )
+        await callback.answer()
 
     @dp.callback_query(F.data.startswith("language:"))
     async def handle_language_select(callback: CallbackQuery) -> None:
