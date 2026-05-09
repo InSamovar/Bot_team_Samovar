@@ -5,6 +5,7 @@ import json
 import os
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
+import calendar
 from fractions import Fraction
 from pathlib import Path
 from typing import Any
@@ -92,12 +93,29 @@ BOT_TEXT = {
         "tap_to_purchase": "Нажмите на позицию ниже, чтобы отметить покупку.",
         "history_title": "История планов:",
         "choose_date": "Выберите дату:",
+        "choose_history_section": "Что открыть в истории?",
         "choose_plan_date": "План по дате",
         "choose_shopping_date": "Покупки по дате",
         "latest": "Последний",
         "no_records_for_date": "На эту дату записей нет.",
         "shopping_for_date": "Список покупок за дату",
         "plans_for_date": "Планы на дату",
+        "back": "Назад",
+        "month_names": [
+            "Январь",
+            "Февраль",
+            "Март",
+            "Апрель",
+            "Май",
+            "Июнь",
+            "Июль",
+            "Август",
+            "Сентябрь",
+            "Октябрь",
+            "Ноябрь",
+            "Декабрь",
+        ],
+        "weekdays": ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
         "dishes": "Блюда",
         "shopping_positions": "Позиций к покупке",
         "not_set": "не указана",
@@ -138,12 +156,29 @@ BOT_TEXT = {
         "tap_to_purchase": "Tap an item below to mark it as purchased.",
         "history_title": "Plan history:",
         "choose_date": "Choose date:",
+        "choose_history_section": "What do you want to open?",
         "choose_plan_date": "Plan by date",
         "choose_shopping_date": "Shopping by date",
         "latest": "Latest",
         "no_records_for_date": "No records for this date.",
         "shopping_for_date": "Shopping list for date",
         "plans_for_date": "Plans for date",
+        "back": "Back",
+        "month_names": [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ],
+        "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         "dishes": "Dishes",
         "shopping_positions": "Items to buy",
         "not_set": "not set",
@@ -207,6 +242,10 @@ def set_user_lang(user_id: int, lang: str) -> None:
 
 
 def t(lang: str, key: str) -> str:
+    return BOT_TEXT.get(lang, BOT_TEXT["ru"]).get(key, BOT_TEXT["ru"][key])
+
+
+def tr(lang: str, key: str) -> Any:
     return BOT_TEXT.get(lang, BOT_TEXT["ru"]).get(key, BOT_TEXT["ru"][key])
 
 
@@ -605,26 +644,60 @@ def shopping_tracking_keyboard(payload: dict[str, Any]) -> InlineKeyboardMarkup:
             ]
         )
 
-    buttons.append([InlineKeyboardButton(text="📅", callback_data="history_shopping_dates")])
+    buttons.append([InlineKeyboardButton(text="📅", callback_data="history_shopping_calendar")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
 def plan_history_keyboard(lang: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=f"📅 {t(lang, 'choose_plan_date')}", callback_data="history_plan_dates")]
+            [InlineKeyboardButton(text=f"📅 {t(lang, 'choose_plan_date')}", callback_data="history_plan_calendar")]
         ]
     )
 
 
-def date_picker_keyboard(kind: str, lang: str) -> InlineKeyboardMarkup:
-    rows = []
-    for date in history_dates():
-        rows.append([InlineKeyboardButton(text=date, callback_data=f"history_{kind}:{date}")])
+def history_section_keyboard(lang: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=f"🛒 {t(lang, 'choose_shopping_date')}", callback_data="history_shopping_calendar")],
+            [InlineKeyboardButton(text=f"🍳 {t(lang, 'choose_plan_date')}", callback_data="history_plan_calendar")],
+        ]
+    )
 
-    if not rows:
-        rows.append([InlineKeyboardButton(text=t(lang, "empty_history"), callback_data="noop")])
 
+def calendar_keyboard(kind: str, lang: str, year: int | None = None, month: int | None = None) -> InlineKeyboardMarkup:
+    dates = history_dates()
+    available = set(dates)
+    if year is None or month is None:
+        year, month = latest_history_year_month()
+
+    month_names = tr(lang, "month_names")
+    weekdays = tr(lang, "weekdays")
+    rows = [[InlineKeyboardButton(text=f"{month_names[month - 1]} {year}", callback_data="noop")]]
+    rows.append([InlineKeyboardButton(text=day, callback_data="noop") for day in weekdays])
+
+    for week in calendar.monthcalendar(year, month):
+        row = []
+        for day in week:
+            if day == 0:
+                row.append(InlineKeyboardButton(text=" ", callback_data="noop"))
+                continue
+
+            date = f"{day:02d}.{month:02d}.{year}"
+            text = f"● {day}" if date in available else str(day)
+            callback = f"history_{kind}:{date}" if date in available else "noop"
+            row.append(InlineKeyboardButton(text=text, callback_data=callback))
+        rows.append(row)
+
+    prev_year, prev_month = shift_month(year, month, -1)
+    next_year, next_month = shift_month(year, month, 1)
+    rows.append(
+        [
+            InlineKeyboardButton(text="‹", callback_data=f"calendar:{kind}:{prev_year}:{prev_month}"),
+            InlineKeyboardButton(text=t(lang, "back"), callback_data="history_sections"),
+            InlineKeyboardButton(text="›", callback_data=f"calendar:{kind}:{next_year}:{next_month}"),
+        ]
+    )
     rows.append([InlineKeyboardButton(text=t(lang, "latest"), callback_data=f"history_{kind}:latest")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
@@ -650,12 +723,41 @@ def history_dates() -> list[str]:
     return sorted(dates, key=date_sort_key, reverse=True)
 
 
+def latest_history_year_month() -> tuple[int, int]:
+    dates = history_dates()
+    if dates:
+        day, month, year = dates[0].split(".")
+        return int(year), int(month)
+
+    now = datetime.now(ZoneInfo(DEFAULT_TIMEZONE))
+    return now.year, now.month
+
+
+def shift_month(year: int, month: int, delta: int) -> tuple[int, int]:
+    month += delta
+    while month < 1:
+        month += 12
+        year -= 1
+    while month > 12:
+        month -= 12
+        year += 1
+    return year, month
+
+
 def date_sort_key(value: str) -> tuple[int, int, int]:
     try:
         day, month, year = value.split(".")
         return int(year), int(month), int(day)
     except ValueError:
         return 0, 0, 0
+
+
+def date_year_month(value: str) -> tuple[int, int]:
+    try:
+        day, month, year = value.split(".")
+        return int(year), int(month)
+    except ValueError:
+        return latest_history_year_month()
 
 
 def history_entries_for_date(date: str) -> list[dict[str, Any]]:
@@ -802,7 +904,7 @@ async def main() -> None:
     @dp.message(Command("history"))
     async def handle_history(message: Message) -> None:
         lang = get_user_lang(message.from_user.id)
-        await message.answer(format_history(lang), reply_markup=date_picker_keyboard("plan", lang))
+        await message.answer(t(lang, "choose_history_section"), reply_markup=history_section_keyboard(lang))
 
     @dp.message(Command("language"))
     async def handle_language(message: Message) -> None:
@@ -853,11 +955,11 @@ async def main() -> None:
 
     @dp.message(F.text == "История")
     async def handle_history_button(message: Message) -> None:
-        await message.answer(format_history("ru"), reply_markup=date_picker_keyboard("plan", "ru"))
+        await message.answer(t("ru", "choose_history_section"), reply_markup=history_section_keyboard("ru"))
 
     @dp.message(F.text == "History")
     async def handle_history_button_en(message: Message) -> None:
-        await message.answer(format_history("en"), reply_markup=date_picker_keyboard("plan", "en"))
+        await message.answer(t("en", "choose_history_section"), reply_markup=history_section_keyboard("en"))
 
     @dp.message(F.text.in_({"Язык", "Language"}))
     async def handle_language_button(message: Message) -> None:
@@ -879,16 +981,32 @@ async def main() -> None:
         )
         await callback.answer(t(lang, "updated"))
 
-    @dp.callback_query(F.data == "history_plan_dates")
-    async def handle_history_plan_dates(callback: CallbackQuery) -> None:
+    @dp.callback_query(F.data == "history_sections")
+    async def handle_history_sections(callback: CallbackQuery) -> None:
         lang = get_user_lang(callback.from_user.id)
-        await callback.message.edit_text(t(lang, "choose_date"), reply_markup=date_picker_keyboard("plan", lang))
+        await callback.message.edit_text(t(lang, "choose_history_section"), reply_markup=history_section_keyboard(lang))
         await callback.answer()
 
-    @dp.callback_query(F.data == "history_shopping_dates")
-    async def handle_history_shopping_dates(callback: CallbackQuery) -> None:
+    @dp.callback_query(F.data == "history_plan_calendar")
+    async def handle_history_plan_calendar(callback: CallbackQuery) -> None:
         lang = get_user_lang(callback.from_user.id)
-        await callback.message.edit_text(t(lang, "choose_date"), reply_markup=date_picker_keyboard("shopping", lang))
+        await callback.message.edit_text(t(lang, "choose_date"), reply_markup=calendar_keyboard("plan", lang))
+        await callback.answer()
+
+    @dp.callback_query(F.data == "history_shopping_calendar")
+    async def handle_history_shopping_calendar(callback: CallbackQuery) -> None:
+        lang = get_user_lang(callback.from_user.id)
+        await callback.message.edit_text(t(lang, "choose_date"), reply_markup=calendar_keyboard("shopping", lang))
+        await callback.answer()
+
+    @dp.callback_query(F.data.startswith("calendar:"))
+    async def handle_calendar_month(callback: CallbackQuery) -> None:
+        lang = get_user_lang(callback.from_user.id)
+        _, kind, raw_year, raw_month = callback.data.split(":", 3)
+        await callback.message.edit_text(
+            t(lang, "choose_date"),
+            reply_markup=calendar_keyboard(kind, lang, int(raw_year), int(raw_month)),
+        )
         await callback.answer()
 
     @dp.callback_query(F.data.startswith("history_plan:"))
@@ -900,7 +1018,7 @@ async def main() -> None:
         else:
             await callback.message.edit_text(
                 format_history_plans_for_date(date, lang),
-                reply_markup=date_picker_keyboard("plan", lang),
+                reply_markup=calendar_keyboard("plan", lang, *date_year_month(date)),
             )
         await callback.answer()
 
@@ -917,7 +1035,7 @@ async def main() -> None:
         else:
             await callback.message.edit_text(
                 format_history_shopping_for_date(date, lang),
-                reply_markup=date_picker_keyboard("shopping", lang),
+                reply_markup=calendar_keyboard("shopping", lang, *date_year_month(date)),
             )
         await callback.answer()
 
