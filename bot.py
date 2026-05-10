@@ -67,11 +67,7 @@ BOT_TEXT = {
         "language": "Язык",
         "start": (
             "Привет. Я помогу собрать план приготовления и список покупок.\n\n"
-            "Команды:\n"
-            "/plan - собрать новый план\n"
-            "/morning_plan - план на утро\n"
-            "/shopping_list - список покупок\n"
-            "/history - история планов"
+            "Выберите нужное действие в меню ниже."
         ),
         "open_app_prompt": "Удобнее собрать план в Mini App:",
         "saved": "План из Mini App сохранен.",
@@ -130,11 +126,7 @@ BOT_TEXT = {
         "language": "Language",
         "start": (
             "Hi. I will help prepare the cooking plan and shopping list.\n\n"
-            "Commands:\n"
-            "/plan - create a new plan\n"
-            "/morning_plan - morning plan\n"
-            "/shopping_list - shopping list\n"
-            "/history - plan history"
+            "Choose an action from the menu below."
         ),
         "open_app_prompt": "It is easier to create the plan in the Mini App:",
         "saved": "Mini App plan saved.",
