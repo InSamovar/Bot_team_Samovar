@@ -64,6 +64,7 @@ BOT_TEXT = {
         "morning_plan": "План на утро",
         "shopping_list": "Список покупок",
         "history": "История",
+        "recipes": "Рецепты",
         "language": "Язык",
         "start": (
             "Привет. Я помогу собрать план приготовления и список покупок.\n\n"
@@ -123,6 +124,7 @@ BOT_TEXT = {
         "morning_plan": "Morning plan",
         "shopping_list": "Shopping list",
         "history": "History",
+        "recipes": "Recipes",
         "language": "Language",
         "start": (
             "Hi. I will help prepare the cooking plan and shopping list.\n\n"
@@ -241,13 +243,13 @@ def tr(lang: str, key: str) -> Any:
     return BOT_TEXT.get(lang, BOT_TEXT["ru"]).get(key, BOT_TEXT["ru"][key])
 
 
-def webapp_url_for_lang(lang: str) -> str | None:
+def webapp_url_for_lang(lang: str, view: str = "plan") -> str | None:
     webapp_url = os.getenv("WEBAPP_URL")
     if not webapp_url:
         return None
 
     separator = "&" if "?" in webapp_url else "?"
-    return f"{webapp_url}{separator}lang={lang}"
+    return f"{webapp_url}{separator}lang={lang}&view={view}"
 
 
 def recipe_keyboard(selected: list[str]) -> InlineKeyboardMarkup:
@@ -342,9 +344,12 @@ def language_keyboard() -> InlineKeyboardMarkup:
 
 def main_keyboard(lang: str) -> ReplyKeyboardMarkup | None:
     webapp_url = webapp_url_for_lang(lang)
+    recipes_url = webapp_url_for_lang(lang, "recipes")
     keyboard = []
     if webapp_url:
         keyboard.append([KeyboardButton(text=t(lang, "open_app"), web_app=WebAppInfo(url=webapp_url))])
+    if recipes_url:
+        keyboard.append([KeyboardButton(text=t(lang, "recipes"), web_app=WebAppInfo(url=recipes_url))])
 
     keyboard.extend(
         [

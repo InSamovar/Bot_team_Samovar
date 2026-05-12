@@ -23,6 +23,14 @@
         <div class="dish-list" id="dishList"></div>
       </section>
 
+      <section class="section recipe-book-section" id="recipeBookSection" hidden>
+        <div class="section-heading">
+          <h2>Рецепты</h2>
+          <span id="recipeBookCount">0 блюд</span>
+        </div>
+        <div class="recipe-list protected-content" id="recipeBookList"></div>
+      </section>
+
       <section class="section">
         <div class="section-heading">
           <h2>Ингредиенты</h2>
@@ -60,6 +68,16 @@
 
     <template id="recipeTemplate">
       <article class="recipe-block">
+        <div class="recipe-title-row">
+          <h3></h3>
+          <span></span>
+        </div>
+        <div class="ingredient-grid"></div>
+      </article>
+    </template>
+
+    <template id="recipeBookTemplate">
+      <article class="recipe-block recipe-book-card">
         <div class="recipe-title-row">
           <h3></h3>
           <span></span>

@@ -370,6 +370,22 @@ h3 {
   padding: 0 8px;
 }
 
+.recipes-mode .protected-content,
+.recipes-mode .recipe-book-card,
+.recipes-mode .ingredient-row {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.recipe-book-section .recipe-block {
+  border-color: var(--line-strong);
+}
+
+.recipe-book-card .ingredient-row {
+  cursor: default;
+}
+
 @media (max-width: 520px) {
   .dish-row {
     align-items: flex-start;

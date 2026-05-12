@@ -59,7 +59,7 @@ const recipes = {
     name: { ru: "Куриные котлеты", en: "Chicken cutlets" },
     category: "hot",
     icon: "🍗",
-    portions: 18,
+    portions: 13,
     ingredients: [
       { name: { ru: "куриная грудка", en: "chicken breast" }, quantity: 2000, unit: { ru: "г", en: "g" } },
       { name: { ru: "лук", en: "onion" }, quantity: 533, unit: { ru: "г", en: "g" } },
@@ -67,6 +67,142 @@ const recipes = {
       { name: { ru: "подсолнечное масло", en: "sunflower oil" }, quantity: 47, unit: { ru: "г", en: "g" } },
       { name: { ru: "соль", en: "salt" }, quantity: 19, unit: { ru: "г", en: "g" } },
       { name: { ru: "яйца", en: "eggs" }, quantity: 2, unit: { ru: "шт", en: "pcs" } },
+    ],
+  },
+  olivier: {
+    name: { ru: "Оливье", en: "Russian salad" },
+    category: "salads",
+    icon: "🥗",
+    portions: 9,
+    shelfLife: { ru: "2,5 дня", en: "2.5 days" },
+    ingredients: [
+      { name: { ru: "картошка", en: "potatoes" }, quantity: 600, unit: { ru: "г", en: "g" } },
+      { name: { ru: "морковь", en: "carrot" }, quantity: 375, unit: { ru: "г", en: "g" } },
+      { name: { ru: "яйца", en: "eggs" }, quantity: 5, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "зеленый горошек", en: "green peas" }, quantity: 300, unit: { ru: "г", en: "g" } },
+      { name: { ru: "майонез", en: "mayonnaise" }, quantity: "", unit: "", note: { ru: "напоминание", en: "reminder" } },
+    ],
+  },
+  crab_salad: {
+    name: { ru: "Крабовый салат", en: "Crab salad" },
+    category: "salads",
+    icon: "🦀",
+    portions: 13,
+    shelfLife: { ru: "2,5 дня", en: "2.5 days" },
+    ingredients: [
+      { name: { ru: "крабовые палочки", en: "crab sticks" }, quantity: 500, unit: { ru: "г", en: "g" } },
+      { name: { ru: "сладкая кукуруза", en: "sweet corn" }, quantity: 510, unit: { ru: "г", en: "g" } },
+      { name: { ru: "огурец", en: "cucumber" }, quantity: 600, unit: { ru: "г", en: "g" } },
+      { name: { ru: "яйца", en: "eggs" }, quantity: 10, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "майонез", en: "mayonnaise" }, quantity: "", unit: "", note: { ru: "напоминание", en: "reminder" } },
+    ],
+  },
+  salad_shuba: {
+    name: { ru: "Шуба", en: "Salad shuba" },
+    category: "salads",
+    icon: "🐟",
+    portions: 8,
+    shelfLife: { ru: "4 дня", en: "4 days" },
+    ingredients: [
+      { name: { ru: "свекла", en: "beetroot" }, quantity: 500, unit: { ru: "г", en: "g" } },
+      { name: { ru: "картошка", en: "potatoes" }, quantity: 500, unit: { ru: "г", en: "g" } },
+      { name: { ru: "морковь", en: "carrot" }, quantity: 300, unit: { ru: "г", en: "g" } },
+      { name: { ru: "яйца", en: "eggs" }, quantity: 3, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "селедка", en: "herring" }, quantity: 200, unit: { ru: "г", en: "g" } },
+      { name: { ru: "майонез", en: "mayonnaise" }, quantity: "", unit: "", note: { ru: "напоминание", en: "reminder" } },
+    ],
+  },
+  pineapple_salad: {
+    name: { ru: "Салат Курица-ананасы", en: "Pineapple salad" },
+    category: "salads",
+    icon: "🍍",
+    portions: 5,
+    shelfLife: { ru: "2,5 дня", en: "2.5 days" },
+    ingredients: [
+      { name: { ru: "ананас", en: "pineapple" }, quantity: 1, unit: { ru: "банка", en: "can" } },
+      { name: { ru: "сыр", en: "cheese" }, quantity: 130, unit: { ru: "г", en: "g" } },
+      { name: { ru: "куриные ножки", en: "chicken legs" }, quantity: 320, unit: { ru: "г", en: "g" } },
+      { name: { ru: "чеснок", en: "garlic" }, quantity: 2, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "перец", en: "pepper" }, quantity: 10, unit: { ru: "оборотов", en: "turns" } },
+      { name: { ru: "соль", en: "salt" }, quantity: "", unit: "", note: { ru: "немного", en: "a little" } },
+      { name: { ru: "майонез", en: "mayonnaise" }, quantity: 1.5, unit: { ru: "ст. ложки", en: "tbsp" } },
+      { name: { ru: "сметана", en: "sour cream" }, quantity: 1.5, unit: { ru: "ст. ложки", en: "tbsp" } },
+    ],
+  },
+  okroshka: {
+    name: { ru: "Окрошка", en: "Okroshka" },
+    category: "salads",
+    icon: "🥒",
+    portions: 8,
+    shelfLife: { ru: "4 дня", en: "4 days" },
+    ingredients: [
+      { name: { ru: "картошка", en: "potatoes" }, quantity: 500, unit: { ru: "г", en: "g" } },
+      { name: { ru: "редиска", en: "radish" }, quantity: 250, unit: { ru: "г", en: "g" } },
+      { name: { ru: "огурец", en: "cucumber" }, quantity: 150, unit: { ru: "г", en: "g" } },
+      { name: { ru: "яйца", en: "eggs" }, quantity: 4, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "майонез", en: "mayonnaise" }, quantity: 2, unit: { ru: "ст. ложки", en: "tbsp" } },
+      { name: { ru: "соль", en: "salt" }, quantity: 4, unit: { ru: "маленькие ложки", en: "small spoons" } },
+      { name: { ru: "уксус", en: "vinegar" }, quantity: 5, unit: { ru: "ст. ложки", en: "tbsp" } },
+    ],
+  },
+  quick_pickled_cucumber: {
+    name: { ru: "Малосольные огурцы", en: "Quick pickled cucumber" },
+    category: "salads",
+    icon: "🥒",
+    portions: 1,
+    shelfLife: { ru: "долго", en: "long" },
+    ingredients: [
+      { name: { ru: "огурцы", en: "cucumbers" }, quantity: 1000, unit: { ru: "г", en: "g" } },
+      { name: { ru: "чеснок", en: "garlic" }, quantity: 6, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "укроп", en: "dill" }, quantity: 30, unit: { ru: "г", en: "g" } },
+      { name: { ru: "соль", en: "salt" }, quantity: 3, unit: { ru: "ст. ложки", en: "tbsp" } },
+      { name: { ru: "сахар", en: "sugar" }, quantity: 3, unit: { ru: "ст. ложки", en: "tbsp" } },
+      { name: { ru: "уксус", en: "vinegar" }, quantity: 4, unit: { ru: "ст. ложки", en: "tbsp" } },
+    ],
+  },
+  salo: {
+    name: { ru: "Сало", en: "Salo" },
+    category: "salads",
+    icon: "🥓",
+    portions: 1,
+    shelfLife: { ru: "долго", en: "long" },
+    ingredients: [
+      { name: { ru: "свинина", en: "pork" }, quantity: 1000, unit: { ru: "г", en: "g" } },
+      { name: { ru: "чеснок", en: "garlic" }, quantity: 125, unit: { ru: "г", en: "g" } },
+      { name: { ru: "морская соль", en: "sea salt" }, quantity: 7, unit: { ru: "ст. ложек", en: "tbsp" } },
+      { name: { ru: "черный перец", en: "black pepper" }, quantity: 200, unit: { ru: "поворотов", en: "turns" } },
+    ],
+  },
+  braised_cabbage: {
+    name: { ru: "Тушеная капуста", en: "Braised cabbage" },
+    category: "hot",
+    icon: "🥬",
+    portions: 4,
+    shelfLife: { ru: "3 дня", en: "3 days" },
+    ingredients: [
+      { name: { ru: "капуста", en: "cabbage" }, quantity: 2, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "сосиски", en: "sausages" }, quantity: 10, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "сахар", en: "sugar" }, quantity: 1, unit: { ru: "ст. ложка", en: "tbsp" } },
+      { name: { ru: "соль", en: "salt" }, quantity: 1.5, unit: { ru: "ч. ложки", en: "tsp" } },
+      { name: { ru: "перец", en: "pepper" }, quantity: 15, unit: { ru: "оборотов", en: "turns" } },
+      { name: { ru: "подсолнечное масло", en: "sunflower oil" }, quantity: 15, unit: { ru: "ст. ложек", en: "tbsp" } },
+    ],
+  },
+  braised_potato_beef: {
+    name: { ru: "Тушеная картошка с говядиной", en: "Braised potato with beef" },
+    category: "hot",
+    icon: "🥩",
+    portions: 5,
+    shelfLife: { ru: "2 дня", en: "2 days" },
+    ingredients: [
+      { name: { ru: "говядина", en: "beef" }, quantity: 600, unit: { ru: "г", en: "g" } },
+      { name: { ru: "морковь", en: "carrot" }, quantity: 1, unit: { ru: "шт", en: "pc" } },
+      { name: { ru: "белый лук", en: "white onion" }, quantity: 1, unit: { ru: "шт", en: "pc" } },
+      { name: { ru: "чеснок", en: "garlic" }, quantity: 8, unit: { ru: "шт", en: "pcs" } },
+      { name: { ru: "томатная паста", en: "tomato paste" }, quantity: 1, unit: { ru: "ст. ложка", en: "tbsp" } },
+      { name: { ru: "картошка", en: "potatoes" }, quantity: 1500, unit: { ru: "г", en: "g" } },
+      { name: { ru: "соль", en: "salt" }, quantity: 4, unit: { ru: "ч. ложки", en: "tsp" } },
+      { name: { ru: "перец", en: "pepper" }, quantity: 15, unit: { ru: "оборотов", en: "turns" } },
     ],
   },
   ham_cheese_julienne_crepe: {
@@ -163,6 +299,9 @@ const i18n = {
     whatCook: "Что готовим",
     ingredients: "Ингредиенты",
     productCheck: "Проверка продуктов",
+    recipesTitle: "Рецепты",
+    recipeNoIngredients: "Рецепт пока не внесен",
+    shelfLife: "Срок хранения",
     selectedEmpty: "Выберите блюда выше",
     emptyCategory: "В этой вкладке пока нет блюд",
     productsEmpty: "Продукты появятся после выбора блюд",
@@ -192,6 +331,9 @@ const i18n = {
     whatCook: "What to cook",
     ingredients: "Ingredients",
     productCheck: "Product check",
+    recipesTitle: "Recipes",
+    recipeNoIngredients: "Recipe not added yet",
+    shelfLife: "Shelf life",
     selectedEmpty: "Select dishes above",
     emptyCategory: "No dishes in this tab yet",
     productsEmpty: "Products will appear after selecting dishes",
@@ -218,7 +360,9 @@ const i18n = {
 };
 
 const tg = window.Telegram?.WebApp;
-const lang = new URLSearchParams(window.location.search).get("lang") === "en" ? "en" : "ru";
+const params = new URLSearchParams(window.location.search);
+const lang = params.get("lang") === "en" ? "en" : "ru";
+const view = params.get("view") === "recipes" ? "recipes" : "plan";
 const state = {
   selected: {},
   plans: {},
@@ -234,6 +378,9 @@ const selectedCount = document.querySelector("#selectedCount");
 const shoppingCount = document.querySelector("#shoppingCount");
 const saveButton = document.querySelector("#saveButton");
 const resetButton = document.querySelector("#resetButton");
+const recipeBookSection = document.querySelector("#recipeBookSection");
+const recipeBookList = document.querySelector("#recipeBookList");
+const recipeBookCount = document.querySelector("#recipeBookCount");
 
 init();
 
@@ -241,6 +388,9 @@ function init() {
   tg?.ready();
   tg?.expand();
   applyLanguage();
+  if (view === "recipes") {
+    enableProtectedRecipeMode();
+  }
   renderCategoryTabs();
   renderDishes();
   renderAll();
@@ -251,11 +401,17 @@ function init() {
 function applyLanguage() {
   document.documentElement.lang = lang;
   document.querySelector("h1").textContent = tt("title");
+  if (view === "recipes") {
+    document.querySelector("h1").textContent = tt("recipesTitle");
+  }
   resetButton.textContent = tt("reset");
   const headings = document.querySelectorAll(".section h2");
   headings[0].textContent = tt("whatCook");
   headings[1].textContent = tt("ingredients");
   headings[2].textContent = tt("productCheck");
+  if (recipeBookSection) {
+    recipeBookSection.querySelector("h2").textContent = tt("recipesTitle");
+  }
   saveButton.textContent = tt("save");
   document.querySelectorAll(".scale-select option").forEach((option) => {
     option.textContent = localize(scaleLabels[option.value]);
@@ -322,6 +478,12 @@ function renderDishes() {
 
     dishList.appendChild(node);
   });
+
+  if (view === "recipes") {
+    dishList.querySelectorAll(".dish-checkbox, .scale-select").forEach((element) => {
+      element.hidden = true;
+    });
+  }
 }
 
 function selectRecipe(key, scale) {
@@ -330,10 +492,52 @@ function selectRecipe(key, scale) {
 }
 
 function renderAll() {
+  if (view === "recipes") {
+    renderRecipeBook();
+    return;
+  }
   renderRecipes();
   renderProductCheck();
   const count = Object.keys(state.selected).length;
   selectedCount.textContent = plural(count, tt("dishOne"), tt("dishFew"), tt("dishMany"));
+}
+
+function renderRecipeBook() {
+  document.querySelectorAll(".section")[1].hidden = true;
+  document.querySelectorAll(".section")[2].hidden = true;
+  document.querySelector(".footer-actions").hidden = true;
+  recipeBookSection.hidden = false;
+  recipeBookList.innerHTML = "";
+  const currentRecipes = Object.values(recipes).filter((recipe) => recipe.category === state.activeCategory);
+  recipeBookCount.textContent = plural(currentRecipes.length, tt("dishOne"), tt("dishFew"), tt("dishMany"));
+
+  const template = document.querySelector("#recipeBookTemplate");
+  currentRecipes.forEach((recipe) => {
+    const node = template.content.cloneNode(true);
+    node.querySelector("h3").textContent = `${recipe.icon} ${localize(recipe.name)}`;
+    const meta = [`${recipe.portions} ${tt("portions")}`];
+    if (recipe.shelfLife) {
+      meta.push(`${tt("shelfLife")}: ${localize(recipe.shelfLife)}`);
+    }
+    node.querySelector(".recipe-title-row span").textContent = meta.join(" · ");
+    const grid = node.querySelector(".ingredient-grid");
+
+    if (!recipe.ingredients.length) {
+      grid.innerHTML = `<div class="empty-state">${escapeHtml(tt("recipeNoIngredients"))}</div>`;
+    } else {
+      recipe.ingredients.forEach((ingredient) => {
+        const row = document.createElement("div");
+        row.className = "ingredient-row";
+        row.innerHTML = `
+          <span class="ingredient-name">${escapeHtml(localize(ingredient.name))}</span>
+          <span class="unit-label">${escapeHtml(formatRecipeIngredient(ingredient))}</span>
+        `;
+        grid.appendChild(row);
+      });
+    }
+
+    recipeBookList.appendChild(node);
+  });
 }
 
 function renderRecipes() {
@@ -633,6 +837,13 @@ function formatAmount(item) {
   return `${amount}${item.unit ? ` ${item.unit}` : ""}${item.note ? ` (${item.note})` : ""}`.trim();
 }
 
+function formatRecipeIngredient(ingredient) {
+  const quantity = ingredient.quantity === "" ? "" : formatQuantity(parseAmount(ingredient.quantity));
+  const unit = localize(ingredient.unit);
+  const note = ingredient.note ? localize(ingredient.note) : "";
+  return `${quantity}${unit ? ` ${unit}` : ""}${note ? ` (${note})` : ""}`.trim();
+}
+
 function productKey(item) {
   return `${item.name}|${item.unit}|${item.note}`;
 }
@@ -658,6 +869,13 @@ function localize(value) {
     return value[lang] || value.ru || value.en || "";
   }
   return value || "";
+}
+
+function enableProtectedRecipeMode() {
+  document.body.classList.add("recipes-mode");
+  ["copy", "cut", "contextmenu", "dragstart", "selectstart"].forEach((eventName) => {
+    document.addEventListener(eventName, (event) => event.preventDefault());
+  });
 }
 
 function asSimpleFraction(value) {

@@ -39,7 +39,12 @@ class CalculatorTest(TestCase):
     def test_new_hot_dishes_have_expected_portions(self) -> None:
         self.assertEqual(RECIPES["borscht"].portions, 14)
         self.assertEqual(RECIPES["mashed_potatoes"].portions, 5)
-        self.assertEqual(RECIPES["chicken_cutlets"].portions, 18)
+        self.assertEqual(RECIPES["chicken_cutlets"].portions, 13)
+
+    def test_salads_have_expected_portions(self) -> None:
+        self.assertEqual(RECIPES["olivier"].portions, 9)
+        self.assertEqual(RECIPES["crab_salad"].portions, 13)
+        self.assertEqual(RECIPES["salad_shuba"].portions, 8)
 
     def test_scales_borscht_to_half_volume(self) -> None:
         recipe = scale_recipe(RECIPES["borscht"], Fraction(1, 2), "50% меньше")
