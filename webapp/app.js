@@ -654,6 +654,11 @@ function renderDishes() {
     scale.value = String(state.selected[key]?.scale ?? 1);
     scale.disabled = !checkbox.checked;
 
+    if (view === "recipes") {
+      row.classList.add("is-clickable");
+      row.addEventListener("click", () => startRecipeEdit(key));
+    }
+
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) {
         selectRecipe(key, Number(scale.value));

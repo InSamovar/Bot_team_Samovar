@@ -339,7 +339,15 @@ h3 {
   cursor: pointer;
 }
 
+.dish-row.is-clickable {
+  cursor: pointer;
+}
+
 .recipe-block.is-clickable:active {
+  border-color: var(--accent);
+}
+
+.dish-row.is-clickable:active {
   border-color: var(--accent);
 }
 
