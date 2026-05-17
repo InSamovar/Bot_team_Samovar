@@ -212,6 +212,67 @@ h3 {
   overflow: hidden;
 }
 
+.recipe-editor {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.recipe-editor label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.recipe-editor select,
+.recipe-editor input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--text);
+  padding: 0 9px;
+}
+
+.recipe-editor-head,
+.recipe-editor-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(74px, 100px) minmax(88px, 110px) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.recipe-editor-head {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.recipe-editor-list {
+  display: grid;
+  gap: 8px;
+}
+
+.recipe-editor-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.recipe-editor .primary-button,
+.recipe-editor .ghost-button {
+  width: auto;
+  min-width: 150px;
+  padding: 0 14px;
+}
+
 .product-card {
   display: flex;
   justify-content: space-between;
@@ -511,6 +572,18 @@ h3 {
 
   .product-form {
     grid-template-columns: 1fr;
+  }
+
+  .recipe-editor-head {
+    display: none;
+  }
+
+  .recipe-editor-row {
+    grid-template-columns: 1fr;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fbfcf9;
   }
 
   .product-form-actions,

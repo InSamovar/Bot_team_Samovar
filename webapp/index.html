@@ -28,6 +28,22 @@
           <h2>Рецепты</h2>
           <span id="recipeBookCount">0 блюд</span>
         </div>
+        <form class="recipe-editor" id="recipeEditor">
+          <label>
+            <span id="recipeDishLabel">Блюдо</span>
+            <select id="recipeDishSelect"></select>
+          </label>
+          <div class="recipe-editor-head">
+            <span id="recipeIngredientLabel">Продукт</span>
+            <span id="recipeQuantityLabel">Кол-во</span>
+            <span id="recipeMeasureLabel">Мера</span>
+          </div>
+          <div class="recipe-editor-list" id="recipeEditorList"></div>
+          <div class="recipe-editor-actions">
+            <button class="ghost-button" id="recipeAddIngredientButton" type="button">Добавить продукт</button>
+            <button class="primary-button" id="recipeSaveButton" type="submit">Сохранить рецепт</button>
+          </div>
+        </form>
         <div class="recipe-list protected-content" id="recipeBookList"></div>
       </section>
 
@@ -110,6 +126,15 @@
         </div>
         <div class="ingredient-grid"></div>
       </article>
+    </template>
+
+    <template id="recipeEditorRowTemplate">
+      <div class="recipe-editor-row">
+        <select class="recipe-product-select"></select>
+        <input class="recipe-quantity-input" inputmode="decimal">
+        <select class="recipe-unit-select"></select>
+        <button class="product-icon-button recipe-remove-button" type="button">Delete</button>
+      </div>
     </template>
 
     <template id="productTemplate">

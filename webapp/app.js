@@ -329,6 +329,7 @@ const unitAliases = {
 };
 
 const productStorageKey = "samovarProducts";
+const recipeStorageKey = "samovarRecipeLinks";
 
 const i18n = {
   ru: {
@@ -349,6 +350,15 @@ const i18n = {
     productEdit: "Изменить",
     productDelete: "Удалить",
     productRequired: "Заполните название на русском, английском и выберите меру.",
+    recipeDishLabel: "Блюдо",
+    recipeIngredientLabel: "Продукт",
+    recipeQuantityLabel: "Кол-во",
+    recipeMeasureLabel: "Мера",
+    recipeAddIngredient: "Добавить продукт",
+    recipeSave: "Сохранить рецепт",
+    recipeDelete: "Удалить",
+    recipeSaved: "Рецепт сохранен",
+    recipeRequired: "Выберите продукт, количество и меру для каждой строки.",
     recipeNoIngredients: "Рецепт пока не внесен",
     shelfLife: "Срок хранения",
     selectedEmpty: "Выберите блюда выше",
@@ -392,6 +402,15 @@ const i18n = {
     productEdit: "Edit",
     productDelete: "Delete",
     productRequired: "Fill in Russian name, English name, and unit.",
+    recipeDishLabel: "Dish",
+    recipeIngredientLabel: "Product",
+    recipeQuantityLabel: "Qty",
+    recipeMeasureLabel: "Unit",
+    recipeAddIngredient: "Add product",
+    recipeSave: "Save recipe",
+    recipeDelete: "Delete",
+    recipeSaved: "Recipe saved",
+    recipeRequired: "Choose product, quantity, and unit for every row.",
     recipeNoIngredients: "Recipe not added yet",
     shelfLife: "Shelf life",
     selectedEmpty: "Select dishes above",
@@ -430,7 +449,9 @@ const state = {
   stockByProduct: {},
   activeCategory: "hot",
   products: loadProducts(),
+  recipeLinks: loadRecipeLinks(),
   editingProductId: null,
+  editingRecipeKey: "chicken_soup",
 };
 
 const categoryTabs = document.querySelector("#categoryTabs");
@@ -453,6 +474,11 @@ const productEnInput = document.querySelector("#productEnInput");
 const productUnitSelect = document.querySelector("#productUnitSelect");
 const productSaveButton = document.querySelector("#productSaveButton");
 const productCancelButton = document.querySelector("#productCancelButton");
+const recipeEditor = document.querySelector("#recipeEditor");
+const recipeDishSelect = document.querySelector("#recipeDishSelect");
+const recipeEditorList = document.querySelector("#recipeEditorList");
+const recipeAddIngredientButton = document.querySelector("#recipeAddIngredientButton");
+const recipeSaveButton = document.querySelector("#recipeSaveButton");
 
 init();
 
@@ -472,6 +498,7 @@ function init() {
   saveButton.addEventListener("click", savePlan);
   resetButton.addEventListener("click", resetPlan);
   initProductForm();
+  initRecipeEditor();
 }
 
 function applyLanguage() {
@@ -501,6 +528,12 @@ function applyLanguage() {
   document.querySelector("#productUnitLabel").textContent = tt("productUnitLabel");
   productSaveButton.textContent = state.editingProductId ? tt("productUpdate") : tt("productAdd");
   productCancelButton.textContent = tt("productCancel");
+  document.querySelector("#recipeDishLabel").textContent = tt("recipeDishLabel");
+  document.querySelector("#recipeIngredientLabel").textContent = tt("recipeIngredientLabel");
+  document.querySelector("#recipeQuantityLabel").textContent = tt("recipeQuantityLabel");
+  document.querySelector("#recipeMeasureLabel").textContent = tt("recipeMeasureLabel");
+  recipeAddIngredientButton.textContent = tt("recipeAddIngredient");
+  recipeSaveButton.textContent = tt("recipeSave");
   saveButton.textContent = tt("save");
   document.querySelectorAll(".scale-select option").forEach((option) => {
     option.textContent = localize(scaleLabels[option.value]);
@@ -577,7 +610,7 @@ function renderDishes() {
 
 function selectRecipe(key, scale) {
   state.selected[key] = { scale };
-  state.plans[key] = scaleRecipe(recipes[key], scale);
+  state.plans[key] = scaleRecipe(getEditableRecipe(key), scale);
 }
 
 function renderAll() {
@@ -602,8 +635,11 @@ function renderRecipeBook() {
   document.querySelectorAll(".section")[4].hidden = true;
   document.querySelector(".footer-actions").hidden = true;
   recipeBookSection.hidden = false;
+  renderRecipeEditor();
   recipeBookList.innerHTML = "";
-  const currentRecipes = Object.values(recipes).filter((recipe) => recipe.category === state.activeCategory);
+  const currentRecipes = Object.entries(recipes)
+    .filter(([, recipe]) => recipe.category === state.activeCategory)
+    .map(([key]) => getEditableRecipe(key));
   recipeBookCount.textContent = plural(currentRecipes.length, tt("dishOne"), tt("dishFew"), tt("dishMany"));
 
   const template = document.querySelector("#recipeBookTemplate");
@@ -679,6 +715,157 @@ function initProductForm() {
     saveProductFromForm();
   });
   productCancelButton.addEventListener("click", resetProductForm);
+}
+
+function initRecipeEditor() {
+  recipeDishSelect.addEventListener("change", () => {
+    state.editingRecipeKey = recipeDishSelect.value;
+    state.activeCategory = recipes[state.editingRecipeKey]?.category || state.activeCategory;
+    renderCategoryTabs();
+    renderDishes();
+    renderRecipeEditorRows(getEditableRecipe(state.editingRecipeKey).ingredients);
+  });
+  recipeAddIngredientButton.addEventListener("click", () => addRecipeEditorRow());
+  recipeEditor.addEventListener("submit", (event) => {
+    event.preventDefault();
+    saveRecipeEditor();
+  });
+}
+
+function renderRecipeEditor() {
+  recipeDishSelect.innerHTML = Object.entries(recipes)
+    .filter(([, recipe]) => recipe.category === state.activeCategory)
+    .map(([key, recipe]) => `<option value="${escapeHtml(key)}">${escapeHtml(localize(recipe.name))}</option>`)
+    .join("");
+
+  const categoryKeys = Object.keys(recipes).filter((key) => recipes[key].category === state.activeCategory);
+  if (!categoryKeys.includes(state.editingRecipeKey)) {
+    state.editingRecipeKey = categoryKeys[0] || Object.keys(recipes)[0];
+  }
+
+  recipeDishSelect.value = state.editingRecipeKey;
+  renderRecipeEditorRows(getEditableRecipe(state.editingRecipeKey).ingredients);
+}
+
+function renderRecipeEditorRows(ingredients) {
+  recipeEditorList.innerHTML = "";
+  if (!ingredients.length) {
+    addRecipeEditorRow();
+    return;
+  }
+  ingredients.forEach((ingredient) => addRecipeEditorRow(ingredient));
+}
+
+function addRecipeEditorRow(ingredient = null) {
+  const template = document.querySelector("#recipeEditorRowTemplate");
+  const node = template.content.cloneNode(true);
+  const productSelect = node.querySelector(".recipe-product-select");
+  const quantityInput = node.querySelector(".recipe-quantity-input");
+  const unitSelect = node.querySelector(".recipe-unit-select");
+  const removeButton = node.querySelector(".recipe-remove-button");
+  const productId = ingredient?.productId || findProductIdByIngredient(ingredient) || state.products[0]?.id || "";
+
+  productSelect.innerHTML = state.products
+    .map((product) => `<option value="${escapeHtml(product.id)}">${escapeHtml(productLabel(product))}</option>`)
+    .join("");
+  unitSelect.innerHTML = productUnitOptions
+    .map((unit) => `<option value="${escapeHtml(unit)}">${escapeHtml(unit)}</option>`)
+    .join("");
+
+  productSelect.value = productId;
+  quantityInput.value = ingredient?.quantity ?? "";
+  unitSelect.value = ingredient?.unit
+    ? normalizeProductUnit(ingredient.unit)
+    : state.products.find((product) => product.id === productId)?.unit || "gr";
+  removeButton.textContent = tt("recipeDelete");
+  productSelect.addEventListener("change", () => {
+    const product = state.products.find((item) => item.id === productSelect.value);
+    if (product) {
+      unitSelect.value = product.unit;
+    }
+  });
+  removeButton.addEventListener("click", () => {
+    removeButton.closest(".recipe-editor-row").remove();
+  });
+  recipeEditorList.appendChild(node);
+}
+
+function saveRecipeEditor() {
+  const rows = Array.from(recipeEditorList.querySelectorAll(".recipe-editor-row"));
+  const ingredients = rows.map((row) => ({
+    productId: row.querySelector(".recipe-product-select").value,
+    quantity: normalizeInput(row.querySelector(".recipe-quantity-input").value),
+    unit: row.querySelector(".recipe-unit-select").value,
+  }));
+
+  if (
+    !ingredients.length ||
+    ingredients.some((ingredient) => !ingredient.productId || !ingredient.quantity || !productUnitOptions.includes(ingredient.unit))
+  ) {
+    alert(tt("recipeRequired"));
+    return;
+  }
+
+  state.recipeLinks[recipeDishSelect.value] = ingredients;
+  saveRecipeLinks();
+  if (state.selected[recipeDishSelect.value]) {
+    selectRecipe(recipeDishSelect.value, state.selected[recipeDishSelect.value].scale);
+  }
+  renderRecipeBook();
+  alert(tt("recipeSaved"));
+}
+
+function loadRecipeLinks() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(recipeStorageKey) || "{}");
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function saveRecipeLinks() {
+  localStorage.setItem(recipeStorageKey, JSON.stringify(state.recipeLinks));
+}
+
+function getEditableRecipe(recipeKey) {
+  const recipe = recipes[recipeKey];
+  const linkedIngredients = state.recipeLinks[recipeKey];
+  if (!Array.isArray(linkedIngredients)) {
+    return recipe;
+  }
+
+  return {
+    ...recipe,
+    ingredients: linkedIngredients.map((ingredient) => {
+      const product = state.products.find((item) => item.id === ingredient.productId);
+      return {
+        productId: ingredient.productId,
+        name: {
+          ru: product?.ru || "",
+          en: product?.en || "",
+        },
+        quantity: ingredient.quantity,
+        unit: {
+          ru: ingredient.unit,
+          en: ingredient.unit,
+        },
+      };
+    }),
+  };
+}
+
+function findProductIdByIngredient(ingredient) {
+  if (!ingredient) {
+    return "";
+  }
+  const ru = localizeLanguage(ingredient.name, "ru").toLocaleLowerCase("ru");
+  const en = localizeLanguage(ingredient.name, "en").toLocaleLowerCase("en");
+  return state.products.find((product) => product.ru.toLocaleLowerCase("ru") === ru || product.en.toLocaleLowerCase("en") === en)?.id || "";
+}
+
+function productLabel(product) {
+  return lang === "en" ? `${product.en} / ${product.ru}` : `${product.ru} / ${product.en}`;
 }
 
 function loadProducts() {
@@ -1158,7 +1345,12 @@ function localizeLanguage(value, targetLang) {
 function enableProtectedRecipeMode() {
   document.body.classList.add("recipes-mode");
   ["copy", "cut", "contextmenu", "dragstart", "selectstart"].forEach((eventName) => {
-    document.addEventListener(eventName, (event) => event.preventDefault());
+    document.addEventListener(eventName, (event) => {
+      if (event.target.closest(".recipe-editor")) {
+        return;
+      }
+      event.preventDefault();
+    });
   });
 }
 
