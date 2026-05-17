@@ -31,6 +31,14 @@
         <div class="recipe-list protected-content" id="recipeBookList"></div>
       </section>
 
+      <section class="section product-catalog-section" id="productCatalogSection" hidden>
+        <div class="section-heading">
+          <h2>Products</h2>
+          <span id="productCatalogCount">0 позиций</span>
+        </div>
+        <div class="product-list" id="productCatalogList"></div>
+      </section>
+
       <section class="section">
         <div class="section-heading">
           <h2>Ингредиенты</h2>
@@ -83,6 +91,16 @@
           <span></span>
         </div>
         <div class="ingredient-grid"></div>
+      </article>
+    </template>
+
+    <template id="productTemplate">
+      <article class="product-card">
+        <div>
+          <h3></h3>
+          <p class="product-meta"></p>
+        </div>
+        <span class="product-unit"></span>
       </article>
     </template>
 

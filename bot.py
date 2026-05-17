@@ -65,6 +65,7 @@ BOT_TEXT = {
         "shopping_list": "Список покупок",
         "history": "История",
         "recipes": "Рецепты",
+        "products": "Products",
         "language": "Язык",
         "start": (
             "Привет. Я помогу собрать план приготовления и список покупок.\n\n"
@@ -125,6 +126,7 @@ BOT_TEXT = {
         "shopping_list": "Shopping list",
         "history": "History",
         "recipes": "Recipes",
+        "products": "Products",
         "language": "Language",
         "start": (
             "Hi. I will help prepare the cooking plan and shopping list.\n\n"
@@ -345,11 +347,14 @@ def language_keyboard() -> InlineKeyboardMarkup:
 def main_keyboard(lang: str) -> ReplyKeyboardMarkup | None:
     webapp_url = webapp_url_for_lang(lang)
     recipes_url = webapp_url_for_lang(lang, "recipes")
+    products_url = webapp_url_for_lang(lang, "products")
     keyboard = []
     if webapp_url:
         keyboard.append([KeyboardButton(text=t(lang, "open_app"), web_app=WebAppInfo(url=webapp_url))])
     if recipes_url:
         keyboard.append([KeyboardButton(text=t(lang, "recipes"), web_app=WebAppInfo(url=recipes_url))])
+    if products_url:
+        keyboard.append([KeyboardButton(text=t(lang, "products"), web_app=WebAppInfo(url=products_url))])
 
     keyboard.extend(
         [

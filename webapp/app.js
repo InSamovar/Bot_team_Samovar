@@ -300,6 +300,10 @@ const i18n = {
     ingredients: "Ингредиенты",
     productCheck: "Проверка продуктов",
     recipesTitle: "Рецепты",
+    productsTitle: "Products",
+    productCatalogEmpty: "Продукты появятся после внесения рецептов",
+    productUnits: "Единицы",
+    productUsedIn: "В рецептах",
     recipeNoIngredients: "Рецепт пока не внесен",
     shelfLife: "Срок хранения",
     selectedEmpty: "Выберите блюда выше",
@@ -332,6 +336,10 @@ const i18n = {
     ingredients: "Ingredients",
     productCheck: "Product check",
     recipesTitle: "Recipes",
+    productsTitle: "Products",
+    productCatalogEmpty: "Products will appear after recipes are added",
+    productUnits: "Units",
+    productUsedIn: "Used in",
     recipeNoIngredients: "Recipe not added yet",
     shelfLife: "Shelf life",
     selectedEmpty: "Select dishes above",
@@ -362,7 +370,8 @@ const i18n = {
 const tg = window.Telegram?.WebApp;
 const params = new URLSearchParams(window.location.search);
 const lang = params.get("lang") === "en" ? "en" : "ru";
-const view = params.get("view") === "recipes" ? "recipes" : "plan";
+const rawView = params.get("view");
+const view = ["recipes", "products"].includes(rawView) ? rawView : "plan";
 const state = {
   selected: {},
   plans: {},
@@ -381,6 +390,9 @@ const resetButton = document.querySelector("#resetButton");
 const recipeBookSection = document.querySelector("#recipeBookSection");
 const recipeBookList = document.querySelector("#recipeBookList");
 const recipeBookCount = document.querySelector("#recipeBookCount");
+const productCatalogSection = document.querySelector("#productCatalogSection");
+const productCatalogList = document.querySelector("#productCatalogList");
+const productCatalogCount = document.querySelector("#productCatalogCount");
 
 init();
 
@@ -390,6 +402,9 @@ function init() {
   applyLanguage();
   if (view === "recipes") {
     enableProtectedRecipeMode();
+  }
+  if (view === "products") {
+    document.body.classList.add("products-mode");
   }
   renderCategoryTabs();
   renderDishes();
@@ -404,13 +419,21 @@ function applyLanguage() {
   if (view === "recipes") {
     document.querySelector("h1").textContent = tt("recipesTitle");
   }
+  if (view === "products") {
+    document.querySelector("h1").textContent = tt("productsTitle");
+  }
   resetButton.textContent = tt("reset");
   const headings = document.querySelectorAll(".section h2");
   headings[0].textContent = tt("whatCook");
-  headings[1].textContent = tt("ingredients");
-  headings[2].textContent = tt("productCheck");
+  headings[1].textContent = tt("recipesTitle");
+  headings[2].textContent = tt("productsTitle");
+  headings[3].textContent = tt("ingredients");
+  headings[4].textContent = tt("productCheck");
   if (recipeBookSection) {
     recipeBookSection.querySelector("h2").textContent = tt("recipesTitle");
+  }
+  if (productCatalogSection) {
+    productCatalogSection.querySelector("h2").textContent = tt("productsTitle");
   }
   saveButton.textContent = tt("save");
   document.querySelectorAll(".scale-select option").forEach((option) => {
@@ -496,6 +519,10 @@ function renderAll() {
     renderRecipeBook();
     return;
   }
+  if (view === "products") {
+    renderProductCatalog();
+    return;
+  }
   renderRecipes();
   renderProductCheck();
   const count = Object.keys(state.selected).length;
@@ -505,6 +532,8 @@ function renderAll() {
 function renderRecipeBook() {
   document.querySelectorAll(".section")[1].hidden = true;
   document.querySelectorAll(".section")[2].hidden = true;
+  document.querySelectorAll(".section")[3].hidden = true;
+  document.querySelectorAll(".section")[4].hidden = true;
   document.querySelector(".footer-actions").hidden = true;
   recipeBookSection.hidden = false;
   recipeBookList.innerHTML = "";
@@ -538,6 +567,70 @@ function renderRecipeBook() {
 
     recipeBookList.appendChild(node);
   });
+}
+
+function renderProductCatalog() {
+  document.querySelectorAll(".section")[0].hidden = true;
+  document.querySelectorAll(".section")[1].hidden = true;
+  document.querySelectorAll(".section")[3].hidden = true;
+  document.querySelectorAll(".section")[4].hidden = true;
+  document.querySelector(".footer-actions").hidden = true;
+  resetButton.hidden = true;
+  productCatalogSection.hidden = false;
+  productCatalogList.innerHTML = "";
+
+  const products = buildProductCatalog();
+  productCatalogCount.textContent = plural(products.length, tt("itemOne"), tt("itemFew"), tt("itemMany"));
+
+  if (!products.length) {
+    productCatalogList.innerHTML = `<div class="empty-state">${escapeHtml(tt("productCatalogEmpty"))}</div>`;
+    return;
+  }
+
+  const template = document.querySelector("#productTemplate");
+  products.forEach((product) => {
+    const node = template.content.cloneNode(true);
+    node.querySelector("h3").textContent = product.name;
+    node.querySelector(".product-meta").textContent = `${tt("productUsedIn")}: ${product.recipeCount}`;
+    node.querySelector(".product-unit").textContent = product.units.length
+      ? `${tt("productUnits")}: ${product.units.join(", ")}`
+      : tt("productUnits");
+    productCatalogList.appendChild(node);
+  });
+}
+
+function buildProductCatalog() {
+  const products = new Map();
+  Object.values(recipes).forEach((recipe) => {
+    recipe.ingredients.forEach((ingredient) => {
+      const name = localize(ingredient.name);
+      if (!name) {
+        return;
+      }
+      const key = name.toLocaleLowerCase(lang === "en" ? "en" : "ru");
+      if (!products.has(key)) {
+        products.set(key, {
+          name,
+          units: new Set(),
+          recipeKeys: new Set(),
+        });
+      }
+      const product = products.get(key);
+      const unit = localize(ingredient.unit);
+      if (unit) {
+        product.units.add(unit);
+      }
+      product.recipeKeys.add(localize(recipe.name));
+    });
+  });
+
+  return Array.from(products.values())
+    .map((product) => ({
+      name: product.name,
+      units: Array.from(product.units).sort((a, b) => a.localeCompare(b, lang)),
+      recipeCount: product.recipeKeys.size,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, lang));
 }
 
 function renderRecipes() {

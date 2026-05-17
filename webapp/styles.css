@@ -146,13 +146,15 @@ h3 {
 
 .dish-list,
 .recipe-list,
-.shopping-list {
+.shopping-list,
+.product-list {
   display: grid;
   gap: 10px;
 }
 
 .dish-row,
 .recipe-block,
+.product-card,
 .shopping-row,
 .stock-row {
   background: var(--surface);
@@ -208,6 +210,32 @@ h3 {
 
 .recipe-block {
   overflow: hidden;
+}
+
+.product-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px;
+}
+
+.product-card h3 {
+  margin-bottom: 4px;
+}
+
+.product-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.product-unit {
+  align-self: center;
+  flex: 0 0 auto;
+  color: var(--accent-strong);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: right;
 }
 
 .recipe-title-row {
@@ -411,9 +439,15 @@ h3 {
   }
 
   .shopping-row,
-  .stock-row {
+  .stock-row,
+  .product-card {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .product-unit {
+    align-self: flex-start;
+    text-align: left;
   }
 
   .stock-input-wrap {
