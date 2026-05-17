@@ -36,6 +36,24 @@
           <h2>Products</h2>
           <span id="productCatalogCount">0 позиций</span>
         </div>
+        <form class="product-form" id="productForm">
+          <label>
+            <span id="productRuLabel">Название RU</span>
+            <input id="productRuInput" autocomplete="off">
+          </label>
+          <label>
+            <span id="productEnLabel">Name EN</span>
+            <input id="productEnInput" autocomplete="off">
+          </label>
+          <label>
+            <span id="productUnitLabel">Unit</span>
+            <select id="productUnitSelect"></select>
+          </label>
+          <div class="product-form-actions">
+            <button class="primary-button" id="productSaveButton" type="submit">Добавить</button>
+            <button class="ghost-button" id="productCancelButton" type="button" hidden>Отмена</button>
+          </div>
+        </form>
         <div class="product-list" id="productCatalogList"></div>
       </section>
 
@@ -96,11 +114,15 @@
 
     <template id="productTemplate">
       <article class="product-card">
-        <div>
+        <div class="product-copy">
           <h3></h3>
-          <p class="product-meta"></p>
+          <p class="product-meta product-meta-en"></p>
         </div>
-        <span class="product-unit"></span>
+        <div class="product-actions">
+          <span class="product-unit"></span>
+          <button class="product-icon-button product-edit-button" type="button">Edit</button>
+          <button class="product-icon-button product-delete-button" type="button">Delete</button>
+        </div>
       </article>
     </template>
 

@@ -292,6 +292,44 @@ const scaleLabels = {
   0.25: { ru: "75% меньше", en: "75% less" },
 };
 
+const productUnitOptions = ["kg", "gr", "TBsp", "tsp", "times", "turn", "pc", "box", "ladle", "litr", "ml"];
+
+const unitAliases = {
+  г: "gr",
+  g: "gr",
+  кг: "kg",
+  kg: "kg",
+  шт: "pc",
+  штука: "pc",
+  штук: "pc",
+  pc: "pc",
+  pcs: "pc",
+  головка: "pc",
+  банка: "pc",
+  can: "pc",
+  jar: "pc",
+  пачка: "pc",
+  pack: "pc",
+  бокс: "box",
+  box: "box",
+  "ст. ложка": "TBsp",
+  "ст. ложки": "TBsp",
+  "ст. ложек": "TBsp",
+  tbsp: "TBsp",
+  "ч. ложки": "tsp",
+  "маленькие ложки": "tsp",
+  tsp: "tsp",
+  оборотов: "turn",
+  поворотов: "turn",
+  turns: "turn",
+  л: "litr",
+  litr: "litr",
+  мл: "ml",
+  ml: "ml",
+};
+
+const productStorageKey = "samovarProducts";
+
 const i18n = {
   ru: {
     title: "План на завтра",
@@ -301,9 +339,16 @@ const i18n = {
     productCheck: "Проверка продуктов",
     recipesTitle: "Рецепты",
     productsTitle: "Products",
-    productCatalogEmpty: "Продукты появятся после внесения рецептов",
-    productUnits: "Единицы",
-    productUsedIn: "В рецептах",
+    productCatalogEmpty: "Добавьте первый продукт выше",
+    productRuLabel: "Название RU",
+    productEnLabel: "Name EN",
+    productUnitLabel: "Мера измерения",
+    productAdd: "Добавить",
+    productUpdate: "Сохранить",
+    productCancel: "Отмена",
+    productEdit: "Изменить",
+    productDelete: "Удалить",
+    productRequired: "Заполните название на русском, английском и выберите меру.",
     recipeNoIngredients: "Рецепт пока не внесен",
     shelfLife: "Срок хранения",
     selectedEmpty: "Выберите блюда выше",
@@ -337,9 +382,16 @@ const i18n = {
     productCheck: "Product check",
     recipesTitle: "Recipes",
     productsTitle: "Products",
-    productCatalogEmpty: "Products will appear after recipes are added",
-    productUnits: "Units",
-    productUsedIn: "Used in",
+    productCatalogEmpty: "Add the first product above",
+    productRuLabel: "Name RU",
+    productEnLabel: "Name EN",
+    productUnitLabel: "Unit",
+    productAdd: "Add",
+    productUpdate: "Save",
+    productCancel: "Cancel",
+    productEdit: "Edit",
+    productDelete: "Delete",
+    productRequired: "Fill in Russian name, English name, and unit.",
     recipeNoIngredients: "Recipe not added yet",
     shelfLife: "Shelf life",
     selectedEmpty: "Select dishes above",
@@ -377,6 +429,8 @@ const state = {
   plans: {},
   stockByProduct: {},
   activeCategory: "hot",
+  products: loadProducts(),
+  editingProductId: null,
 };
 
 const categoryTabs = document.querySelector("#categoryTabs");
@@ -393,6 +447,12 @@ const recipeBookCount = document.querySelector("#recipeBookCount");
 const productCatalogSection = document.querySelector("#productCatalogSection");
 const productCatalogList = document.querySelector("#productCatalogList");
 const productCatalogCount = document.querySelector("#productCatalogCount");
+const productForm = document.querySelector("#productForm");
+const productRuInput = document.querySelector("#productRuInput");
+const productEnInput = document.querySelector("#productEnInput");
+const productUnitSelect = document.querySelector("#productUnitSelect");
+const productSaveButton = document.querySelector("#productSaveButton");
+const productCancelButton = document.querySelector("#productCancelButton");
 
 init();
 
@@ -411,6 +471,7 @@ function init() {
   renderAll();
   saveButton.addEventListener("click", savePlan);
   resetButton.addEventListener("click", resetPlan);
+  initProductForm();
 }
 
 function applyLanguage() {
@@ -435,6 +496,11 @@ function applyLanguage() {
   if (productCatalogSection) {
     productCatalogSection.querySelector("h2").textContent = tt("productsTitle");
   }
+  document.querySelector("#productRuLabel").textContent = tt("productRuLabel");
+  document.querySelector("#productEnLabel").textContent = tt("productEnLabel");
+  document.querySelector("#productUnitLabel").textContent = tt("productUnitLabel");
+  productSaveButton.textContent = state.editingProductId ? tt("productUpdate") : tt("productAdd");
+  productCancelButton.textContent = tt("productCancel");
   saveButton.textContent = tt("save");
   document.querySelectorAll(".scale-select option").forEach((option) => {
     option.textContent = localize(scaleLabels[option.value]);
@@ -579,7 +645,7 @@ function renderProductCatalog() {
   productCatalogSection.hidden = false;
   productCatalogList.innerHTML = "";
 
-  const products = buildProductCatalog();
+  const products = state.products;
   productCatalogCount.textContent = plural(products.length, tt("itemOne"), tt("itemFew"), tt("itemMany"));
 
   if (!products.length) {
@@ -590,47 +656,165 @@ function renderProductCatalog() {
   const template = document.querySelector("#productTemplate");
   products.forEach((product) => {
     const node = template.content.cloneNode(true);
-    node.querySelector("h3").textContent = product.name;
-    node.querySelector(".product-meta").textContent = `${tt("productUsedIn")}: ${product.recipeCount}`;
-    node.querySelector(".product-unit").textContent = product.units.length
-      ? `${tt("productUnits")}: ${product.units.join(", ")}`
-      : tt("productUnits");
+    node.querySelector("h3").textContent = product.ru;
+    node.querySelector(".product-meta-en").textContent = product.en;
+    node.querySelector(".product-unit").textContent = product.unit;
+    const editButton = node.querySelector(".product-edit-button");
+    const deleteButton = node.querySelector(".product-delete-button");
+    editButton.textContent = tt("productEdit");
+    deleteButton.textContent = tt("productDelete");
+    editButton.addEventListener("click", () => startProductEdit(product.id));
+    deleteButton.addEventListener("click", () => deleteProduct(product.id));
     productCatalogList.appendChild(node);
   });
 }
 
-function buildProductCatalog() {
+function initProductForm() {
+  productUnitSelect.innerHTML = productUnitOptions
+    .map((unit) => `<option value="${escapeHtml(unit)}">${escapeHtml(unit)}</option>`)
+    .join("");
+  productUnitSelect.value = "gr";
+  productForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    saveProductFromForm();
+  });
+  productCancelButton.addEventListener("click", resetProductForm);
+}
+
+function loadProducts() {
+  const savedProducts = localStorage.getItem(productStorageKey);
+  if (savedProducts !== null) {
+    try {
+      const parsed = JSON.parse(savedProducts);
+      return Array.isArray(parsed) ? normalizeProducts(parsed) : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  const seededProducts = buildSeedProductsFromRecipes();
+  localStorage.setItem(productStorageKey, JSON.stringify(seededProducts));
+  return seededProducts;
+}
+
+function normalizeProducts(products) {
+  return products
+    .map((product) => ({
+      id: String(product.id || makeProductId(product.ru || "", product.en || "")),
+      ru: String(product.ru || "").trim(),
+      en: String(product.en || "").trim(),
+      unit: productUnitOptions.includes(product.unit) ? product.unit : "pc",
+    }))
+    .filter((product) => product.ru && product.en)
+    .sort(sortProducts);
+}
+
+function buildSeedProductsFromRecipes() {
   const products = new Map();
   Object.values(recipes).forEach((recipe) => {
     recipe.ingredients.forEach((ingredient) => {
-      const name = localize(ingredient.name);
-      if (!name) {
+      const ru = localizeLanguage(ingredient.name, "ru");
+      const en = localizeLanguage(ingredient.name, "en");
+      if (!ru || !en) {
         return;
       }
-      const key = name.toLocaleLowerCase(lang === "en" ? "en" : "ru");
+      const key = ru.toLocaleLowerCase("ru");
       if (!products.has(key)) {
         products.set(key, {
-          name,
-          units: new Set(),
-          recipeKeys: new Set(),
+          id: makeProductId(ru, en),
+          ru,
+          en,
+          unit: normalizeProductUnit(localizeLanguage(ingredient.unit, "ru") || localizeLanguage(ingredient.unit, "en")),
         });
       }
-      const product = products.get(key);
-      const unit = localize(ingredient.unit);
-      if (unit) {
-        product.units.add(unit);
-      }
-      product.recipeKeys.add(localize(recipe.name));
     });
   });
 
-  return Array.from(products.values())
-    .map((product) => ({
-      name: product.name,
-      units: Array.from(product.units).sort((a, b) => a.localeCompare(b, lang)),
-      recipeCount: product.recipeKeys.size,
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name, lang));
+  return Array.from(products.values()).sort(sortProducts);
+}
+
+function saveProductFromForm() {
+  const ru = productRuInput.value.trim();
+  const en = productEnInput.value.trim();
+  const unit = productUnitSelect.value;
+  if (!ru || !en || !productUnitOptions.includes(unit)) {
+    alert(tt("productRequired"));
+    return;
+  }
+
+  if (state.editingProductId) {
+    state.products = state.products.map((product) =>
+      product.id === state.editingProductId ? { ...product, ru, en, unit } : product
+    );
+  } else {
+    state.products = [...state.products, { id: makeProductId(ru, en), ru, en, unit }];
+  }
+
+  state.products = dedupeProducts(state.products).sort(sortProducts);
+  saveProducts();
+  resetProductForm();
+  renderProductCatalog();
+}
+
+function startProductEdit(productId) {
+  const product = state.products.find((item) => item.id === productId);
+  if (!product) {
+    return;
+  }
+  state.editingProductId = product.id;
+  productRuInput.value = product.ru;
+  productEnInput.value = product.en;
+  productUnitSelect.value = product.unit;
+  productSaveButton.textContent = tt("productUpdate");
+  productCancelButton.hidden = false;
+  productRuInput.focus();
+}
+
+function deleteProduct(productId) {
+  state.products = state.products.filter((product) => product.id !== productId);
+  saveProducts();
+  if (state.editingProductId === productId) {
+    resetProductForm();
+  }
+  renderProductCatalog();
+}
+
+function resetProductForm() {
+  state.editingProductId = null;
+  productForm.reset();
+  productUnitSelect.value = "gr";
+  productSaveButton.textContent = tt("productAdd");
+  productCancelButton.hidden = true;
+}
+
+function saveProducts() {
+  localStorage.setItem(productStorageKey, JSON.stringify(state.products));
+}
+
+function dedupeProducts(products) {
+  const byName = new Map();
+  products.forEach((product) => {
+    const key = `${product.ru.toLocaleLowerCase("ru")}|${product.en.toLocaleLowerCase("en")}`;
+    byName.set(key, product);
+  });
+  return Array.from(byName.values());
+}
+
+function sortProducts(a, b) {
+  return a.ru.localeCompare(b.ru, "ru");
+}
+
+function makeProductId(ru, en) {
+  const slug = `${ru}-${en}`
+    .toLocaleLowerCase("en")
+    .replace(/[^a-zа-я0-9]+/gi, "-")
+    .replace(/^-|-$/g, "");
+  return `${slug || "product"}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+}
+
+function normalizeProductUnit(unit) {
+  const normalized = unitAliases[String(unit || "").trim().toLowerCase()];
+  return productUnitOptions.includes(normalized) ? normalized : "pc";
 }
 
 function renderRecipes() {
@@ -960,6 +1144,13 @@ function tt(key) {
 function localize(value) {
   if (value && typeof value === "object") {
     return value[lang] || value.ru || value.en || "";
+  }
+  return value || "";
+}
+
+function localizeLanguage(value, targetLang) {
+  if (value && typeof value === "object") {
+    return value[targetLang] || value.ru || value.en || "";
   }
   return value || "";
 }
