@@ -85,6 +85,30 @@ h3 {
   margin-top: 18px;
 }
 
+.view-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.view-tab {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.view-tab.is-active {
+  border-color: var(--accent);
+  background: #e7f4ec;
+  color: var(--accent-strong);
+  box-shadow: inset 0 0 0 1px rgba(23, 108, 67, 0.16);
+}
+
 .category-tabs {
   display: flex;
   gap: 8px;

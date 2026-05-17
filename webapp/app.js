@@ -334,6 +334,7 @@ const recipeStorageKey = "samovarRecipeLinks";
 const i18n = {
   ru: {
     title: "План на завтра",
+    planTab: "План",
     reset: "Сбросить",
     whatCook: "Что готовим",
     ingredients: "Ингредиенты",
@@ -386,6 +387,7 @@ const i18n = {
   },
   en: {
     title: "Plan for tomorrow",
+    planTab: "Plan",
     reset: "Reset",
     whatCook: "What to cook",
     ingredients: "Ingredients",
@@ -474,6 +476,7 @@ const productEnInput = document.querySelector("#productEnInput");
 const productUnitSelect = document.querySelector("#productUnitSelect");
 const productSaveButton = document.querySelector("#productSaveButton");
 const productCancelButton = document.querySelector("#productCancelButton");
+const viewButtons = document.querySelectorAll("[data-view-target]");
 const recipeEditor = document.querySelector("#recipeEditor");
 const recipeDishSelect = document.querySelector("#recipeDishSelect");
 const recipeEditorList = document.querySelector("#recipeEditorList");
@@ -497,6 +500,7 @@ function init() {
   renderAll();
   saveButton.addEventListener("click", savePlan);
   resetButton.addEventListener("click", resetPlan);
+  initViewTabs();
   initProductForm();
   initRecipeEditor();
 }
@@ -510,6 +514,12 @@ function applyLanguage() {
   if (view === "products") {
     document.querySelector("h1").textContent = tt("productsTitle");
   }
+  document.querySelector("#planViewButton").textContent = tt("planTab");
+  document.querySelector("#recipesViewButton").textContent = tt("recipesTitle");
+  document.querySelector("#productsViewButton").textContent = tt("productsTitle");
+  viewButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.viewTarget === view);
+  });
   resetButton.textContent = tt("reset");
   const headings = document.querySelectorAll(".section h2");
   headings[0].textContent = tt("whatCook");
@@ -537,6 +547,18 @@ function applyLanguage() {
   saveButton.textContent = tt("save");
   document.querySelectorAll(".scale-select option").forEach((option) => {
     option.textContent = localize(scaleLabels[option.value]);
+  });
+}
+
+function initViewTabs() {
+  viewButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextView = button.dataset.viewTarget;
+      const nextUrl = new URL(window.location.href);
+      nextUrl.searchParams.set("lang", lang);
+      nextUrl.searchParams.set("view", nextView);
+      window.location.href = nextUrl.toString();
+    });
   });
 }
 
