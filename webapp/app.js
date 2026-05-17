@@ -359,6 +359,7 @@ const i18n = {
     recipeCategoryLabel: "Категория",
     recipePortionsLabel: "Порции",
     recipeIconLabel: "Иконка",
+    recipeShelfLifeLabel: "Срок хранения",
     recipeIngredientLabel: "Продукт",
     recipeQuantityLabel: "Кол-во",
     recipeMeasureLabel: "Мера",
@@ -420,6 +421,7 @@ const i18n = {
     recipeCategoryLabel: "Category",
     recipePortionsLabel: "Portions",
     recipeIconLabel: "Icon",
+    recipeShelfLifeLabel: "Shelf life",
     recipeIngredientLabel: "Product",
     recipeQuantityLabel: "Qty",
     recipeMeasureLabel: "Unit",
@@ -504,6 +506,7 @@ const recipeNameEnInput = document.querySelector("#recipeNameEnInput");
 const recipeCategorySelect = document.querySelector("#recipeCategorySelect");
 const recipePortionsInput = document.querySelector("#recipePortionsInput");
 const recipeIconInput = document.querySelector("#recipeIconInput");
+const recipeShelfLifeInput = document.querySelector("#recipeShelfLifeInput");
 const recipeEditorList = document.querySelector("#recipeEditorList");
 const recipeNewButton = document.querySelector("#recipeNewButton");
 const recipeAddIngredientButton = document.querySelector("#recipeAddIngredientButton");
@@ -571,6 +574,7 @@ function applyLanguage() {
   document.querySelector("#recipeCategoryLabel").textContent = tt("recipeCategoryLabel");
   document.querySelector("#recipePortionsLabel").textContent = tt("recipePortionsLabel");
   document.querySelector("#recipeIconLabel").textContent = tt("recipeIconLabel");
+  document.querySelector("#recipeShelfLifeLabel").textContent = tt("recipeShelfLifeLabel");
   document.querySelector("#recipeIngredientLabel").textContent = tt("recipeIngredientLabel");
   document.querySelector("#recipeQuantityLabel").textContent = tt("recipeQuantityLabel");
   document.querySelector("#recipeMeasureLabel").textContent = tt("recipeMeasureLabel");
@@ -836,6 +840,7 @@ function fillRecipeEditor(recipe) {
   recipeCategorySelect.value = normalizeCategoryKey(recipe?.category || state.activeCategory);
   recipePortionsInput.value = recipe?.portions || "";
   recipeIconInput.value = recipe?.icon || "🍽";
+  recipeShelfLifeInput.value = recipe ? localizeLanguage(recipe.shelfLife, lang) : "";
   renderRecipeEditorRows(recipe?.ingredients || []);
 }
 
@@ -882,6 +887,7 @@ function saveRecipeEditor() {
   const category = normalizeCategoryKey(recipeCategorySelect.value);
   const portions = Number(recipePortionsInput.value);
   const icon = recipeIconInput.value.trim() || "🍽";
+  const shelfLife = recipeShelfLifeInput.value.trim();
   const rows = Array.from(recipeEditorList.querySelectorAll(".recipe-editor-row"));
   const ingredients = rows.map((row) => ({
     productId: row.querySelector(".recipe-product-select").value,
@@ -907,6 +913,7 @@ function saveRecipeEditor() {
     category,
     icon,
     portions,
+    shelfLife: shelfLife ? { ru: shelfLife, en: shelfLife } : null,
     ingredients,
   };
   state.recipeLinks[recipeKey] = ingredients;

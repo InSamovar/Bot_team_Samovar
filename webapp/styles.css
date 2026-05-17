@@ -279,7 +279,7 @@ h3 {
 
 .recipe-dish-fields {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(120px, 150px) minmax(82px, 100px) minmax(72px, 90px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(120px, 150px) minmax(82px, 100px) minmax(72px, 90px) minmax(120px, 1fr);
   gap: 8px;
 }
 
