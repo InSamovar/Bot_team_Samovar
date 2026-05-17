@@ -43,6 +43,7 @@ SHOPPING_LIST_FILE = DATA_DIR / "shopping_list.json"
 HISTORY_FILE = DATA_DIR / "history.json"
 USER_SETTINGS_FILE = DATA_DIR / "user_settings.json"
 DEFAULT_TIMEZONE = "Asia/Bangkok"
+WEBAPP_VERSION = "20260517-recipes-layout"
 
 
 @dataclass
@@ -251,7 +252,7 @@ def webapp_url_for_lang(lang: str, view: str = "plan") -> str | None:
         return None
 
     separator = "&" if "?" in webapp_url else "?"
-    return f"{webapp_url}{separator}lang={lang}&view={view}"
+    return f"{webapp_url}{separator}lang={lang}&view={view}&v={WEBAPP_VERSION}"
 
 
 def recipe_keyboard(selected: list[str]) -> InlineKeyboardMarkup:
