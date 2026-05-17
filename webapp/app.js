@@ -355,7 +355,6 @@ const i18n = {
     productEdit: "Изменить",
     productDelete: "Удалить",
     productRequired: "Заполните название на русском, английском и выберите меру.",
-    recipeDishLabel: "Блюдо",
     recipeSearchLabel: "Поиск блюда",
     recipeSearchPlaceholder: "Начните вводить название",
     recipeNameRuLabel: "Название RU",
@@ -421,7 +420,6 @@ const i18n = {
     productEdit: "Edit",
     productDelete: "Delete",
     productRequired: "Fill in Russian name, English name, and unit.",
-    recipeDishLabel: "Dish",
     recipeSearchLabel: "Dish search",
     recipeSearchPlaceholder: "Start typing a name",
     recipeNameRuLabel: "Name RU",
@@ -512,7 +510,6 @@ const productCancelButton = document.querySelector("#productCancelButton");
 const viewButtons = document.querySelectorAll("[data-view-target]");
 const recipeEditor = document.querySelector("#recipeEditor");
 const recipeSearchInput = document.querySelector("#recipeSearchInput");
-const recipeDishSelect = document.querySelector("#recipeDishSelect");
 const recipeNameRuInput = document.querySelector("#recipeNameRuInput");
 const recipeNameEnInput = document.querySelector("#recipeNameEnInput");
 const recipeCategorySelect = document.querySelector("#recipeCategorySelect");
@@ -584,7 +581,6 @@ function applyLanguage() {
   productCancelButton.textContent = tt("productCancel");
   document.querySelector("#recipeSearchLabel").textContent = tt("recipeSearchLabel");
   recipeSearchInput.placeholder = tt("recipeSearchPlaceholder");
-  document.querySelector("#recipeDishLabel").textContent = tt("recipeDishLabel");
   document.querySelector("#recipeNameRuLabel").textContent = tt("recipeNameRuLabel");
   document.querySelector("#recipeNameEnLabel").textContent = tt("recipeNameEnLabel");
   document.querySelector("#recipeCategoryLabel").textContent = tt("recipeCategoryLabel");
@@ -811,9 +807,6 @@ function initRecipeEditor() {
     state.recipeSearch = recipeSearchInput.value.trim();
     renderRecipeBook();
   });
-  recipeDishSelect.addEventListener("change", () => {
-    startRecipeEdit(recipeDishSelect.value);
-  });
   recipeNewButton.addEventListener("click", startNewRecipe);
   recipeAddIngredientButton.addEventListener("click", () => addRecipeEditorRow());
   recipeDeleteButton.addEventListener("click", deleteCurrentRecipe);
@@ -825,17 +818,11 @@ function initRecipeEditor() {
 
 function renderRecipeEditor() {
   const allRecipes = getRecipes();
-  recipeDishSelect.innerHTML = Object.entries(allRecipes)
-    .filter(([, recipe]) => normalizeCategoryKey(recipe.category) === state.activeCategory)
-    .map(([key, recipe]) => `<option value="${escapeHtml(key)}">${escapeHtml(localize(recipe.name))}</option>`)
-    .join("");
-
   const categoryKeys = Object.keys(allRecipes).filter((key) => normalizeCategoryKey(allRecipes[key].category) === state.activeCategory);
   if (!state.isNewRecipe && !categoryKeys.includes(state.editingRecipeKey)) {
     state.editingRecipeKey = categoryKeys[0] || Object.keys(allRecipes)[0];
   }
 
-  recipeDishSelect.value = state.editingRecipeKey;
   fillRecipeEditor(state.editingRecipeKey ? getEditableRecipe(state.editingRecipeKey) : null);
 }
 
@@ -855,12 +842,10 @@ function startRecipeEdit(recipeKey) {
 function startNewRecipe() {
   state.isNewRecipe = true;
   state.editingRecipeKey = "";
-  recipeDishSelect.value = "";
   fillRecipeEditor(null);
 }
 
 function fillRecipeEditor(recipe) {
-  recipeDishSelect.disabled = state.isNewRecipe;
   recipeDeleteButton.disabled = state.isNewRecipe;
   recipeNameRuInput.value = recipe ? localizeLanguage(recipe.name, "ru") : "";
   recipeNameEnInput.value = recipe ? localizeLanguage(recipe.name, "en") : "";
@@ -934,7 +919,7 @@ function saveRecipeEditor() {
     return;
   }
 
-  const recipeKey = state.isNewRecipe ? uniqueDishKey(makeDishKey(nameRu, nameEn)) : recipeDishSelect.value;
+  const recipeKey = state.isNewRecipe ? uniqueDishKey(makeDishKey(nameRu, nameEn)) : state.editingRecipeKey;
   state.dishes[recipeKey] = {
     name: { ru: nameRu, en: nameEn },
     category,
@@ -959,7 +944,7 @@ function saveRecipeEditor() {
 }
 
 function deleteCurrentRecipe() {
-  const recipeKey = recipeDishSelect.value;
+  const recipeKey = state.editingRecipeKey;
   if (!recipeKey || state.isNewRecipe) {
     return;
   }
