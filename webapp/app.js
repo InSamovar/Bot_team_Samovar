@@ -347,6 +347,8 @@ const i18n = {
     productRuLabel: "Название RU",
     productEnLabel: "Name EN",
     productUnitLabel: "Мера измерения",
+    productSearchLabel: "Поиск продукта",
+    productSearchPlaceholder: "Начните вводить название",
     productAdd: "Добавить",
     productUpdate: "Сохранить",
     productCancel: "Отмена",
@@ -354,6 +356,8 @@ const i18n = {
     productDelete: "Удалить",
     productRequired: "Заполните название на русском, английском и выберите меру.",
     recipeDishLabel: "Блюдо",
+    recipeSearchLabel: "Поиск блюда",
+    recipeSearchPlaceholder: "Начните вводить название",
     recipeNameRuLabel: "Название RU",
     recipeNameEnLabel: "Name EN",
     recipeCategoryLabel: "Категория",
@@ -409,6 +413,8 @@ const i18n = {
     productRuLabel: "Name RU",
     productEnLabel: "Name EN",
     productUnitLabel: "Unit",
+    productSearchLabel: "Product search",
+    productSearchPlaceholder: "Start typing a name",
     productAdd: "Add",
     productUpdate: "Save",
     productCancel: "Cancel",
@@ -416,6 +422,8 @@ const i18n = {
     productDelete: "Delete",
     productRequired: "Fill in Russian name, English name, and unit.",
     recipeDishLabel: "Dish",
+    recipeSearchLabel: "Dish search",
+    recipeSearchPlaceholder: "Start typing a name",
     recipeNameRuLabel: "Name RU",
     recipeNameEnLabel: "Name EN",
     recipeCategoryLabel: "Category",
@@ -476,6 +484,8 @@ const state = {
   editingProductId: null,
   editingRecipeKey: "chicken_soup",
   isNewRecipe: false,
+  productSearch: "",
+  recipeSearch: "",
 };
 
 const categoryTabs = document.querySelector("#categoryTabs");
@@ -493,6 +503,7 @@ const productCatalogSection = document.querySelector("#productCatalogSection");
 const productCatalogList = document.querySelector("#productCatalogList");
 const productCatalogCount = document.querySelector("#productCatalogCount");
 const productForm = document.querySelector("#productForm");
+const productSearchInput = document.querySelector("#productSearchInput");
 const productRuInput = document.querySelector("#productRuInput");
 const productEnInput = document.querySelector("#productEnInput");
 const productUnitSelect = document.querySelector("#productUnitSelect");
@@ -500,6 +511,7 @@ const productSaveButton = document.querySelector("#productSaveButton");
 const productCancelButton = document.querySelector("#productCancelButton");
 const viewButtons = document.querySelectorAll("[data-view-target]");
 const recipeEditor = document.querySelector("#recipeEditor");
+const recipeSearchInput = document.querySelector("#recipeSearchInput");
 const recipeDishSelect = document.querySelector("#recipeDishSelect");
 const recipeNameRuInput = document.querySelector("#recipeNameRuInput");
 const recipeNameEnInput = document.querySelector("#recipeNameEnInput");
@@ -566,8 +578,12 @@ function applyLanguage() {
   document.querySelector("#productRuLabel").textContent = tt("productRuLabel");
   document.querySelector("#productEnLabel").textContent = tt("productEnLabel");
   document.querySelector("#productUnitLabel").textContent = tt("productUnitLabel");
+  document.querySelector("#productSearchLabel").textContent = tt("productSearchLabel");
+  productSearchInput.placeholder = tt("productSearchPlaceholder");
   productSaveButton.textContent = state.editingProductId ? tt("productUpdate") : tt("productAdd");
   productCancelButton.textContent = tt("productCancel");
+  document.querySelector("#recipeSearchLabel").textContent = tt("recipeSearchLabel");
+  recipeSearchInput.placeholder = tt("recipeSearchPlaceholder");
   document.querySelector("#recipeDishLabel").textContent = tt("recipeDishLabel");
   document.querySelector("#recipeNameRuLabel").textContent = tt("recipeNameRuLabel");
   document.querySelector("#recipeNameEnLabel").textContent = tt("recipeNameEnLabel");
@@ -699,6 +715,7 @@ function renderRecipeBook() {
   recipeBookList.innerHTML = "";
   const currentRecipes = Object.entries(getRecipes())
     .filter(([, recipe]) => normalizeCategoryKey(recipe.category) === state.activeCategory)
+    .filter(([, recipe]) => matchesSearch(localizeLanguage(recipe.name, "ru"), state.recipeSearch) || matchesSearch(localizeLanguage(recipe.name, "en"), state.recipeSearch))
     .map(([key]) => [key, getEditableRecipe(key)]);
   recipeBookCount.textContent = plural(currentRecipes.length, tt("dishOne"), tt("dishFew"), tt("dishMany"));
 
@@ -744,7 +761,9 @@ function renderProductCatalog() {
   productCatalogSection.hidden = false;
   productCatalogList.innerHTML = "";
 
-  const products = state.products;
+  const products = state.products.filter(
+    (product) => matchesSearch(product.ru, state.productSearch) || matchesSearch(product.en, state.productSearch)
+  );
   productCatalogCount.textContent = plural(products.length, tt("itemOne"), tt("itemFew"), tt("itemMany"));
 
   if (!products.length) {
@@ -773,6 +792,10 @@ function initProductForm() {
     .map((unit) => `<option value="${escapeHtml(unit)}">${escapeHtml(unit)}</option>`)
     .join("");
   productUnitSelect.value = "gr";
+  productSearchInput.addEventListener("input", () => {
+    state.productSearch = productSearchInput.value.trim();
+    renderProductCatalog();
+  });
   productForm.addEventListener("submit", (event) => {
     event.preventDefault();
     saveProductFromForm();
@@ -784,6 +807,10 @@ function initRecipeEditor() {
   recipeCategorySelect.innerHTML = categories
     .map((category) => `<option value="${escapeHtml(category.key)}">${escapeHtml(localize(category.label))}</option>`)
     .join("");
+  recipeSearchInput.addEventListener("input", () => {
+    state.recipeSearch = recipeSearchInput.value.trim();
+    renderRecipeBook();
+  });
   recipeDishSelect.addEventListener("change", () => {
     startRecipeEdit(recipeDishSelect.value);
   });
@@ -1068,6 +1095,17 @@ function productLabel(product) {
 function normalizeCategoryKey(categoryKey) {
   const category = categories.find((item) => item.key === categoryKey || item.legacyKeys.includes(categoryKey));
   return category?.key || "soup_hot";
+}
+
+function matchesSearch(value, query) {
+  if (!query) {
+    return true;
+  }
+  return normalizeSearchText(value).includes(normalizeSearchText(query));
+}
+
+function normalizeSearchText(value) {
+  return String(value || "").trim().toLocaleLowerCase(lang === "en" ? "en" : "ru");
 }
 
 function makeDishKey(ru, en) {
