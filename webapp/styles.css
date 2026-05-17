@@ -265,6 +265,18 @@ h3 {
   padding: 0 9px;
 }
 
+.recipe-unit-display {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #f7f9f4;
+  color: var(--accent-strong);
+  padding: 0 9px;
+  font-weight: 850;
+}
+
 .recipe-dish-fields {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(120px, 150px) minmax(82px, 100px) minmax(72px, 90px);

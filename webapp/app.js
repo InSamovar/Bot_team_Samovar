@@ -278,11 +278,12 @@ const recipes = {
 };
 
 const categories = [
-  { key: "hot", label: { ru: "Горячее", en: "Hot dishes" }, icon: "🔥" },
-  { key: "pancakes", label: { ru: "Блины", en: "Pancakes" }, icon: "🥞" },
-  { key: "dumplings", label: { ru: "Пельмени/Вареники", en: "Dumplings" }, icon: "🥟" },
-  { key: "salads", label: { ru: "Салаты", en: "Salads" }, icon: "🥗" },
-  { key: "desserts", label: { ru: "Десерты", en: "Desserts" }, icon: "🍰" },
+  { key: "crepes", legacyKeys: ["pancakes"], label: { ru: "Crepes", en: "Crepes" }, icon: "🥞" },
+  { key: "soup_hot", legacyKeys: ["hot"], label: { ru: "Soup&hot", en: "Soup&hot" }, icon: "🔥" },
+  { key: "salads", legacyKeys: [], label: { ru: "Salads", en: "Salads" }, icon: "🥗" },
+  { key: "pelmeni_vareniki", legacyKeys: ["dumplings"], label: { ru: "Pelmeni&Vareniki", en: "Pelmeni&Vareniki" }, icon: "🥟" },
+  { key: "desserts", legacyKeys: [], label: { ru: "Desserts", en: "Desserts" }, icon: "🍰" },
+  { key: "drinks", legacyKeys: [], label: { ru: "Drinks", en: "Drinks" }, icon: "🥤" },
 ];
 
 const scaleLabels = {
@@ -466,7 +467,7 @@ const state = {
   selected: {},
   plans: {},
   stockByProduct: {},
-  activeCategory: "hot",
+  activeCategory: "soup_hot",
   products: loadProducts(),
   dishes: loadDishes(),
   recipeLinks: loadRecipeLinks(),
@@ -598,7 +599,7 @@ function initViewTabs() {
 function renderCategoryTabs() {
   categoryTabs.innerHTML = "";
   categories.forEach((category) => {
-    const count = Object.values(getRecipes()).filter((recipe) => recipe.category === category.key).length;
+    const count = Object.values(getRecipes()).filter((recipe) => normalizeCategoryKey(recipe.category) === category.key).length;
     const button = document.createElement("button");
     button.className = `category-tab${state.activeCategory === category.key ? " is-active" : ""}`;
     button.type = "button";
@@ -615,7 +616,7 @@ function renderCategoryTabs() {
 function renderDishes() {
   dishList.innerHTML = "";
   const template = document.querySelector("#dishTemplate");
-  const visibleRecipes = Object.entries(getRecipes()).filter(([, recipe]) => recipe.category === state.activeCategory);
+  const visibleRecipes = Object.entries(getRecipes()).filter(([, recipe]) => normalizeCategoryKey(recipe.category) === state.activeCategory);
 
   if (!visibleRecipes.length) {
     dishList.innerHTML = `<div class="empty-state">${escapeHtml(tt("emptyCategory"))}</div>`;
@@ -693,7 +694,7 @@ function renderRecipeBook() {
   renderRecipeEditor();
   recipeBookList.innerHTML = "";
   const currentRecipes = Object.entries(getRecipes())
-    .filter(([, recipe]) => recipe.category === state.activeCategory)
+    .filter(([, recipe]) => normalizeCategoryKey(recipe.category) === state.activeCategory)
     .map(([key]) => [key, getEditableRecipe(key)]);
   recipeBookCount.textContent = plural(currentRecipes.length, tt("dishOne"), tt("dishFew"), tt("dishMany"));
 
@@ -794,11 +795,11 @@ function initRecipeEditor() {
 function renderRecipeEditor() {
   const allRecipes = getRecipes();
   recipeDishSelect.innerHTML = Object.entries(allRecipes)
-    .filter(([, recipe]) => recipe.category === state.activeCategory)
+    .filter(([, recipe]) => normalizeCategoryKey(recipe.category) === state.activeCategory)
     .map(([key, recipe]) => `<option value="${escapeHtml(key)}">${escapeHtml(localize(recipe.name))}</option>`)
     .join("");
 
-  const categoryKeys = Object.keys(allRecipes).filter((key) => allRecipes[key].category === state.activeCategory);
+  const categoryKeys = Object.keys(allRecipes).filter((key) => normalizeCategoryKey(allRecipes[key].category) === state.activeCategory);
   if (!state.isNewRecipe && !categoryKeys.includes(state.editingRecipeKey)) {
     state.editingRecipeKey = categoryKeys[0] || Object.keys(allRecipes)[0];
   }
@@ -814,7 +815,7 @@ function startRecipeEdit(recipeKey) {
   }
   state.isNewRecipe = false;
   state.editingRecipeKey = recipeKey;
-  state.activeCategory = recipe.category;
+  state.activeCategory = normalizeCategoryKey(recipe.category);
   renderCategoryTabs();
   renderDishes();
   renderRecipeEditor();
@@ -832,7 +833,7 @@ function fillRecipeEditor(recipe) {
   recipeDeleteButton.disabled = state.isNewRecipe;
   recipeNameRuInput.value = recipe ? localizeLanguage(recipe.name, "ru") : "";
   recipeNameEnInput.value = recipe ? localizeLanguage(recipe.name, "en") : "";
-  recipeCategorySelect.value = recipe?.category || state.activeCategory;
+  recipeCategorySelect.value = normalizeCategoryKey(recipe?.category || state.activeCategory);
   recipePortionsInput.value = recipe?.portions || "";
   recipeIconInput.value = recipe?.icon || "🍽";
   renderRecipeEditorRows(recipe?.ingredients || []);
@@ -852,29 +853,23 @@ function addRecipeEditorRow(ingredient = null) {
   const node = template.content.cloneNode(true);
   const productSelect = node.querySelector(".recipe-product-select");
   const quantityInput = node.querySelector(".recipe-quantity-input");
-  const unitSelect = node.querySelector(".recipe-unit-select");
+  const unitDisplay = node.querySelector(".recipe-unit-display");
   const removeButton = node.querySelector(".recipe-remove-button");
   const productId = ingredient?.productId || findProductIdByIngredient(ingredient) || state.products[0]?.id || "";
 
   productSelect.innerHTML = state.products
     .map((product) => `<option value="${escapeHtml(product.id)}">${escapeHtml(productLabel(product))}</option>`)
     .join("");
-  unitSelect.innerHTML = productUnitOptions
-    .map((unit) => `<option value="${escapeHtml(unit)}">${escapeHtml(unit)}</option>`)
-    .join("");
-
   productSelect.value = productId;
   quantityInput.value = ingredient?.quantity ?? "";
-  unitSelect.value = ingredient?.unit
-    ? normalizeProductUnit(ingredient.unit)
-    : state.products.find((product) => product.id === productId)?.unit || "gr";
-  removeButton.textContent = tt("recipeDelete");
-  productSelect.addEventListener("change", () => {
+  const updateUnit = () => {
     const product = state.products.find((item) => item.id === productSelect.value);
-    if (product) {
-      unitSelect.value = product.unit;
-    }
-  });
+    unitDisplay.textContent = product?.unit || "gr";
+    unitDisplay.dataset.unit = product?.unit || "gr";
+  };
+  updateUnit();
+  removeButton.textContent = tt("recipeDelete");
+  productSelect.addEventListener("change", updateUnit);
   removeButton.addEventListener("click", () => {
     removeButton.closest(".recipe-editor-row").remove();
   });
@@ -884,14 +879,14 @@ function addRecipeEditorRow(ingredient = null) {
 function saveRecipeEditor() {
   const nameRu = recipeNameRuInput.value.trim();
   const nameEn = recipeNameEnInput.value.trim();
-  const category = recipeCategorySelect.value;
+  const category = normalizeCategoryKey(recipeCategorySelect.value);
   const portions = Number(recipePortionsInput.value);
   const icon = recipeIconInput.value.trim() || "🍽";
   const rows = Array.from(recipeEditorList.querySelectorAll(".recipe-editor-row"));
   const ingredients = rows.map((row) => ({
     productId: row.querySelector(".recipe-product-select").value,
     quantity: normalizeInput(row.querySelector(".recipe-quantity-input").value),
-    unit: row.querySelector(".recipe-unit-select").value,
+    unit: row.querySelector(".recipe-unit-display").dataset.unit,
   }));
 
   if (
@@ -982,7 +977,7 @@ function normalizeDishes(dishes) {
         key,
         {
           name: recipe.name || { ru: "", en: "" },
-          category: recipe.category || "hot",
+          category: normalizeCategoryKey(recipe.category || "soup_hot"),
           icon: recipe.icon || "🍽",
           portions: Number(recipe.portions) || 1,
           shelfLife: recipe.shelfLife || null,
@@ -1061,6 +1056,11 @@ function findProductIdByIngredient(ingredient) {
 
 function productLabel(product) {
   return lang === "en" ? `${product.en} / ${product.ru}` : `${product.ru} / ${product.en}`;
+}
+
+function normalizeCategoryKey(categoryKey) {
+  const category = categories.find((item) => item.key === categoryKey || item.legacyKeys.includes(categoryKey));
+  return category?.key || "soup_hot";
 }
 
 function makeDishKey(ru, en) {
@@ -1422,7 +1422,7 @@ function resetPlan() {
   state.selected = {};
   state.plans = {};
   state.stockByProduct = {};
-  state.activeCategory = "hot";
+  state.activeCategory = "soup_hot";
   saveButton.disabled = false;
   saveButton.textContent = tt("save");
   localStorage.removeItem("samovarKitchenPlan");
