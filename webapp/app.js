@@ -329,6 +329,7 @@ const unitAliases = {
 };
 
 const productStorageKey = "samovarProducts";
+const dishStorageKey = "samovarDishes";
 const recipeStorageKey = "samovarRecipeLinks";
 
 const i18n = {
@@ -352,14 +353,22 @@ const i18n = {
     productDelete: "Удалить",
     productRequired: "Заполните название на русском, английском и выберите меру.",
     recipeDishLabel: "Блюдо",
+    recipeNameRuLabel: "Название RU",
+    recipeNameEnLabel: "Name EN",
+    recipeCategoryLabel: "Категория",
+    recipePortionsLabel: "Порции",
+    recipeIconLabel: "Иконка",
     recipeIngredientLabel: "Продукт",
     recipeQuantityLabel: "Кол-во",
     recipeMeasureLabel: "Мера",
+    recipeNew: "Новое блюдо",
     recipeAddIngredient: "Добавить продукт",
     recipeSave: "Сохранить рецепт",
     recipeDelete: "Удалить",
+    recipeDeleteDish: "Удалить блюдо",
     recipeSaved: "Рецепт сохранен",
-    recipeRequired: "Выберите продукт, количество и меру для каждой строки.",
+    recipeRequired: "Заполните название, порции, продукт, количество и меру.",
+    recipeDeleted: "Блюдо удалено",
     recipeNoIngredients: "Рецепт пока не внесен",
     shelfLife: "Срок хранения",
     selectedEmpty: "Выберите блюда выше",
@@ -405,14 +414,22 @@ const i18n = {
     productDelete: "Delete",
     productRequired: "Fill in Russian name, English name, and unit.",
     recipeDishLabel: "Dish",
+    recipeNameRuLabel: "Name RU",
+    recipeNameEnLabel: "Name EN",
+    recipeCategoryLabel: "Category",
+    recipePortionsLabel: "Portions",
+    recipeIconLabel: "Icon",
     recipeIngredientLabel: "Product",
     recipeQuantityLabel: "Qty",
     recipeMeasureLabel: "Unit",
+    recipeNew: "New dish",
     recipeAddIngredient: "Add product",
     recipeSave: "Save recipe",
     recipeDelete: "Delete",
+    recipeDeleteDish: "Delete dish",
     recipeSaved: "Recipe saved",
-    recipeRequired: "Choose product, quantity, and unit for every row.",
+    recipeRequired: "Fill in name, portions, product, quantity, and unit.",
+    recipeDeleted: "Dish deleted",
     recipeNoIngredients: "Recipe not added yet",
     shelfLife: "Shelf life",
     selectedEmpty: "Select dishes above",
@@ -451,9 +468,11 @@ const state = {
   stockByProduct: {},
   activeCategory: "hot",
   products: loadProducts(),
+  dishes: loadDishes(),
   recipeLinks: loadRecipeLinks(),
   editingProductId: null,
   editingRecipeKey: "chicken_soup",
+  isNewRecipe: false,
 };
 
 const categoryTabs = document.querySelector("#categoryTabs");
@@ -479,9 +498,16 @@ const productCancelButton = document.querySelector("#productCancelButton");
 const viewButtons = document.querySelectorAll("[data-view-target]");
 const recipeEditor = document.querySelector("#recipeEditor");
 const recipeDishSelect = document.querySelector("#recipeDishSelect");
+const recipeNameRuInput = document.querySelector("#recipeNameRuInput");
+const recipeNameEnInput = document.querySelector("#recipeNameEnInput");
+const recipeCategorySelect = document.querySelector("#recipeCategorySelect");
+const recipePortionsInput = document.querySelector("#recipePortionsInput");
+const recipeIconInput = document.querySelector("#recipeIconInput");
 const recipeEditorList = document.querySelector("#recipeEditorList");
+const recipeNewButton = document.querySelector("#recipeNewButton");
 const recipeAddIngredientButton = document.querySelector("#recipeAddIngredientButton");
 const recipeSaveButton = document.querySelector("#recipeSaveButton");
+const recipeDeleteButton = document.querySelector("#recipeDeleteButton");
 
 init();
 
@@ -495,14 +521,14 @@ function init() {
   if (view === "products") {
     document.body.classList.add("products-mode");
   }
+  initViewTabs();
+  initProductForm();
+  initRecipeEditor();
   renderCategoryTabs();
   renderDishes();
   renderAll();
   saveButton.addEventListener("click", savePlan);
   resetButton.addEventListener("click", resetPlan);
-  initViewTabs();
-  initProductForm();
-  initRecipeEditor();
 }
 
 function applyLanguage() {
@@ -539,11 +565,18 @@ function applyLanguage() {
   productSaveButton.textContent = state.editingProductId ? tt("productUpdate") : tt("productAdd");
   productCancelButton.textContent = tt("productCancel");
   document.querySelector("#recipeDishLabel").textContent = tt("recipeDishLabel");
+  document.querySelector("#recipeNameRuLabel").textContent = tt("recipeNameRuLabel");
+  document.querySelector("#recipeNameEnLabel").textContent = tt("recipeNameEnLabel");
+  document.querySelector("#recipeCategoryLabel").textContent = tt("recipeCategoryLabel");
+  document.querySelector("#recipePortionsLabel").textContent = tt("recipePortionsLabel");
+  document.querySelector("#recipeIconLabel").textContent = tt("recipeIconLabel");
   document.querySelector("#recipeIngredientLabel").textContent = tt("recipeIngredientLabel");
   document.querySelector("#recipeQuantityLabel").textContent = tt("recipeQuantityLabel");
   document.querySelector("#recipeMeasureLabel").textContent = tt("recipeMeasureLabel");
+  recipeNewButton.textContent = tt("recipeNew");
   recipeAddIngredientButton.textContent = tt("recipeAddIngredient");
   recipeSaveButton.textContent = tt("recipeSave");
+  recipeDeleteButton.textContent = tt("recipeDeleteDish");
   saveButton.textContent = tt("save");
   document.querySelectorAll(".scale-select option").forEach((option) => {
     option.textContent = localize(scaleLabels[option.value]);
@@ -565,7 +598,7 @@ function initViewTabs() {
 function renderCategoryTabs() {
   categoryTabs.innerHTML = "";
   categories.forEach((category) => {
-    const count = Object.values(recipes).filter((recipe) => recipe.category === category.key).length;
+    const count = Object.values(getRecipes()).filter((recipe) => recipe.category === category.key).length;
     const button = document.createElement("button");
     button.className = `category-tab${state.activeCategory === category.key ? " is-active" : ""}`;
     button.type = "button";
@@ -582,7 +615,7 @@ function renderCategoryTabs() {
 function renderDishes() {
   dishList.innerHTML = "";
   const template = document.querySelector("#dishTemplate");
-  const visibleRecipes = Object.entries(recipes).filter(([, recipe]) => recipe.category === state.activeCategory);
+  const visibleRecipes = Object.entries(getRecipes()).filter(([, recipe]) => recipe.category === state.activeCategory);
 
   if (!visibleRecipes.length) {
     dishList.innerHTML = `<div class="empty-state">${escapeHtml(tt("emptyCategory"))}</div>`;
@@ -659,14 +692,17 @@ function renderRecipeBook() {
   recipeBookSection.hidden = false;
   renderRecipeEditor();
   recipeBookList.innerHTML = "";
-  const currentRecipes = Object.entries(recipes)
+  const currentRecipes = Object.entries(getRecipes())
     .filter(([, recipe]) => recipe.category === state.activeCategory)
-    .map(([key]) => getEditableRecipe(key));
+    .map(([key]) => [key, getEditableRecipe(key)]);
   recipeBookCount.textContent = plural(currentRecipes.length, tt("dishOne"), tt("dishFew"), tt("dishMany"));
 
   const template = document.querySelector("#recipeBookTemplate");
-  currentRecipes.forEach((recipe) => {
+  currentRecipes.forEach(([recipeKey, recipe]) => {
     const node = template.content.cloneNode(true);
+    const card = node.querySelector(".recipe-block");
+    card.classList.add("is-clickable");
+    card.addEventListener("click", () => startRecipeEdit(recipeKey));
     node.querySelector("h3").textContent = `${recipe.icon} ${localize(recipe.name)}`;
     const meta = [`${recipe.portions} ${tt("portions")}`];
     if (recipe.shelfLife) {
@@ -740,14 +776,15 @@ function initProductForm() {
 }
 
 function initRecipeEditor() {
+  recipeCategorySelect.innerHTML = categories
+    .map((category) => `<option value="${escapeHtml(category.key)}">${escapeHtml(localize(category.label))}</option>`)
+    .join("");
   recipeDishSelect.addEventListener("change", () => {
-    state.editingRecipeKey = recipeDishSelect.value;
-    state.activeCategory = recipes[state.editingRecipeKey]?.category || state.activeCategory;
-    renderCategoryTabs();
-    renderDishes();
-    renderRecipeEditorRows(getEditableRecipe(state.editingRecipeKey).ingredients);
+    startRecipeEdit(recipeDishSelect.value);
   });
+  recipeNewButton.addEventListener("click", startNewRecipe);
   recipeAddIngredientButton.addEventListener("click", () => addRecipeEditorRow());
+  recipeDeleteButton.addEventListener("click", deleteCurrentRecipe);
   recipeEditor.addEventListener("submit", (event) => {
     event.preventDefault();
     saveRecipeEditor();
@@ -755,18 +792,50 @@ function initRecipeEditor() {
 }
 
 function renderRecipeEditor() {
-  recipeDishSelect.innerHTML = Object.entries(recipes)
+  const allRecipes = getRecipes();
+  recipeDishSelect.innerHTML = Object.entries(allRecipes)
     .filter(([, recipe]) => recipe.category === state.activeCategory)
     .map(([key, recipe]) => `<option value="${escapeHtml(key)}">${escapeHtml(localize(recipe.name))}</option>`)
     .join("");
 
-  const categoryKeys = Object.keys(recipes).filter((key) => recipes[key].category === state.activeCategory);
-  if (!categoryKeys.includes(state.editingRecipeKey)) {
-    state.editingRecipeKey = categoryKeys[0] || Object.keys(recipes)[0];
+  const categoryKeys = Object.keys(allRecipes).filter((key) => allRecipes[key].category === state.activeCategory);
+  if (!state.isNewRecipe && !categoryKeys.includes(state.editingRecipeKey)) {
+    state.editingRecipeKey = categoryKeys[0] || Object.keys(allRecipes)[0];
   }
 
   recipeDishSelect.value = state.editingRecipeKey;
-  renderRecipeEditorRows(getEditableRecipe(state.editingRecipeKey).ingredients);
+  fillRecipeEditor(state.editingRecipeKey ? getEditableRecipe(state.editingRecipeKey) : null);
+}
+
+function startRecipeEdit(recipeKey) {
+  const recipe = getRecipes()[recipeKey];
+  if (!recipe) {
+    return;
+  }
+  state.isNewRecipe = false;
+  state.editingRecipeKey = recipeKey;
+  state.activeCategory = recipe.category;
+  renderCategoryTabs();
+  renderDishes();
+  renderRecipeEditor();
+}
+
+function startNewRecipe() {
+  state.isNewRecipe = true;
+  state.editingRecipeKey = "";
+  recipeDishSelect.value = "";
+  fillRecipeEditor(null);
+}
+
+function fillRecipeEditor(recipe) {
+  recipeDishSelect.disabled = state.isNewRecipe;
+  recipeDeleteButton.disabled = state.isNewRecipe;
+  recipeNameRuInput.value = recipe ? localizeLanguage(recipe.name, "ru") : "";
+  recipeNameEnInput.value = recipe ? localizeLanguage(recipe.name, "en") : "";
+  recipeCategorySelect.value = recipe?.category || state.activeCategory;
+  recipePortionsInput.value = recipe?.portions || "";
+  recipeIconInput.value = recipe?.icon || "🍽";
+  renderRecipeEditorRows(recipe?.ingredients || []);
 }
 
 function renderRecipeEditorRows(ingredients) {
@@ -813,6 +882,11 @@ function addRecipeEditorRow(ingredient = null) {
 }
 
 function saveRecipeEditor() {
+  const nameRu = recipeNameRuInput.value.trim();
+  const nameEn = recipeNameEnInput.value.trim();
+  const category = recipeCategorySelect.value;
+  const portions = Number(recipePortionsInput.value);
+  const icon = recipeIconInput.value.trim() || "🍽";
   const rows = Array.from(recipeEditorList.querySelectorAll(".recipe-editor-row"));
   const ingredients = rows.map((row) => ({
     productId: row.querySelector(".recipe-product-select").value,
@@ -821,6 +895,10 @@ function saveRecipeEditor() {
   }));
 
   if (
+    !nameRu ||
+    !nameEn ||
+    !Number.isFinite(portions) ||
+    portions <= 0 ||
     !ingredients.length ||
     ingredients.some((ingredient) => !ingredient.productId || !ingredient.quantity || !productUnitOptions.includes(ingredient.unit))
   ) {
@@ -828,13 +906,45 @@ function saveRecipeEditor() {
     return;
   }
 
-  state.recipeLinks[recipeDishSelect.value] = ingredients;
+  const recipeKey = state.isNewRecipe ? uniqueDishKey(makeDishKey(nameRu, nameEn)) : recipeDishSelect.value;
+  state.dishes[recipeKey] = {
+    name: { ru: nameRu, en: nameEn },
+    category,
+    icon,
+    portions,
+    ingredients,
+  };
+  state.recipeLinks[recipeKey] = ingredients;
+  state.isNewRecipe = false;
+  state.editingRecipeKey = recipeKey;
+  state.activeCategory = category;
+  saveDishes();
   saveRecipeLinks();
-  if (state.selected[recipeDishSelect.value]) {
-    selectRecipe(recipeDishSelect.value, state.selected[recipeDishSelect.value].scale);
+  if (state.selected[recipeKey]) {
+    selectRecipe(recipeKey, state.selected[recipeKey].scale);
   }
+  renderCategoryTabs();
+  renderDishes();
   renderRecipeBook();
   alert(tt("recipeSaved"));
+}
+
+function deleteCurrentRecipe() {
+  const recipeKey = recipeDishSelect.value;
+  if (!recipeKey || state.isNewRecipe) {
+    return;
+  }
+  delete state.dishes[recipeKey];
+  delete state.recipeLinks[recipeKey];
+  delete state.selected[recipeKey];
+  delete state.plans[recipeKey];
+  saveDishes();
+  saveRecipeLinks();
+  state.editingRecipeKey = "";
+  renderCategoryTabs();
+  renderDishes();
+  renderRecipeBook();
+  alert(tt("recipeDeleted"));
 }
 
 function loadRecipeLinks() {
@@ -850,11 +960,55 @@ function saveRecipeLinks() {
   localStorage.setItem(recipeStorageKey, JSON.stringify(state.recipeLinks));
 }
 
+function loadDishes() {
+  const savedDishes = localStorage.getItem(dishStorageKey);
+  if (savedDishes !== null) {
+    try {
+      const parsed = JSON.parse(savedDishes);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? normalizeDishes(parsed) : normalizeDishes(recipes);
+    } catch (error) {
+      return normalizeDishes(recipes);
+    }
+  }
+  const seededDishes = normalizeDishes(recipes);
+  localStorage.setItem(dishStorageKey, JSON.stringify(seededDishes));
+  return seededDishes;
+}
+
+function normalizeDishes(dishes) {
+  return Object.fromEntries(
+    Object.entries(dishes)
+      .map(([key, recipe]) => [
+        key,
+        {
+          name: recipe.name || { ru: "", en: "" },
+          category: recipe.category || "hot",
+          icon: recipe.icon || "🍽",
+          portions: Number(recipe.portions) || 1,
+          shelfLife: recipe.shelfLife || null,
+          ingredients: Array.isArray(recipe.ingredients) ? recipe.ingredients : [],
+        },
+      ])
+      .filter(([, recipe]) => localizeLanguage(recipe.name, "ru") && localizeLanguage(recipe.name, "en"))
+  );
+}
+
+function saveDishes() {
+  localStorage.setItem(dishStorageKey, JSON.stringify(state.dishes));
+}
+
+function getRecipes() {
+  return state.dishes;
+}
+
 function getEditableRecipe(recipeKey) {
-  const recipe = recipes[recipeKey];
+  const recipe = getRecipes()[recipeKey];
   const linkedIngredients = state.recipeLinks[recipeKey];
   if (!Array.isArray(linkedIngredients)) {
-    return recipe;
+    return {
+      ...recipe,
+      ingredients: recipe.ingredients.map(normalizeDisplayIngredient),
+    };
   }
 
   return {
@@ -877,6 +1031,25 @@ function getEditableRecipe(recipeKey) {
   };
 }
 
+function normalizeDisplayIngredient(ingredient) {
+  if (!ingredient?.productId) {
+    return ingredient;
+  }
+  const product = state.products.find((item) => item.id === ingredient.productId);
+  return {
+    productId: ingredient.productId,
+    name: {
+      ru: product?.ru || "",
+      en: product?.en || "",
+    },
+    quantity: ingredient.quantity,
+    unit: {
+      ru: ingredient.unit,
+      en: ingredient.unit,
+    },
+  };
+}
+
 function findProductIdByIngredient(ingredient) {
   if (!ingredient) {
     return "";
@@ -888,6 +1061,23 @@ function findProductIdByIngredient(ingredient) {
 
 function productLabel(product) {
   return lang === "en" ? `${product.en} / ${product.ru}` : `${product.ru} / ${product.en}`;
+}
+
+function makeDishKey(ru, en) {
+  return `${ru}-${en}`
+    .toLocaleLowerCase("en")
+    .replace(/[^a-zа-я0-9]+/gi, "_")
+    .replace(/^_+|_+$/g, "") || `dish_${Date.now()}`;
+}
+
+function uniqueDishKey(baseKey) {
+  let key = baseKey;
+  let index = 2;
+  while (state.dishes[key]) {
+    key = `${baseKey}_${index}`;
+    index += 1;
+  }
+  return key;
 }
 
 function loadProducts() {

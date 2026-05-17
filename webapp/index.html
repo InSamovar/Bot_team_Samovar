@@ -39,6 +39,28 @@
             <span id="recipeDishLabel">Блюдо</span>
             <select id="recipeDishSelect"></select>
           </label>
+          <div class="recipe-dish-fields">
+            <label>
+              <span id="recipeNameRuLabel">Название RU</span>
+              <input id="recipeNameRuInput" autocomplete="off">
+            </label>
+            <label>
+              <span id="recipeNameEnLabel">Name EN</span>
+              <input id="recipeNameEnInput" autocomplete="off">
+            </label>
+            <label>
+              <span id="recipeCategoryLabel">Категория</span>
+              <select id="recipeCategorySelect"></select>
+            </label>
+            <label>
+              <span id="recipePortionsLabel">Порции</span>
+              <input id="recipePortionsInput" inputmode="numeric">
+            </label>
+            <label>
+              <span id="recipeIconLabel">Иконка</span>
+              <input id="recipeIconInput" autocomplete="off">
+            </label>
+          </div>
           <div class="recipe-editor-head">
             <span id="recipeIngredientLabel">Продукт</span>
             <span id="recipeQuantityLabel">Кол-во</span>
@@ -46,8 +68,10 @@
           </div>
           <div class="recipe-editor-list" id="recipeEditorList"></div>
           <div class="recipe-editor-actions">
+            <button class="ghost-button" id="recipeNewButton" type="button">Новое блюдо</button>
             <button class="ghost-button" id="recipeAddIngredientButton" type="button">Добавить продукт</button>
             <button class="primary-button" id="recipeSaveButton" type="submit">Сохранить рецепт</button>
+            <button class="danger-button" id="recipeDeleteButton" type="button">Удалить блюдо</button>
           </div>
         </form>
         <div class="recipe-list protected-content" id="recipeBookList"></div>
