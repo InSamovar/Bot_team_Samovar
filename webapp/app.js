@@ -951,7 +951,7 @@ function addRecipeEditorRow(ingredient = null) {
   const quantityInput = node.querySelector(".recipe-quantity-input");
   const unitDisplay = node.querySelector(".recipe-unit-display");
   const removeButton = node.querySelector(".recipe-remove-button");
-  const productId = ingredient?.productId || findProductIdByIngredient(ingredient) || state.products[0]?.id || "";
+  const productId = resolveIngredientProductId(ingredient) || state.products[0]?.id || "";
 
   productSelect.innerHTML = state.products
     .map((product) => `<option value="${escapeHtml(product.id)}">${escapeHtml(productLabel(product))}</option>`)
@@ -984,14 +984,13 @@ function saveRecipeEditor() {
     .map((row) => ({
       productId: row.querySelector(".recipe-product-select").value,
       quantity: normalizeInput(row.querySelector(".recipe-quantity-input").value),
-      unit: row.querySelector(".recipe-unit-display").dataset.unit,
     }))
     .filter((ingredient) => ingredient.productId && ingredient.quantity);
 
   if (
     !nameRu ||
     !nameEn ||
-    ingredients.some((ingredient) => !productUnitOptions.includes(ingredient.unit))
+    ingredients.some((ingredient) => !state.products.some((product) => product.id === ingredient.productId))
   ) {
     alert(tt("recipeRequired"));
     return;
@@ -1101,56 +1100,29 @@ function getRecipes() {
 
 function getEditableRecipe(recipeKey) {
   const recipe = getRecipes()[recipeKey];
-  const linkedIngredients = state.recipeLinks[recipeKey];
-  if (!Array.isArray(linkedIngredients)) {
-    return {
-      ...recipe,
-      ingredients: recipe.ingredients.map(normalizeDisplayIngredient),
-    };
-  }
+  const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
 
   return {
     ...recipe,
-    ingredients: linkedIngredients.map((ingredient) => {
-      const product = state.products.find((item) => item.id === ingredient.productId);
+    ingredients: ingredients.map((ingredient) => {
+      const productId = resolveIngredientProductId(ingredient);
+      const product = state.products.find((item) => item.id === productId);
       return {
-        productId: ingredient.productId,
-        name: {
-          ru: product?.ru || "",
-          en: product?.en || "",
-        },
+        productId,
+        name: { ru: product?.ru || "", en: product?.en || "" },
         quantity: ingredient.quantity,
-        unit: {
-          ru: ingredient.unit,
-          en: ingredient.unit,
-        },
+        unit: { ru: product?.unit || "", en: product?.unit || "" },
       };
-    }),
+    }).filter((ingredient) => ingredient.productId),
   };
 }
 
-function normalizeDisplayIngredient(ingredient) {
-  if (!ingredient?.productId) {
-    return ingredient;
-  }
-  const product = state.products.find((item) => item.id === ingredient.productId);
-  return {
-    productId: ingredient.productId,
-    name: {
-      ru: product?.ru || "",
-      en: product?.en || "",
-    },
-    quantity: ingredient.quantity,
-    unit: {
-      ru: ingredient.unit,
-      en: ingredient.unit,
-    },
-  };
-}
-
-function findProductIdByIngredient(ingredient) {
+function resolveIngredientProductId(ingredient) {
   if (!ingredient) {
     return "";
+  }
+  if (ingredient.productId && state.products.some((product) => product.id === ingredient.productId)) {
+    return ingredient.productId;
   }
   const ru = localizeLanguage(ingredient.name, "ru").toLocaleLowerCase("ru");
   const en = localizeLanguage(ingredient.name, "en").toLocaleLowerCase("en");
@@ -1416,7 +1388,7 @@ function scaleRecipe(recipe, scale) {
     name: localize(recipe.name),
     scale,
     scaleLabel: localize(scaleLabels[scale]),
-    portionsLabel: formatPortions(recipe.portions * scale),
+    portionsLabel: formatRecipePortions(recipe.portions, scale),
     ingredients: recipe.ingredients.map((ingredient) => ({
       name: localize(ingredient.name),
       quantity: ingredient.quantity === "" ? "" : formatQuantity(parseAmount(ingredient.quantity) * scale),
@@ -1585,6 +1557,14 @@ function formatPortions(value) {
     return `${value} ${tt("portions")}`;
   }
   return `${tt("approx")} ${Math.floor(value)}-${Math.ceil(value)} ${tt("portions")}`;
+}
+
+function formatRecipePortions(portions, scale) {
+  const numericPortions = parseAmount(portions);
+  if (Number.isFinite(numericPortions)) {
+    return formatPortions(numericPortions * scale);
+  }
+  return String(portions || "").trim();
 }
 
 function formatQuantity(value) {
