@@ -630,6 +630,7 @@ function renderCategoryTabs() {
     button.innerHTML = `<span>${category.icon}</span><span>${escapeHtml(localize(category.label))}</span><small>${count}</small>`;
     button.addEventListener("click", () => {
       state.activeCategory = category.key;
+      closeRecipeEditor({ render: false });
       renderCategoryTabs();
       renderDishes();
       renderAll();
@@ -708,6 +709,7 @@ function selectRecipe(key, scale) {
 
 function renderAll() {
   if (view === "recipes") {
+    closeRecipeEditor({ render: false });
     renderRecipeBook();
     return;
   }
@@ -880,7 +882,7 @@ function selectRecipeForView(recipeKey) {
     return;
   }
   state.selectedRecipeKey = recipeKey;
-  state.recipeEditorMode = "closed";
+  closeRecipeEditor({ render: false });
   renderRecipePanel();
 }
 
@@ -916,10 +918,15 @@ function fillRecipeEditor(recipe) {
   renderRecipeEditorRows(recipe?.ingredients || []);
 }
 
-function closeRecipeEditor() {
+function closeRecipeEditor(options = {}) {
   state.recipeEditorMode = "closed";
   state.editingRecipeKey = "";
-  renderRecipePanel();
+  recipeEditor.hidden = true;
+  recipeBookList.hidden = false;
+  recipeNewButton.hidden = false;
+  if (options.render !== false) {
+    renderRecipePanel();
+  }
 }
 
 function renderRecipeEditorRows(ingredients) {
@@ -1002,7 +1009,6 @@ function saveRecipeEditor() {
   state.recipeLinks[recipeKey] = ingredients;
   state.editingRecipeKey = recipeKey;
   state.selectedRecipeKey = recipeKey;
-  state.recipeEditorMode = "closed";
   state.activeCategory = category;
   saveDishes();
   saveRecipeLinks();
@@ -1011,6 +1017,7 @@ function saveRecipeEditor() {
   }
   renderCategoryTabs();
   renderDishes();
+  closeRecipeEditor({ render: false });
   renderRecipePanel();
   alert(tt("recipeSaved"));
 }
