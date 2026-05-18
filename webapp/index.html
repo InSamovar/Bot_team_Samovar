@@ -26,6 +26,10 @@
       <section class="section">
         <h2>Что готовим</h2>
         <div class="category-tabs" id="categoryTabs"></div>
+        <label class="search-field recipe-search-field" id="recipeSearchField" hidden>
+          <span id="recipeSearchLabel">Поиск блюда</span>
+          <input id="recipeSearchInput" autocomplete="off">
+        </label>
         <div class="dish-list" id="dishList"></div>
       </section>
 
@@ -34,11 +38,9 @@
           <h2>Рецепты</h2>
           <span id="recipeBookCount">0 блюд</span>
         </div>
-        <label class="search-field">
-          <span id="recipeSearchLabel">Поиск блюда</span>
-          <input id="recipeSearchInput" autocomplete="off">
-        </label>
-        <form class="recipe-editor" id="recipeEditor">
+        <div class="recipe-list protected-content" id="recipeBookList"></div>
+        <button class="primary-button section-action-button" id="recipeNewButton" type="button">Добавить блюдо</button>
+        <form class="recipe-editor" id="recipeEditor" hidden>
           <div class="recipe-dish-fields">
             <label>
               <span id="recipeNameRuLabel">Название RU</span>
@@ -72,13 +74,11 @@
           </div>
           <div class="recipe-editor-list" id="recipeEditorList"></div>
           <div class="recipe-editor-actions">
-            <button class="ghost-button" id="recipeNewButton" type="button">Новое блюдо</button>
             <button class="ghost-button" id="recipeAddIngredientButton" type="button">Добавить продукт</button>
             <button class="primary-button" id="recipeSaveButton" type="submit">Сохранить рецепт</button>
-            <button class="danger-button" id="recipeDeleteButton" type="button">Удалить блюдо</button>
+            <button class="ghost-button" id="recipeCancelButton" type="button">Отмена</button>
           </div>
         </form>
-        <div class="recipe-list protected-content" id="recipeBookList"></div>
       </section>
 
       <section class="section product-catalog-section" id="productCatalogSection" hidden>

@@ -367,6 +367,9 @@ const i18n = {
     recipeQuantityLabel: "Кол-во",
     recipeMeasureLabel: "Мера",
     recipeNew: "Новое блюдо",
+    recipeAddDish: "Добавить блюдо",
+    recipeEdit: "Редактировать",
+    recipeCancel: "Отмена",
     recipeAddIngredient: "Добавить продукт",
     recipeSave: "Сохранить рецепт",
     recipeDelete: "Удалить",
@@ -432,6 +435,9 @@ const i18n = {
     recipeQuantityLabel: "Qty",
     recipeMeasureLabel: "Unit",
     recipeNew: "New dish",
+    recipeAddDish: "Add dish",
+    recipeEdit: "Edit",
+    recipeCancel: "Cancel",
     recipeAddIngredient: "Add product",
     recipeSave: "Save recipe",
     recipeDelete: "Delete",
@@ -481,7 +487,8 @@ const state = {
   recipeLinks: loadRecipeLinks(),
   editingProductId: null,
   editingRecipeKey: "chicken_soup",
-  isNewRecipe: false,
+  selectedRecipeKey: "chicken_soup",
+  recipeEditorMode: "closed",
   productSearch: "",
   recipeSearch: "",
 };
@@ -509,6 +516,7 @@ const productSaveButton = document.querySelector("#productSaveButton");
 const productCancelButton = document.querySelector("#productCancelButton");
 const viewButtons = document.querySelectorAll("[data-view-target]");
 const recipeEditor = document.querySelector("#recipeEditor");
+const recipeSearchField = document.querySelector("#recipeSearchField");
 const recipeSearchInput = document.querySelector("#recipeSearchInput");
 const recipeNameRuInput = document.querySelector("#recipeNameRuInput");
 const recipeNameEnInput = document.querySelector("#recipeNameEnInput");
@@ -520,7 +528,7 @@ const recipeEditorList = document.querySelector("#recipeEditorList");
 const recipeNewButton = document.querySelector("#recipeNewButton");
 const recipeAddIngredientButton = document.querySelector("#recipeAddIngredientButton");
 const recipeSaveButton = document.querySelector("#recipeSaveButton");
-const recipeDeleteButton = document.querySelector("#recipeDeleteButton");
+const recipeCancelButton = document.querySelector("#recipeCancelButton");
 
 init();
 
@@ -590,10 +598,10 @@ function applyLanguage() {
   document.querySelector("#recipeIngredientLabel").textContent = tt("recipeIngredientLabel");
   document.querySelector("#recipeQuantityLabel").textContent = tt("recipeQuantityLabel");
   document.querySelector("#recipeMeasureLabel").textContent = tt("recipeMeasureLabel");
-  recipeNewButton.textContent = tt("recipeNew");
+  recipeNewButton.textContent = tt("recipeAddDish");
   recipeAddIngredientButton.textContent = tt("recipeAddIngredient");
   recipeSaveButton.textContent = tt("recipeSave");
-  recipeDeleteButton.textContent = tt("recipeDeleteDish");
+  recipeCancelButton.textContent = tt("recipeCancel");
   saveButton.textContent = tt("save");
   document.querySelectorAll(".scale-select option").forEach((option) => {
     option.textContent = localize(scaleLabels[option.value]);
@@ -633,7 +641,14 @@ function renderCategoryTabs() {
 function renderDishes() {
   dishList.innerHTML = "";
   const template = document.querySelector("#dishTemplate");
-  const visibleRecipes = Object.entries(getRecipes()).filter(([, recipe]) => normalizeCategoryKey(recipe.category) === state.activeCategory);
+  const visibleRecipes = Object.entries(getRecipes())
+    .filter(([, recipe]) => normalizeCategoryKey(recipe.category) === state.activeCategory)
+    .filter(
+      ([, recipe]) =>
+        view !== "recipes" ||
+        matchesSearch(localizeLanguage(recipe.name, "ru"), state.recipeSearch) ||
+        matchesSearch(localizeLanguage(recipe.name, "en"), state.recipeSearch)
+    );
 
   if (!visibleRecipes.length) {
     dishList.innerHTML = `<div class="empty-state">${escapeHtml(tt("emptyCategory"))}</div>`;
@@ -657,7 +672,7 @@ function renderDishes() {
 
     if (view === "recipes") {
       row.classList.add("is-clickable");
-      row.addEventListener("click", () => startRecipeEdit(key));
+      row.addEventListener("click", () => selectRecipeForView(key));
     }
 
     checkbox.addEventListener("change", () => {
@@ -713,44 +728,71 @@ function renderRecipeBook() {
   document.querySelectorAll(".section")[4].hidden = true;
   document.querySelector(".footer-actions").hidden = true;
   recipeBookSection.hidden = false;
-  renderRecipeEditor();
+  recipeSearchField.hidden = false;
+  renderRecipePanel();
+}
+
+function renderRecipePanel() {
   recipeBookList.innerHTML = "";
-  const currentRecipes = Object.entries(getRecipes())
-    .filter(([, recipe]) => normalizeCategoryKey(recipe.category) === state.activeCategory)
-    .filter(([, recipe]) => matchesSearch(localizeLanguage(recipe.name, "ru"), state.recipeSearch) || matchesSearch(localizeLanguage(recipe.name, "en"), state.recipeSearch))
-    .map(([key]) => [key, getEditableRecipe(key)]);
-  recipeBookCount.textContent = plural(currentRecipes.length, tt("dishOne"), tt("dishFew"), tt("dishMany"));
+  const currentRecipeKeys = filteredRecipeKeys();
+  recipeBookCount.textContent = plural(currentRecipeKeys.length, tt("dishOne"), tt("dishFew"), tt("dishMany"));
+
+  if (state.recipeEditorMode !== "closed") {
+    recipeEditor.hidden = false;
+    recipeNewButton.hidden = true;
+    recipeBookList.hidden = true;
+    return;
+  }
+
+  recipeEditor.hidden = true;
+  recipeNewButton.hidden = false;
+  recipeBookList.hidden = false;
+
+  if (!currentRecipeKeys.length) {
+    state.selectedRecipeKey = "";
+    recipeBookList.innerHTML = `<div class="empty-state">${escapeHtml(tt("emptyCategory"))}</div>`;
+    return;
+  }
+
+  if (!currentRecipeKeys.includes(state.selectedRecipeKey)) {
+    state.selectedRecipeKey = currentRecipeKeys[0];
+  }
 
   const template = document.querySelector("#recipeBookTemplate");
-  currentRecipes.forEach(([recipeKey, recipe]) => {
-    const node = template.content.cloneNode(true);
-    const card = node.querySelector(".recipe-block");
-    card.classList.add("is-clickable");
-    card.addEventListener("click", () => startRecipeEdit(recipeKey));
-    node.querySelector("h3").textContent = `${recipe.icon} ${localize(recipe.name)}`;
-    const meta = [`${recipe.portions} ${tt("portions")}`];
-    if (recipe.shelfLife) {
-      meta.push(`${tt("shelfLife")}: ${localize(recipe.shelfLife)}`);
-    }
-    node.querySelector(".recipe-title-row span").textContent = meta.join(" · ");
-    const grid = node.querySelector(".ingredient-grid");
+  const recipe = getEditableRecipe(state.selectedRecipeKey);
+  const node = template.content.cloneNode(true);
+  node.querySelector("h3").textContent = `${recipe.icon} ${localize(recipe.name)}`;
+  const meta = [`${recipe.portions} ${tt("portions")}`];
+  if (recipe.shelfLife) {
+    meta.push(`${tt("shelfLife")}: ${localize(recipe.shelfLife)}`);
+  }
+  node.querySelector(".recipe-title-row span").textContent = meta.join(" · ");
+  const grid = node.querySelector(".ingredient-grid");
 
-    if (!recipe.ingredients.length) {
-      grid.innerHTML = `<div class="empty-state">${escapeHtml(tt("recipeNoIngredients"))}</div>`;
-    } else {
-      recipe.ingredients.forEach((ingredient) => {
-        const row = document.createElement("div");
-        row.className = "ingredient-row";
-        row.innerHTML = `
-          <span class="ingredient-name">${escapeHtml(localize(ingredient.name))}</span>
-          <span class="unit-label">${escapeHtml(formatRecipeIngredient(ingredient))}</span>
-        `;
-        grid.appendChild(row);
-      });
-    }
+  if (!recipe.ingredients.length) {
+    grid.innerHTML = `<div class="empty-state">${escapeHtml(tt("recipeNoIngredients"))}</div>`;
+  } else {
+    recipe.ingredients.forEach((ingredient) => {
+      const row = document.createElement("div");
+      row.className = "ingredient-row";
+      row.innerHTML = `
+        <span class="ingredient-name">${escapeHtml(localize(ingredient.name))}</span>
+        <span class="unit-label">${escapeHtml(formatRecipeIngredient(ingredient))}</span>
+      `;
+      grid.appendChild(row);
+    });
+  }
 
-    recipeBookList.appendChild(node);
-  });
+  const actions = document.createElement("div");
+  actions.className = "recipe-view-actions";
+  actions.innerHTML = `
+    <button class="primary-button" type="button" data-recipe-action="edit">${escapeHtml(tt("recipeEdit"))}</button>
+    <button class="danger-button" type="button" data-recipe-action="delete">${escapeHtml(tt("recipeDeleteDish"))}</button>
+  `;
+  actions.querySelector('[data-recipe-action="edit"]').addEventListener("click", () => startRecipeEdit(state.selectedRecipeKey));
+  actions.querySelector('[data-recipe-action="delete"]').addEventListener("click", () => deleteRecipeByKey(state.selectedRecipeKey));
+  recipeBookList.appendChild(node);
+  recipeBookList.appendChild(actions);
 }
 
 function renderProductCatalog() {
@@ -811,25 +853,36 @@ function initRecipeEditor() {
     .join("");
   recipeSearchInput.addEventListener("input", () => {
     state.recipeSearch = recipeSearchInput.value.trim();
-    renderRecipeBook();
+    renderDishes();
+    renderRecipePanel();
   });
   recipeNewButton.addEventListener("click", startNewRecipe);
   recipeAddIngredientButton.addEventListener("click", () => addRecipeEditorRow());
-  recipeDeleteButton.addEventListener("click", deleteCurrentRecipe);
+  recipeCancelButton.addEventListener("click", closeRecipeEditor);
   recipeEditor.addEventListener("submit", (event) => {
     event.preventDefault();
     saveRecipeEditor();
   });
 }
 
-function renderRecipeEditor() {
-  const allRecipes = getRecipes();
-  const categoryKeys = Object.keys(allRecipes).filter((key) => normalizeCategoryKey(allRecipes[key].category) === state.activeCategory);
-  if (!state.isNewRecipe && !categoryKeys.includes(state.editingRecipeKey)) {
-    state.editingRecipeKey = categoryKeys[0] || Object.keys(allRecipes)[0];
-  }
+function filteredRecipeKeys() {
+  return Object.entries(getRecipes())
+    .filter(([, recipe]) => normalizeCategoryKey(recipe.category) === state.activeCategory)
+    .filter(
+      ([, recipe]) =>
+        matchesSearch(localizeLanguage(recipe.name, "ru"), state.recipeSearch) ||
+        matchesSearch(localizeLanguage(recipe.name, "en"), state.recipeSearch)
+    )
+    .map(([key]) => key);
+}
 
-  fillRecipeEditor(state.editingRecipeKey ? getEditableRecipe(state.editingRecipeKey) : null);
+function selectRecipeForView(recipeKey) {
+  if (!getRecipes()[recipeKey]) {
+    return;
+  }
+  state.selectedRecipeKey = recipeKey;
+  state.recipeEditorMode = "closed";
+  renderRecipePanel();
 }
 
 function startRecipeEdit(recipeKey) {
@@ -837,22 +890,24 @@ function startRecipeEdit(recipeKey) {
   if (!recipe) {
     return;
   }
-  state.isNewRecipe = false;
+  state.recipeEditorMode = "edit";
   state.editingRecipeKey = recipeKey;
+  state.selectedRecipeKey = recipeKey;
   state.activeCategory = normalizeCategoryKey(recipe.category);
   renderCategoryTabs();
   renderDishes();
-  renderRecipeEditor();
+  fillRecipeEditor(getEditableRecipe(recipeKey));
+  renderRecipePanel();
 }
 
 function startNewRecipe() {
-  state.isNewRecipe = true;
+  state.recipeEditorMode = "new";
   state.editingRecipeKey = "";
   fillRecipeEditor(null);
+  renderRecipePanel();
 }
 
 function fillRecipeEditor(recipe) {
-  recipeDeleteButton.disabled = state.isNewRecipe;
   recipeNameRuInput.value = recipe ? localizeLanguage(recipe.name, "ru") : "";
   recipeNameEnInput.value = recipe ? localizeLanguage(recipe.name, "en") : "";
   recipeCategorySelect.value = normalizeCategoryKey(recipe?.category || state.activeCategory);
@@ -860,6 +915,12 @@ function fillRecipeEditor(recipe) {
   recipeIconInput.value = recipe?.icon || "🍽";
   recipeShelfLifeInput.value = recipe ? localizeLanguage(recipe.shelfLife, lang) : "";
   renderRecipeEditorRows(recipe?.ingredients || []);
+}
+
+function closeRecipeEditor() {
+  state.recipeEditorMode = "closed";
+  state.editingRecipeKey = "";
+  renderRecipePanel();
 }
 
 function renderRecipeEditorRows(ingredients) {
@@ -926,7 +987,11 @@ function saveRecipeEditor() {
     return;
   }
 
-  const recipeKey = state.isNewRecipe ? uniqueDishKey(makeDishKey(nameRu, nameEn)) : state.editingRecipeKey;
+  const recipeKey = state.recipeEditorMode === "new" ? uniqueDishKey(makeDishKey(nameRu, nameEn)) : state.editingRecipeKey;
+  if (!recipeKey) {
+    alert(tt("recipeRequired"));
+    return;
+  }
   state.dishes[recipeKey] = {
     name: { ru: nameRu, en: nameEn },
     category,
@@ -936,8 +1001,9 @@ function saveRecipeEditor() {
     ingredients,
   };
   state.recipeLinks[recipeKey] = ingredients;
-  state.isNewRecipe = false;
   state.editingRecipeKey = recipeKey;
+  state.selectedRecipeKey = recipeKey;
+  state.recipeEditorMode = "closed";
   state.activeCategory = category;
   saveDishes();
   saveRecipeLinks();
@@ -946,13 +1012,12 @@ function saveRecipeEditor() {
   }
   renderCategoryTabs();
   renderDishes();
-  renderRecipeBook();
+  renderRecipePanel();
   alert(tt("recipeSaved"));
 }
 
-function deleteCurrentRecipe() {
-  const recipeKey = state.editingRecipeKey;
-  if (!recipeKey || state.isNewRecipe) {
+function deleteRecipeByKey(recipeKey) {
+  if (!recipeKey) {
     return;
   }
   delete state.dishes[recipeKey];
@@ -961,10 +1026,12 @@ function deleteCurrentRecipe() {
   delete state.plans[recipeKey];
   saveDishes();
   saveRecipeLinks();
+  state.recipeEditorMode = "closed";
   state.editingRecipeKey = "";
+  state.selectedRecipeKey = filteredRecipeKeys()[0] || "";
   renderCategoryTabs();
   renderDishes();
-  renderRecipeBook();
+  renderRecipePanel();
   alert(tt("recipeDeleted"));
 }
 

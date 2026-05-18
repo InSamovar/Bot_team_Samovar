@@ -327,12 +327,25 @@ h3 {
   flex-wrap: wrap;
 }
 
+.recipe-view-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.recipe-view-actions .primary-button,
+.recipe-view-actions .danger-button,
 .recipe-editor .primary-button,
 .recipe-editor .ghost-button,
 .recipe-editor .danger-button {
   width: auto;
   min-width: 150px;
   padding: 0 14px;
+}
+
+.section-action-button {
+  width: 100%;
+  margin-top: 12px;
 }
 
 .recipe-block.is-clickable {
