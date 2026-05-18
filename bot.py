@@ -43,7 +43,7 @@ SHOPPING_LIST_FILE = DATA_DIR / "shopping_list.json"
 HISTORY_FILE = DATA_DIR / "history.json"
 USER_SETTINGS_FILE = DATA_DIR / "user_settings.json"
 DEFAULT_TIMEZONE = "Asia/Bangkok"
-WEBAPP_VERSION = "20260518-recipe-save"
+WEBAPP_VERSION = "20260518-close-editor-hard"
 
 
 @dataclass

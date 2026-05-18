@@ -741,12 +741,12 @@ function renderRecipePanel() {
   recipeNewButton.hidden = false;
 
   if (state.recipeEditorMode !== "closed") {
-    recipeEditor.hidden = false;
+    setRecipeEditorVisible(true);
     recipeBookList.hidden = true;
     return;
   }
 
-  recipeEditor.hidden = true;
+  setRecipeEditorVisible(false);
   recipeBookList.hidden = false;
 
   if (!currentRecipeKeys.length) {
@@ -921,12 +921,18 @@ function fillRecipeEditor(recipe) {
 function closeRecipeEditor(options = {}) {
   state.recipeEditorMode = "closed";
   state.editingRecipeKey = "";
-  recipeEditor.hidden = true;
+  setRecipeEditorVisible(false);
   recipeBookList.hidden = false;
   recipeNewButton.hidden = false;
   if (options.render !== false) {
     renderRecipePanel();
   }
+}
+
+function setRecipeEditorVisible(isVisible) {
+  recipeEditor.hidden = !isVisible;
+  recipeEditor.style.display = isVisible ? "grid" : "none";
+  recipeEditor.setAttribute("aria-hidden", String(!isVisible));
 }
 
 function renderRecipeEditorRows(ingredients) {
