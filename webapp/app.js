@@ -375,7 +375,7 @@ const i18n = {
     recipeDelete: "Удалить",
     recipeDeleteDish: "Удалить блюдо",
     recipeSaved: "Рецепт сохранен",
-    recipeRequired: "Заполните название и порции. Продукты можно добавить сейчас или позже.",
+    recipeRequired: "Заполните название блюда. Продукты можно добавить сейчас или позже.",
     recipeDeleted: "Блюдо удалено",
     recipeNoIngredients: "Рецепт пока не внесен",
     shelfLife: "Срок хранения",
@@ -443,7 +443,7 @@ const i18n = {
     recipeDelete: "Delete",
     recipeDeleteDish: "Delete dish",
     recipeSaved: "Recipe saved",
-    recipeRequired: "Fill in name and portions. Products can be added now or later.",
+    recipeRequired: "Fill in dish name. Products can be added now or later.",
     recipeDeleted: "Dish deleted",
     recipeNoIngredients: "Recipe not added yet",
     shelfLife: "Shelf life",
@@ -976,7 +976,7 @@ function saveRecipeEditor() {
   const nameRu = recipeNameRuInput.value.trim();
   const nameEn = recipeNameEnInput.value.trim();
   const category = normalizeCategoryKey(recipeCategorySelect.value);
-  const portions = Number(recipePortionsInput.value);
+  const portions = recipePortionsInput.value.trim();
   const icon = recipeIconInput.value.trim() || "🍽";
   const shelfLife = recipeShelfLifeInput.value.trim();
   const rows = Array.from(recipeEditorList.querySelectorAll(".recipe-editor-row"));
@@ -991,8 +991,6 @@ function saveRecipeEditor() {
   if (
     !nameRu ||
     !nameEn ||
-    !Number.isFinite(portions) ||
-    portions <= 0 ||
     ingredients.some((ingredient) => !productUnitOptions.includes(ingredient.unit))
   ) {
     alert(tt("recipeRequired"));
@@ -1084,7 +1082,7 @@ function normalizeDishes(dishes) {
           name: recipe.name || { ru: "", en: "" },
           category: normalizeCategoryKey(recipe.category || "soup_hot"),
           icon: recipe.icon || "🍽",
-          portions: Number(recipe.portions) || 1,
+          portions: recipe.portions || "",
           shelfLife: recipe.shelfLife || null,
           ingredients: Array.isArray(recipe.ingredients) ? recipe.ingredients : [],
         },
