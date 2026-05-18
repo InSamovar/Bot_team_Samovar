@@ -84,6 +84,11 @@ BOT_TEXT = {
         "created_date": "Дата создания",
         "purchase_date": "Дата закупки",
         "purchased": "Куплено",
+        "group_meat": "Мясо / рыба",
+        "group_vegetables": "Овощи / зелень",
+        "group_dairy": "Молочное / яйца",
+        "group_grocery": "Бакалея / соусы",
+        "group_other": "Прочее",
         "dish": "Блюдо",
         "volume": "Объем",
         "status": "Ст",
@@ -145,6 +150,11 @@ BOT_TEXT = {
         "created_date": "Created",
         "purchase_date": "Purchase date",
         "purchased": "Purchased",
+        "group_meat": "Meat / fish",
+        "group_vegetables": "Vegetables / herbs",
+        "group_dairy": "Dairy / eggs",
+        "group_grocery": "Grocery / sauces",
+        "group_other": "Other",
         "dish": "Dish",
         "volume": "Volume",
         "status": "St",
@@ -616,10 +626,13 @@ def format_saved_shopping_list(lang: str = "ru") -> str:
         "-- --- ----------------------- ----------",
     ]
 
-    for index, item in enumerate(items, start=1):
-        status = "OK" if item.get("purchased") else "--"
-        quantity = format_item_quantity(item)
-        sections.append(f"{index:<2} {status:<3} {item.get('name', '')[:23]:<23} {quantity}")
+    group_label_keys = dict(SHOPPING_GROUPS)
+    for group, group_items in grouped_shopping_items(items):
+        sections.append(f"{t(lang, group_label_keys[group])}")
+        for index, item in group_items:
+            status = "OK" if item.get("purchased") else "--"
+            quantity = format_item_quantity(item)
+            sections.append(f"{index + 1:<2} {status:<3} {item.get('name', '')[:23]:<23} {quantity}")
 
     sections.append("```")
     sections.append(t(lang, "tap_to_purchase"))
@@ -632,20 +645,129 @@ def format_item_quantity(item: dict[str, Any]) -> str:
     return f"{quantity} {unit}".strip()
 
 
+SHOPPING_GROUPS = [
+    ("meat", "group_meat"),
+    ("vegetables", "group_vegetables"),
+    ("dairy", "group_dairy"),
+    ("grocery", "group_grocery"),
+    ("other", "group_other"),
+]
+
+
+PRODUCT_GROUP_KEYWORDS = {
+    "meat": [
+        "beef",
+        "chicken",
+        "crab",
+        "herring",
+        "pork",
+        "sausage",
+        "говядина",
+        "грудка",
+        "краб",
+        "кури",
+        "мяс",
+        "ножк",
+        "палоч",
+        "свинина",
+        "селед",
+        "сосиск",
+    ],
+    "vegetables": [
+        "beet",
+        "cabbage",
+        "carrot",
+        "cucumber",
+        "dill",
+        "garlic",
+        "green onion",
+        "mushroom",
+        "onion",
+        "potato",
+        "radish",
+        "ананас",
+        "гриб",
+        "зел",
+        "капуст",
+        "карто",
+        "лук",
+        "морков",
+        "огур",
+        "редиск",
+        "свек",
+        "укроп",
+        "чеснок",
+    ],
+    "dairy": [
+        "butter",
+        "cheese",
+        "cream",
+        "egg",
+        "milk",
+        "sour cream",
+        "масло слив",
+        "молоко",
+        "сметан",
+        "сыр",
+        "яйц",
+    ],
+    "grocery": [
+        "corn",
+        "mayonnaise",
+        "oil",
+        "paste",
+        "pea",
+        "pepper",
+        "salt",
+        "sugar",
+        "vinegar",
+        "майонез",
+        "масло подсол",
+        "паста",
+        "перец",
+        "сахар",
+        "соль",
+        "уксус",
+        "горошек",
+        "кукуруз",
+    ],
+}
+
+
+def shopping_item_group(item: dict[str, Any]) -> str:
+    name = str(item.get("name", "")).casefold()
+    for group, keywords in PRODUCT_GROUP_KEYWORDS.items():
+        if any(keyword in name for keyword in keywords):
+            return group
+    return "other"
+
+
+def grouped_shopping_items(items: list[dict[str, Any]]) -> list[tuple[str, list[tuple[int, dict[str, Any]]]]]:
+    grouped: dict[str, list[tuple[int, dict[str, Any]]]] = {group: [] for group, _ in SHOPPING_GROUPS}
+    for index, item in enumerate(items):
+        grouped[shopping_item_group(item)].append((index, item))
+
+    return [(group, grouped[group]) for group, _ in SHOPPING_GROUPS if grouped[group]]
+
+
 def shopping_tracking_keyboard(payload: dict[str, Any]) -> InlineKeyboardMarkup:
     buttons = []
-    for index, item in enumerate(payload.get("items", [])):
-        mark = "✓" if item.get("purchased") else "□"
-        quantity = format_item_quantity(item)
-        item_number = f"{index + 1:02d}"
-        buttons.append(
-            [
-                InlineKeyboardButton(
-                    text=f"{item_number}  {mark}  {item.get('name', '')}  {quantity}".strip(),
-                    callback_data=f"purchase_toggle:{index}",
-                )
-            ]
-        )
+    items = payload.get("items", [])
+    for group, group_items in grouped_shopping_items(items):
+        group_label_key = dict(SHOPPING_GROUPS)[group]
+        buttons.append([InlineKeyboardButton(text=f"— {t('ru', group_label_key)} —", callback_data="noop")])
+        for index, item in group_items:
+            mark = "✓" if item.get("purchased") else "□"
+            quantity = format_item_quantity(item)
+            item_number = f"{index + 1:02d}"
+            buttons.append(
+                [
+                    InlineKeyboardButton(
+                        text=f"{item_number}  {mark}  {item.get('name', '')}  {quantity}".strip(),
+                        callback_data=f"purchase_toggle:{index}",
+                    )
+                ]
+            )
 
     buttons.append([InlineKeyboardButton(text="📅", callback_data="history_shopping_calendar")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
