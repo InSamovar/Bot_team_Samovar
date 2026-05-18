@@ -372,7 +372,7 @@ const i18n = {
     recipeDelete: "Удалить",
     recipeDeleteDish: "Удалить блюдо",
     recipeSaved: "Рецепт сохранен",
-    recipeRequired: "Заполните название, порции, продукт, количество и меру.",
+    recipeRequired: "Заполните название и порции. Продукты можно добавить сейчас или позже.",
     recipeDeleted: "Блюдо удалено",
     recipeNoIngredients: "Рецепт пока не внесен",
     shelfLife: "Срок хранения",
@@ -437,7 +437,7 @@ const i18n = {
     recipeDelete: "Delete",
     recipeDeleteDish: "Delete dish",
     recipeSaved: "Recipe saved",
-    recipeRequired: "Fill in name, portions, product, quantity, and unit.",
+    recipeRequired: "Fill in name and portions. Products can be added now or later.",
     recipeDeleted: "Dish deleted",
     recipeNoIngredients: "Recipe not added yet",
     shelfLife: "Shelf life",
@@ -624,6 +624,7 @@ function renderCategoryTabs() {
       state.activeCategory = category.key;
       renderCategoryTabs();
       renderDishes();
+      renderAll();
     });
     categoryTabs.appendChild(button);
   });
@@ -906,19 +907,20 @@ function saveRecipeEditor() {
   const icon = recipeIconInput.value.trim() || "🍽";
   const shelfLife = recipeShelfLifeInput.value.trim();
   const rows = Array.from(recipeEditorList.querySelectorAll(".recipe-editor-row"));
-  const ingredients = rows.map((row) => ({
-    productId: row.querySelector(".recipe-product-select").value,
-    quantity: normalizeInput(row.querySelector(".recipe-quantity-input").value),
-    unit: row.querySelector(".recipe-unit-display").dataset.unit,
-  }));
+  const ingredients = rows
+    .map((row) => ({
+      productId: row.querySelector(".recipe-product-select").value,
+      quantity: normalizeInput(row.querySelector(".recipe-quantity-input").value),
+      unit: row.querySelector(".recipe-unit-display").dataset.unit,
+    }))
+    .filter((ingredient) => ingredient.productId && ingredient.quantity);
 
   if (
     !nameRu ||
     !nameEn ||
     !Number.isFinite(portions) ||
     portions <= 0 ||
-    !ingredients.length ||
-    ingredients.some((ingredient) => !ingredient.productId || !ingredient.quantity || !productUnitOptions.includes(ingredient.unit))
+    ingredients.some((ingredient) => !productUnitOptions.includes(ingredient.unit))
   ) {
     alert(tt("recipeRequired"));
     return;
