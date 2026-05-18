@@ -571,6 +571,11 @@ h3 {
   backdrop-filter: blur(12px);
 }
 
+.recipes-mode .footer-actions,
+.products-mode .footer-actions {
+  display: none;
+}
+
 .primary-button,
 .ghost-button,
 .danger-button {
