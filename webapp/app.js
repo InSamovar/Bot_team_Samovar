@@ -736,16 +736,15 @@ function renderRecipePanel() {
   recipeBookList.innerHTML = "";
   const currentRecipeKeys = filteredRecipeKeys();
   recipeBookCount.textContent = plural(currentRecipeKeys.length, tt("dishOne"), tt("dishFew"), tt("dishMany"));
+  recipeNewButton.hidden = false;
 
   if (state.recipeEditorMode !== "closed") {
     recipeEditor.hidden = false;
-    recipeNewButton.hidden = true;
     recipeBookList.hidden = true;
     return;
   }
 
   recipeEditor.hidden = true;
-  recipeNewButton.hidden = false;
   recipeBookList.hidden = false;
 
   if (!currentRecipeKeys.length) {

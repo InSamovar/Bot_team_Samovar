@@ -346,6 +346,9 @@ h3 {
 .section-action-button {
   width: 100%;
   margin-top: 12px;
+  position: sticky;
+  bottom: 12px;
+  z-index: 2;
 }
 
 .recipe-block.is-clickable {
