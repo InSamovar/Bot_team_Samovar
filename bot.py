@@ -559,9 +559,9 @@ def normalize_webapp_recipes(payload: dict[str, Any]) -> list[dict[str, Any]]:
 
 def normalize_webapp_shopping_list(payload: dict[str, Any]) -> list[dict[str, Any]]:
     if payload.get("shoppingList"):
-        return payload["shoppingList"]
+        return normalize_shopping_items(payload["shoppingList"])
 
-    return [
+    return normalize_shopping_items([
         {
             "name": item.get("n", ""),
             "quantity": item.get("q", ""),
@@ -569,7 +569,63 @@ def normalize_webapp_shopping_list(payload: dict[str, Any]) -> list[dict[str, An
             "note": item.get("note", ""),
         }
         for item in payload.get("s", [])
-    ]
+    ])
+
+
+UNIT_ALIASES = {
+    "г": "gr",
+    "g": "gr",
+    "гр": "gr",
+    "gr": "gr",
+    "кг": "kg",
+    "kg": "kg",
+    "шт": "pc",
+    "pc": "pc",
+    "pcs": "pc",
+    "бокс": "box",
+    "box": "box",
+}
+
+
+def normalize_item_unit(name: str, unit: str) -> str:
+    name_key = name.casefold()
+    if "карто" in name_key or "potato" in name_key:
+        return "gr"
+
+    return UNIT_ALIASES.get(str(unit).strip().casefold(), str(unit).strip())
+
+
+def normalize_shopping_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    merged: dict[tuple[str, str, str], dict[str, Any]] = {}
+    order: list[tuple[str, str, str]] = []
+
+    for item in items:
+        name = str(item.get("name", "")).strip()
+        unit = normalize_item_unit(name, str(item.get("unit", "")).strip())
+        note = str(item.get("note", "")).strip()
+        quantity = str(item.get("quantity", "")).strip()
+        key = (name.casefold(), unit, note.casefold())
+
+        if key not in merged:
+            merged[key] = {
+                "name": name,
+                "quantity": quantity,
+                "unit": unit,
+                "note": note,
+                "enabled": item.get("enabled", True),
+                "purchased": item.get("purchased", False),
+            }
+            order.append(key)
+            continue
+
+        merged[key]["purchased"] = bool(merged[key].get("purchased")) and bool(item.get("purchased", False))
+        merged[key]["enabled"] = bool(merged[key].get("enabled", True)) or bool(item.get("enabled", True))
+        current_quantity = parse_number(str(merged[key].get("quantity", "")))
+        next_quantity = parse_number(quantity)
+        if current_quantity is not None and next_quantity is not None:
+            merged[key]["quantity"] = format_float(current_quantity + next_quantity)
+
+    return [merged[key] for key in order]
 
 
 def today_label() -> str:
@@ -603,6 +659,10 @@ def load_shopping_payload() -> dict[str, Any] | None:
     payload = load_json(SHOPPING_LIST_FILE)
     if not payload or not payload.get("items"):
         return None
+    normalized_items = normalize_shopping_items(payload["items"])
+    if normalized_items != payload["items"]:
+        payload["items"] = normalized_items
+        save_json(SHOPPING_LIST_FILE, payload)
     return payload
 
 

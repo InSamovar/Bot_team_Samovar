@@ -1188,7 +1188,7 @@ function normalizeProducts(products) {
       id: String(product.id || makeProductId(product.ru || "", product.en || "")),
       ru: String(product.ru || "").trim(),
       en: String(product.en || "").trim(),
-      unit: productUnitOptions.includes(product.unit) ? product.unit : "pc",
+      unit: normalizeProductUnitForName(product.ru || "", product.en || "", product.unit),
     }))
     .filter((product) => product.ru && product.en)
     .sort(sortProducts);
@@ -1300,6 +1300,14 @@ function makeProductId(ru, en) {
 function normalizeProductUnit(unit) {
   const normalized = unitAliases[String(unit || "").trim().toLowerCase()];
   return productUnitOptions.includes(normalized) ? normalized : "pc";
+}
+
+function normalizeProductUnitForName(ru, en, unit) {
+  const name = `${ru} ${en}`.toLocaleLowerCase("en");
+  if (name.includes("карто") || name.includes("potato")) {
+    return "gr";
+  }
+  return normalizeProductUnit(unit);
 }
 
 function renderRecipes() {
