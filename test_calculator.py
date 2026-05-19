@@ -10,20 +10,20 @@ from recipes import RECIPES
 class CalculatorTest(TestCase):
     def test_scales_chicken_soup_to_half_volume(self) -> None:
         recipe = scale_recipe(RECIPES["chicken_soup"], Fraction(1, 2), "50% меньше")
+        ingredients = {ingredient.name: ingredient for ingredient in recipe.ingredients}
 
         self.assertEqual(recipe.portions_label, "8 порций")
-        self.assertEqual(recipe.ingredients[0].display_quantity, "2.5")
-        self.assertEqual(recipe.ingredients[1].display_quantity, "625")
+        self.assertEqual(ingredients["куриные ножки (шт)"].display_quantity, "4")
+        self.assertEqual(ingredients["картошка"].display_quantity, "650")
 
     def test_scales_casserole_to_half_volume(self) -> None:
         recipe = scale_recipe(RECIPES["casserole"], Fraction(1, 2), "50% меньше")
         ingredients = {ingredient.name: ingredient for ingredient in recipe.ingredients}
 
         self.assertEqual(recipe.portions_label, "примерно 4-5 порций")
-        self.assertEqual(ingredients["куриная грудка"].display_quantity, "2.5")
-        self.assertEqual(ingredients["картошка"].display_quantity, "1100")
+        self.assertEqual(ingredients["куриная грудка (шт)"].display_quantity, "2.5")
         self.assertEqual(ingredients["сыр"].display_quantity, "150")
-        self.assertEqual(ingredients["майонез"].display_quantity, "1/6")
+        self.assertEqual(ingredients["майонез"].display_quantity, "2.5")
 
     def test_builds_shopping_list_from_scaled_recipes(self) -> None:
         soup = scale_recipe(RECIPES["chicken_soup"], Fraction(1, 1), "Полный объем")
@@ -32,8 +32,8 @@ class CalculatorTest(TestCase):
         items = build_shopping_list([soup, casserole])
         item_names = [item.name for item in items]
 
-        self.assertIn("куриные ножки", item_names)
-        self.assertIn("куриная грудка", item_names)
+        self.assertIn("куриные ножки (шт)", item_names)
+        self.assertIn("куриная грудка (шт)", item_names)
         self.assertIn("сыр", item_names)
 
     def test_new_hot_dishes_have_expected_portions(self) -> None:
@@ -52,4 +52,4 @@ class CalculatorTest(TestCase):
 
         self.assertEqual(recipe.portions_label, "7 порций")
         self.assertEqual(ingredients["свекла"].display_quantity, "500")
-        self.assertEqual(ingredients["соль"].display_quantity, "2.8")
+        self.assertEqual(ingredients["соль (стл)"].display_quantity, "2.8")

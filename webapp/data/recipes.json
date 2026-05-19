@@ -1,0 +1,2253 @@
+{
+  "version": 2,
+  "categories": [
+    {
+      "key": "crepes",
+      "legacyKeys": [
+        "pancakes"
+      ],
+      "label": {
+        "ru": "Crepes",
+        "en": "Crepes"
+      },
+      "icon": "🥞"
+    },
+    {
+      "key": "soup_hot",
+      "legacyKeys": [
+        "hot"
+      ],
+      "label": {
+        "ru": "Soup&hot",
+        "en": "Soup&hot"
+      },
+      "icon": "🔥"
+    },
+    {
+      "key": "salads",
+      "legacyKeys": [],
+      "label": {
+        "ru": "Salads",
+        "en": "Salads"
+      },
+      "icon": "🥗"
+    },
+    {
+      "key": "pelmeni_vareniki",
+      "legacyKeys": [
+        "dumplings"
+      ],
+      "label": {
+        "ru": "Pelmeni&Vareniki",
+        "en": "Pelmeni&Vareniki"
+      },
+      "icon": "🥟"
+    },
+    {
+      "key": "desserts",
+      "legacyKeys": [],
+      "label": {
+        "ru": "Desserts",
+        "en": "Desserts"
+      },
+      "icon": "🍰"
+    },
+    {
+      "key": "drinks",
+      "legacyKeys": [],
+      "label": {
+        "ru": "Drinks",
+        "en": "Drinks"
+      },
+      "icon": "🥤"
+    }
+  ],
+  "recipes": {
+    "chicken_soup": {
+      "name": {
+        "ru": "Куриный суп",
+        "en": "Chicken soup"
+      },
+      "category": "soup_hot",
+      "icon": "🍲",
+      "portions": "16",
+      "shelfLife": {
+        "ru": "3",
+        "en": "3"
+      },
+      "ingredients": [
+        {
+          "productId": "куриные-ножки-chicken-legs-1779001457262-7681",
+          "name": {
+            "ru": "куриные ножки (шт)",
+            "en": "chicken legs (pc)"
+          },
+          "quantity": "8",
+          "unit": "pc"
+        },
+        {
+          "productId": "морковь-carrot-1779006591843-2044",
+          "name": {
+            "ru": "морковь (шт)",
+            "en": "carrot (pc)"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "белый-лук-white-onion-1779001457263-8754",
+          "name": {
+            "ru": "белый лук (шт)",
+            "en": "white onion (pc)"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "соль-salt-1779001457262-7596",
+          "name": {
+            "ru": "соль (стл)",
+            "en": "salt (TBsp)"
+          },
+          "quantity": "4.5",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "картошка-potato-1779174258745-5514",
+          "name": {
+            "ru": "картошка",
+            "en": "potatoes"
+          },
+          "quantity": "1300",
+          "unit": "gr"
+        }
+      ]
+    },
+    "casserole": {
+      "name": {
+        "ru": "Запеканка",
+        "en": "Zapekanka"
+      },
+      "category": "soup_hot",
+      "icon": "🥘",
+      "portions": "9",
+      "shelfLife": {
+        "ru": "3",
+        "en": "3"
+      },
+      "ingredients": [
+        {
+          "productId": "куриная-грудка-chicken-breast-1779001457262-413",
+          "name": {
+            "ru": "куриная грудка (шт)",
+            "en": "chicken breast (pc)"
+          },
+          "quantity": "5",
+          "unit": "pc"
+        },
+        {
+          "productId": "грибы-mushrooms-1779001457262-137",
+          "name": {
+            "ru": "грибы",
+            "en": "mushrooms"
+          },
+          "quantity": "1",
+          "unit": "box"
+        },
+        {
+          "productId": "сыр-cheese-1779001457262-9887",
+          "name": {
+            "ru": "сыр",
+            "en": "cheese"
+          },
+          "quantity": "300",
+          "unit": "gr"
+        },
+        {
+          "productId": "майонез-mayonnaise-1779002294912-3284",
+          "name": {
+            "ru": "майонез",
+            "en": "mayonnaise"
+          },
+          "quantity": "5",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "соль-salt-1779001457262-7596",
+          "name": {
+            "ru": "соль (стл)",
+            "en": "salt (TBsp)"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "перец-pepper-1779001457262-2872",
+          "name": {
+            "ru": "черный перец (раз)",
+            "en": "black pepper (turn)"
+          },
+          "quantity": "15",
+          "unit": "turn"
+        }
+      ]
+    },
+    "borscht": {
+      "name": {
+        "ru": "Борщ",
+        "en": "Borsch"
+      },
+      "category": "soup_hot",
+      "icon": "🥣",
+      "portions": "14",
+      "shelfLife": {
+        "ru": "3",
+        "en": "3"
+      },
+      "ingredients": [
+        {
+          "productId": "куриные-ножки-chicken-legs-1779001457262-7681",
+          "name": {
+            "ru": "куриные ножки (шт)",
+            "en": "chicken legs (pc)"
+          },
+          "quantity": "8",
+          "unit": "pc"
+        },
+        {
+          "productId": "капуста-cabbage-1779001457262-6318",
+          "name": {
+            "ru": "капуста",
+            "en": "cabbage"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "морковь-carrot-1779006591843-2044",
+          "name": {
+            "ru": "морковь (шт)",
+            "en": "carrot (pc)"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "белый-лук-white-onion-1779001457263-8754",
+          "name": {
+            "ru": "белый лук (шт)",
+            "en": "white onion (pc)"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "чеснок-garlic-1779001457262-6913",
+          "name": {
+            "ru": "чеснок (шт)",
+            "en": "garlic (pc)"
+          },
+          "quantity": "10",
+          "unit": "pc"
+        },
+        {
+          "productId": "томатная-паста-tomato-paste-1779001457262-7168",
+          "name": {
+            "ru": "томатная паста",
+            "en": "tomato paste"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "уксус-vinegar-1779001457262-398",
+          "name": {
+            "ru": "уксус",
+            "en": "vinegar"
+          },
+          "quantity": "3",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "соль-salt-1779001457262-7596",
+          "name": {
+            "ru": "соль (стл)",
+            "en": "salt (TBsp)"
+          },
+          "quantity": "5.5",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "свекла-beetroot-1779172530055-7221",
+          "name": {
+            "ru": "свекла",
+            "en": "beetroot"
+          },
+          "quantity": "1000",
+          "unit": "gr"
+        }
+      ]
+    },
+    "mashed_potatoes": {
+      "name": {
+        "ru": "Картофельное пюре",
+        "en": "Mashed potatoes"
+      },
+      "category": "soup_hot",
+      "icon": "🥔",
+      "portions": "5",
+      "shelfLife": {
+        "ru": "3",
+        "en": "3"
+      },
+      "ingredients": [
+        {
+          "productId": "молоко-milk-1779001457262-214",
+          "name": {
+            "ru": "молоко",
+            "en": "milk"
+          },
+          "quantity": "150",
+          "unit": "ml"
+        },
+        {
+          "productId": "масло-сливочное-butter-1779001457262-7233",
+          "name": {
+            "ru": "масло сливочное",
+            "en": "butter"
+          },
+          "quantity": "40",
+          "unit": "gr"
+        },
+        {
+          "productId": "соль-гр-salt-gr-1779089692736-2356",
+          "name": {
+            "ru": "соль (гр)",
+            "en": "salt (gr)"
+          },
+          "quantity": "6",
+          "unit": "gr"
+        },
+        {
+          "productId": "картошка-potato-1779174258745-5514",
+          "name": {
+            "ru": "картошка",
+            "en": "potatoes"
+          },
+          "quantity": "1000",
+          "unit": "gr"
+        }
+      ]
+    },
+    "chicken_cutlets": {
+      "name": {
+        "ru": "Куриные котлеты",
+        "en": "Chicken cutlets"
+      },
+      "category": "soup_hot",
+      "icon": "🍗",
+      "portions": "13",
+      "shelfLife": {
+        "ru": "3",
+        "en": "3"
+      },
+      "ingredients": [
+        {
+          "productId": "куриная-грудка-chicken-breast-1779177478392-7263",
+          "name": {
+            "ru": "куриная грудка",
+            "en": "chicken breast"
+          },
+          "quantity": "2000",
+          "unit": "gr"
+        },
+        {
+          "productId": "масло-сливочное-butter-1779001457262-7233",
+          "name": {
+            "ru": "масло сливочное",
+            "en": "butter"
+          },
+          "quantity": "127",
+          "unit": "gr"
+        },
+        {
+          "productId": "подсолнечное-масло-sunflower-oil-1779001457262-2658",
+          "name": {
+            "ru": "подсолнечное масло",
+            "en": "sunflower oil"
+          },
+          "quantity": "47",
+          "unit": "gr"
+        },
+        {
+          "productId": "яйца-eggs-1779001457262-7957",
+          "name": {
+            "ru": "яйца",
+            "en": "eggs"
+          },
+          "quantity": "2",
+          "unit": "pc"
+        },
+        {
+          "productId": "белый-лук-white-onion-1779088748670-6346",
+          "name": {
+            "ru": "белый лук",
+            "en": "white onion"
+          },
+          "quantity": "533",
+          "unit": "gr"
+        },
+        {
+          "productId": "соль-гр-salt-gr-1779089692736-2356",
+          "name": {
+            "ru": "соль (гр)",
+            "en": "salt (gr)"
+          },
+          "quantity": "29",
+          "unit": "gr"
+        }
+      ]
+    },
+    "olivier": {
+      "name": {
+        "ru": "Оливье",
+        "en": "Russian salad"
+      },
+      "category": "salads",
+      "icon": "🥗",
+      "portions": "9",
+      "shelfLife": {
+        "ru": "2.5 days",
+        "en": "2.5 days"
+      },
+      "ingredients": [
+        {
+          "productId": "морковь-carrot-1779099322291-9819",
+          "name": {
+            "ru": "морковь",
+            "en": "carrot"
+          },
+          "quantity": "375",
+          "unit": "gr"
+        },
+        {
+          "productId": "яйца-eggs-1779001457262-7957",
+          "name": {
+            "ru": "яйца",
+            "en": "eggs"
+          },
+          "quantity": "5",
+          "unit": "pc"
+        },
+        {
+          "productId": "зеленый-горошек-green-peas-1779001457262-4947",
+          "name": {
+            "ru": "зеленый горошек",
+            "en": "green peas"
+          },
+          "quantity": "300",
+          "unit": "gr"
+        },
+        {
+          "productId": "майонез-чл-на-1-порц-mayonnaise-tsp-for-1-por-n-1779099546365-1726",
+          "name": {
+            "ru": "майонез (чл на 1 порц)",
+            "en": "mayonnaise (tsp for 1 por-n)"
+          },
+          "quantity": "2",
+          "unit": "tsp"
+        },
+        {
+          "productId": "картошка-potato-1779174258745-5514",
+          "name": {
+            "ru": "картошка",
+            "en": "potatoes"
+          },
+          "quantity": "600",
+          "unit": "gr"
+        },
+        {
+          "productId": "черный-перец-на-порцию-black-pepper-for-1-por-n-1779177963172-136",
+          "name": {
+            "ru": "черный перец (на порцию)",
+            "en": "black pepper (for 1 por-n)"
+          },
+          "quantity": "4",
+          "unit": "turn"
+        },
+        {
+          "productId": "соль-на-порцию-salt-for-1-por-n-1779178130672-9746",
+          "name": {
+            "ru": "соль (на порцию)",
+            "en": "salt (for 1 por-n)"
+          },
+          "quantity": "3",
+          "unit": "times"
+        }
+      ]
+    },
+    "crab_salad": {
+      "name": {
+        "ru": "Крабовый салат",
+        "en": "Crab salad"
+      },
+      "category": "salads",
+      "icon": "🦀",
+      "portions": "13",
+      "shelfLife": {
+        "ru": "2.5 days",
+        "en": "2.5 days"
+      },
+      "ingredients": [
+        {
+          "productId": "крабовые-палочки-crab-sticks-1779001457262-5716",
+          "name": {
+            "ru": "крабовые палочки",
+            "en": "crab sticks"
+          },
+          "quantity": "500",
+          "unit": "gr"
+        },
+        {
+          "productId": "сладкая-кукуруза-sweet-corn-1779001457262-9890",
+          "name": {
+            "ru": "сладкая кукуруза",
+            "en": "sweet corn"
+          },
+          "quantity": "600",
+          "unit": "gr"
+        },
+        {
+          "productId": "огурец-cucumber-1779001457262-2249",
+          "name": {
+            "ru": "огурец",
+            "en": "cucumber"
+          },
+          "quantity": "600",
+          "unit": "gr"
+        },
+        {
+          "productId": "яйца-eggs-1779001457262-7957",
+          "name": {
+            "ru": "яйца",
+            "en": "eggs"
+          },
+          "quantity": "10",
+          "unit": "pc"
+        },
+        {
+          "productId": "майонез-чл-на-1-порц-mayonnaise-tsp-for-1-por-n-1779099546365-1726",
+          "name": {
+            "ru": "майонез (чл на 1 порц)",
+            "en": "mayonnaise (tsp for 1 por-n)"
+          },
+          "quantity": "2",
+          "unit": "tsp"
+        },
+        {
+          "productId": "черный-перец-на-порцию-black-pepper-for-1-por-n-1779177963172-136",
+          "name": {
+            "ru": "черный перец (на порцию)",
+            "en": "black pepper (for 1 por-n)"
+          },
+          "quantity": "3",
+          "unit": "turn"
+        }
+      ]
+    },
+    "salad_shuba": {
+      "name": {
+        "ru": "Шуба",
+        "en": "Salad shuba"
+      },
+      "category": "salads",
+      "icon": "🐟",
+      "portions": "8",
+      "shelfLife": {
+        "ru": "4 days",
+        "en": "4 days"
+      },
+      "ingredients": [
+        {
+          "productId": "морковь-carrot-1779099322291-9819",
+          "name": {
+            "ru": "морковь",
+            "en": "carrot"
+          },
+          "quantity": "300",
+          "unit": "gr"
+        },
+        {
+          "productId": "яйца-eggs-1779001457262-7957",
+          "name": {
+            "ru": "яйца",
+            "en": "eggs"
+          },
+          "quantity": "3",
+          "unit": "pc"
+        },
+        {
+          "productId": "селедка-herring-1779001457262-7350",
+          "name": {
+            "ru": "селедка",
+            "en": "herring"
+          },
+          "quantity": "200",
+          "unit": "gr"
+        },
+        {
+          "productId": "майонез-mayonnaise-1779002294912-3284",
+          "name": {
+            "ru": "майонез",
+            "en": "mayonnaise"
+          },
+          "quantity": "200",
+          "unit": "gr"
+        },
+        {
+          "productId": "соль-проходка-salt-times-1779089453384-5408",
+          "name": {
+            "ru": "соль (проходка)",
+            "en": "salt (times)"
+          },
+          "quantity": "15",
+          "unit": "times"
+        },
+        {
+          "productId": "перец-pepper-1779001457262-2872",
+          "name": {
+            "ru": "черный перец (раз)",
+            "en": "black pepper (turn)"
+          },
+          "quantity": "10",
+          "unit": "turn"
+        },
+        {
+          "productId": "зеленый-лук-на-порцию-green-onion-for-1-por-n-1779178413788-3362",
+          "name": {
+            "ru": "зеленый лук (на порцию)",
+            "en": "green onion (for 1 por-n)"
+          },
+          "quantity": "5",
+          "unit": "gr"
+        }
+      ]
+    },
+    "pineapple_salad": {
+      "name": {
+        "ru": "Салат Курица-ананасы",
+        "en": "Pineapple salad"
+      },
+      "category": "salads",
+      "icon": "🍍",
+      "portions": "5",
+      "shelfLife": {
+        "ru": "2.5 days",
+        "en": "2.5 days"
+      },
+      "ingredients": [
+        {
+          "productId": "ананас-pineapple-1779001457262-6122",
+          "name": {
+            "ru": "ананас",
+            "en": "pineapple"
+          },
+          "quantity": "1",
+          "unit": "box"
+        },
+        {
+          "productId": "сыр-cheese-1779001457262-9887",
+          "name": {
+            "ru": "сыр",
+            "en": "cheese"
+          },
+          "quantity": "130",
+          "unit": "gr"
+        },
+        {
+          "productId": "куриные-ножки-chicken-legs-1779099963443-2266",
+          "name": {
+            "ru": "куриные ножки",
+            "en": "chicken legs"
+          },
+          "quantity": "320",
+          "unit": "gr"
+        },
+        {
+          "productId": "чеснок-garlic-1779001457262-6913",
+          "name": {
+            "ru": "чеснок (шт)",
+            "en": "garlic (pc)"
+          },
+          "quantity": "2",
+          "unit": "pc"
+        },
+        {
+          "productId": "перец-pepper-1779001457262-2872",
+          "name": {
+            "ru": "черный перец (раз)",
+            "en": "black pepper (turn)"
+          },
+          "quantity": "10",
+          "unit": "turn"
+        },
+        {
+          "productId": "соль-проходка-salt-times-1779089453384-5408",
+          "name": {
+            "ru": "соль (проходка)",
+            "en": "salt (times)"
+          },
+          "quantity": "4",
+          "unit": "times"
+        },
+        {
+          "productId": "майонез-стл-mayonnaise-tbsp-1779090190337-5932",
+          "name": {
+            "ru": "майонез (стл)",
+            "en": "mayonnaise (TBsp)"
+          },
+          "quantity": "1.5",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "сметана-sour-cream-1779001457262-3707",
+          "name": {
+            "ru": "сметана",
+            "en": "sour cream"
+          },
+          "quantity": "1.5",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "перец-pepper-1779001457262-2872",
+          "name": {
+            "ru": "черный перец (раз)",
+            "en": "black pepper (turn)"
+          },
+          "quantity": "10",
+          "unit": "turn"
+        }
+      ]
+    },
+    "okroshka": {
+      "name": {
+        "ru": "Окрошка",
+        "en": "Okroshka"
+      },
+      "category": "soup_hot",
+      "icon": "🥒",
+      "portions": "8",
+      "shelfLife": {
+        "ru": "3 days",
+        "en": "3 days"
+      },
+      "ingredients": [
+        {
+          "productId": "картошка-potatoes-1779001457262-5883",
+          "name": {
+            "ru": "",
+            "en": ""
+          },
+          "quantity": "500",
+          "unit": "gr"
+        },
+        {
+          "productId": "редиска-radish-1779002490549-8913",
+          "name": {
+            "ru": "редиска",
+            "en": "radish"
+          },
+          "quantity": "250",
+          "unit": "gr"
+        },
+        {
+          "productId": "огурец-cucumber-1779001457262-2249",
+          "name": {
+            "ru": "огурец",
+            "en": "cucumber"
+          },
+          "quantity": "150",
+          "unit": "gr"
+        },
+        {
+          "productId": "яйца-eggs-1779001457262-7957",
+          "name": {
+            "ru": "яйца",
+            "en": "eggs"
+          },
+          "quantity": "4",
+          "unit": "pc"
+        },
+        {
+          "productId": "майонез-стл-mayonnaise-tbsp-1779090190337-5932",
+          "name": {
+            "ru": "майонез (стл)",
+            "en": "mayonnaise (TBsp)"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "salt-tsp-соль-чл-1779031238593-6528",
+          "name": {
+            "ru": "соль (чл)",
+            "en": "salt (tsp)"
+          },
+          "quantity": "4",
+          "unit": "tsp"
+        },
+        {
+          "productId": "уксус-vinegar-1779001457262-398",
+          "name": {
+            "ru": "уксус",
+            "en": "vinegar"
+          },
+          "quantity": "5",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "говядина-beef-1779001457263-8415",
+          "name": {
+            "ru": "говядина",
+            "en": "beef"
+          },
+          "quantity": "330",
+          "unit": "gr"
+        },
+        {
+          "productId": "сыворотка-творожная-черпак-tvorog-water-ladle-1779090254927-4529",
+          "name": {
+            "ru": "Сыворотка творожная (черпак)",
+            "en": "Tvorog water (ladle)"
+          },
+          "quantity": "9",
+          "unit": "ladle"
+        },
+        {
+          "productId": "вода-water-1779090278686-4175",
+          "name": {
+            "ru": "вода (черпак)",
+            "en": "water (ladle)"
+          },
+          "quantity": "3",
+          "unit": "ladle"
+        }
+      ]
+    },
+    "quick_pickled_cucumber": {
+      "name": {
+        "ru": "Малосольные огурцы",
+        "en": "Quick pickled cucumber"
+      },
+      "category": "salads",
+      "icon": "🥒",
+      "portions": "1",
+      "shelfLife": {
+        "ru": "long",
+        "en": "long"
+      },
+      "ingredients": [
+        {
+          "productId": "огурец-cucumber-1779001457262-2249",
+          "name": {
+            "ru": "огурец",
+            "en": "cucumber"
+          },
+          "quantity": "1000",
+          "unit": "gr"
+        },
+        {
+          "productId": "чеснок-garlic-1779001457262-6913",
+          "name": {
+            "ru": "чеснок (шт)",
+            "en": "garlic (pc)"
+          },
+          "quantity": "6",
+          "unit": "pc"
+        },
+        {
+          "productId": "укроп-dill-1779001457262-6328",
+          "name": {
+            "ru": "укроп",
+            "en": "dill"
+          },
+          "quantity": "30",
+          "unit": "gr"
+        },
+        {
+          "productId": "salt-tsp-соль-чл-1779031238593-6528",
+          "name": {
+            "ru": "соль (чл)",
+            "en": "salt (tsp)"
+          },
+          "quantity": "3",
+          "unit": "tsp"
+        },
+        {
+          "productId": "сахар-sugar-1779001457262-9152",
+          "name": {
+            "ru": "сахар",
+            "en": "sugar"
+          },
+          "quantity": "3",
+          "unit": "tsp"
+        },
+        {
+          "productId": "уксус-vinegar-1779001457262-398",
+          "name": {
+            "ru": "уксус",
+            "en": "vinegar"
+          },
+          "quantity": "4",
+          "unit": "tsp"
+        }
+      ]
+    },
+    "salo": {
+      "name": {
+        "ru": "Сало",
+        "en": "Salo"
+      },
+      "category": "salads",
+      "icon": "🥓",
+      "portions": "1",
+      "shelfLife": {
+        "ru": "15",
+        "en": "15"
+      },
+      "ingredients": [
+        {
+          "productId": "свинина-pork-1779001457262-9511",
+          "name": {
+            "ru": "свинина (сало)",
+            "en": "pork (fat)"
+          },
+          "quantity": "1000",
+          "unit": "gr"
+        },
+        {
+          "productId": "чеснок-garlic-1779100304315-1839",
+          "name": {
+            "ru": "чеснок",
+            "en": "garlic"
+          },
+          "quantity": "125",
+          "unit": "gr"
+        },
+        {
+          "productId": "морская-соль-sea-salt-1779001457263-102",
+          "name": {
+            "ru": "морская соль",
+            "en": "sea salt"
+          },
+          "quantity": "7",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "черный-перец-black-pepper-1779001457263-1015",
+          "name": {
+            "ru": "черный перец",
+            "en": "black pepper"
+          },
+          "quantity": "200",
+          "unit": "turn"
+        }
+      ]
+    },
+    "braised_cabbage": {
+      "name": {
+        "ru": "Тушеная капуста",
+        "en": "Braised cabbage"
+      },
+      "category": "soup_hot",
+      "icon": "🥬",
+      "portions": "4",
+      "shelfLife": {
+        "ru": "3 days",
+        "en": "3 days"
+      },
+      "ingredients": [
+        {
+          "productId": "капуста-cabbage-1779001457262-6318",
+          "name": {
+            "ru": "капуста",
+            "en": "cabbage"
+          },
+          "quantity": "2",
+          "unit": "pc"
+        },
+        {
+          "productId": "сосиски-sausages-1779001457263-3170",
+          "name": {
+            "ru": "сосиски",
+            "en": "sausages"
+          },
+          "quantity": "10",
+          "unit": "pc"
+        },
+        {
+          "productId": "сахар-sugar-1779001457262-9152",
+          "name": {
+            "ru": "сахар",
+            "en": "sugar"
+          },
+          "quantity": "1",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "salt-tsp-соль-чл-1779031238593-6528",
+          "name": {
+            "ru": "соль (чл)",
+            "en": "salt (tsp)"
+          },
+          "quantity": "1.5",
+          "unit": "tsp"
+        },
+        {
+          "productId": "перец-pepper-1779001457262-2872",
+          "name": {
+            "ru": "черный перец (раз)",
+            "en": "black pepper (turn)"
+          },
+          "quantity": "13",
+          "unit": "turn"
+        },
+        {
+          "productId": "подсолнечное-масло-стл-sunflower-oil-tbsp-1779031463250-9026",
+          "name": {
+            "ru": "подсолнечное масло стл",
+            "en": "sunflower oil TBsp"
+          },
+          "quantity": "15",
+          "unit": "TBsp"
+        }
+      ]
+    },
+    "braised_potato_beef": {
+      "name": {
+        "ru": "Тушеная картошка с говядиной",
+        "en": "Braised potato with beef"
+      },
+      "category": "soup_hot",
+      "icon": "🥩",
+      "portions": "5",
+      "shelfLife": {
+        "ru": "2 days",
+        "en": "2 days"
+      },
+      "ingredients": [
+        {
+          "productId": "говядина-beef-1779001457263-8415",
+          "name": {
+            "ru": "говядина",
+            "en": "beef"
+          },
+          "quantity": "600",
+          "unit": "gr"
+        },
+        {
+          "productId": "морковь-carrot-1779006591843-2044",
+          "name": {
+            "ru": "морковь (шт)",
+            "en": "carrot (pc)"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "белый-лук-white-onion-1779001457263-8754",
+          "name": {
+            "ru": "белый лук (шт)",
+            "en": "white onion (pc)"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "чеснок-garlic-1779001457262-6913",
+          "name": {
+            "ru": "чеснок (шт)",
+            "en": "garlic (pc)"
+          },
+          "quantity": "8",
+          "unit": "pc"
+        },
+        {
+          "productId": "томатная-паста-tomato-paste-1779001457262-7168",
+          "name": {
+            "ru": "томатная паста",
+            "en": "tomato paste"
+          },
+          "quantity": "1",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "salt-tsp-соль-чл-1779031238593-6528",
+          "name": {
+            "ru": "соль (чл)",
+            "en": "salt (tsp)"
+          },
+          "quantity": "4",
+          "unit": "tsp"
+        },
+        {
+          "productId": "перец-pepper-1779001457262-2872",
+          "name": {
+            "ru": "черный перец (раз)",
+            "en": "black pepper (turn)"
+          },
+          "quantity": "15",
+          "unit": "turn"
+        }
+      ]
+    },
+    "ham_cheese_julienne_crepe": {
+      "name": {
+        "ru": "ветчина-сыр",
+        "en": "Ham&Cheese"
+      },
+      "category": "crepes",
+      "icon": "🥞",
+      "portions": "1",
+      "shelfLife": {
+        "ru": "1",
+        "en": "1"
+      },
+      "ingredients": [
+        {
+          "productId": "ветчина-шт-ham-pc-1779180332839-6608",
+          "name": {
+            "ru": "ветчина (шт)",
+            "en": "ham (pc)"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "сыр-cheese-1779001457262-9887",
+          "name": {
+            "ru": "сыр",
+            "en": "cheese"
+          },
+          "quantity": "70",
+          "unit": "gr"
+        }
+      ]
+    },
+    "shaublin_crepe": {
+      "name": {
+        "ru": "Shaublin Crepe",
+        "en": "Shaublin Crepe"
+      },
+      "category": "crepes",
+      "icon": "🥞",
+      "portions": "1",
+      "shelfLife": {
+        "ru": "1",
+        "en": "1"
+      },
+      "ingredients": [
+        {
+          "productId": "капуста-стл-cabbage-tbsp-1779180726047-8217",
+          "name": {
+            "ru": "капуста (стл)",
+            "en": "cabbage (TBsp)"
+          },
+          "quantity": "1",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "морковь-стл-carrot-tbsp-1779180822712-3811",
+          "name": {
+            "ru": "морковь (стл)",
+            "en": "carrot (TBsp)"
+          },
+          "quantity": "1",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "бол-помидор-чл-big-tomato-tsp-1779180605488-284",
+          "name": {
+            "ru": "бол.помидор (чл)",
+            "en": "big tomato (tsp)"
+          },
+          "quantity": "2",
+          "unit": "tsp"
+        },
+        {
+          "productId": "огурец-стл-cucumber-tbsp-1779181745750-9893",
+          "name": {
+            "ru": "огурец (стл)",
+            "en": "cucumber (TBsp)"
+          },
+          "quantity": "1",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "куриная-грудка-стл-chicken-breast-tbsp-1779180522216-7314",
+          "name": {
+            "ru": "куриная грудка (стл)",
+            "en": "chicken breast (TBsp)"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "белый-соус-стл-white-sauce-tbsp-1779180905046-7411",
+          "name": {
+            "ru": "белый соус (стл)",
+            "en": "white sauce (TBsp)"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        }
+      ]
+    },
+    "salmon_mush_sauce_crepe": {
+      "name": {
+        "ru": "Salmon Crepe",
+        "en": "Salmon Crepe"
+      },
+      "category": "crepes",
+      "icon": "🥞",
+      "portions": "1",
+      "shelfLife": {
+        "ru": "1",
+        "en": "1"
+      },
+      "ingredients": [
+        {
+          "productId": "авокадо-шт-avocado-pc-1779180979214-1468",
+          "name": {
+            "ru": "авокадо (шт)",
+            "en": "avocado (pc)"
+          },
+          "quantity": "0.5",
+          "unit": "pc"
+        },
+        {
+          "productId": "семга-salmon-1779180998188-3401",
+          "name": {
+            "ru": "семга",
+            "en": "salmon"
+          },
+          "quantity": "30",
+          "unit": "gr"
+        },
+        {
+          "productId": "крем-сыр-cream-cheese-1779181052804-2797",
+          "name": {
+            "ru": "крем-сыр",
+            "en": "cream-cheese"
+          },
+          "quantity": "2",
+          "unit": "tsp"
+        }
+      ]
+    },
+    "ice_cream_crepe": {
+      "name": {
+        "ru": "IceCream Crepe",
+        "en": "IceCream Crepe"
+      },
+      "category": "crepes",
+      "icon": "🍨",
+      "portions": 1,
+      "shelfLife": null,
+      "ingredients": []
+    },
+    "apple_pie": {
+      "name": {
+        "ru": "Apple Pie",
+        "en": "Apple Pie"
+      },
+      "category": "desserts",
+      "icon": "🥧",
+      "portions": "8",
+      "shelfLife": {
+        "ru": "5",
+        "en": "5"
+      },
+      "ingredients": [
+        {
+          "productId": "яблоки-apple-1779188192116-8931",
+          "name": {
+            "ru": "яблоки",
+            "en": "apple"
+          },
+          "quantity": "5",
+          "unit": "pc"
+        },
+        {
+          "productId": "сахар-sugar-1779001457262-9152",
+          "name": {
+            "ru": "сахар",
+            "en": "sugar"
+          },
+          "quantity": "3",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "сок-лимона-lime-juice-1779188254264-6131",
+          "name": {
+            "ru": "сок лимона",
+            "en": "lime juice"
+          },
+          "quantity": "3",
+          "unit": "tsp"
+        },
+        {
+          "productId": "яйца-eggs-1779001457262-7957",
+          "name": {
+            "ru": "яйца",
+            "en": "eggs"
+          },
+          "quantity": "5",
+          "unit": "pc"
+        },
+        {
+          "productId": "ваниль-vanila-1779188437727-5828",
+          "name": {
+            "ru": "ваниль",
+            "en": "vanila"
+          },
+          "quantity": "3",
+          "unit": "drops"
+        },
+        {
+          "productId": "сахар-sugar-1779001457262-9152",
+          "name": {
+            "ru": "сахар",
+            "en": "sugar"
+          },
+          "quantity": "80",
+          "unit": "gr"
+        },
+        {
+          "productId": "масло-сливочное-butter-1779001457262-7233",
+          "name": {
+            "ru": "масло сливочное",
+            "en": "butter"
+          },
+          "quantity": "10",
+          "unit": "gr"
+        },
+        {
+          "productId": "мука-торты-flour-cake-1779089948574-2085",
+          "name": {
+            "ru": "мука (торты)",
+            "en": "flour (cake)"
+          },
+          "quantity": "120",
+          "unit": "gr"
+        },
+        {
+          "productId": "разрыхлитель-baking-powder-1779188346447-7568",
+          "name": {
+            "ru": "разрыхлитель",
+            "en": "baking powder"
+          },
+          "quantity": "1",
+          "unit": "tsp"
+        },
+        {
+          "productId": "корица-cround-cinnamon-1779188990884-694",
+          "name": {
+            "ru": "корица",
+            "en": "cround cinnamon"
+          },
+          "quantity": "1",
+          "unit": "gr"
+        }
+      ]
+    },
+    "honey_roll": {
+      "name": {
+        "ru": "Honey Roll",
+        "en": "Honey Roll"
+      },
+      "category": "desserts",
+      "icon": "🍯",
+      "portions": "8",
+      "shelfLife": {
+        "ru": "5",
+        "en": "5"
+      },
+      "ingredients": [
+        {
+          "productId": "мед-honey-1779188401459-6148",
+          "name": {
+            "ru": "мед",
+            "en": "honey"
+          },
+          "quantity": "72",
+          "unit": "gr"
+        },
+        {
+          "productId": "подсолнечное-масло-sunflower-oil-1779001457262-2658",
+          "name": {
+            "ru": "подсолнечное масло",
+            "en": "sunflower oil"
+          },
+          "quantity": "30",
+          "unit": "gr"
+        },
+        {
+          "productId": "яйца-eggs-1779001457262-7957",
+          "name": {
+            "ru": "яйца",
+            "en": "eggs"
+          },
+          "quantity": "3",
+          "unit": "pc"
+        },
+        {
+          "productId": "ваниль-vanila-1779188437727-5828",
+          "name": {
+            "ru": "ваниль",
+            "en": "vanila"
+          },
+          "quantity": "3",
+          "unit": "drops"
+        },
+        {
+          "productId": "сахар-sugar-1779001457262-9152",
+          "name": {
+            "ru": "сахар",
+            "en": "sugar"
+          },
+          "quantity": "72",
+          "unit": "gr"
+        },
+        {
+          "productId": "мука-торты-flour-cake-1779089948574-2085",
+          "name": {
+            "ru": "мука (торты)",
+            "en": "flour (cake)"
+          },
+          "quantity": "152",
+          "unit": "gr"
+        },
+        {
+          "productId": "сода-soda-1779188366859-7952",
+          "name": {
+            "ru": "сода",
+            "en": "soda"
+          },
+          "quantity": "1",
+          "unit": "tsp"
+        },
+        {
+          "productId": "разрыхлитель-baking-powder-1779188346447-7568",
+          "name": {
+            "ru": "разрыхлитель",
+            "en": "baking powder"
+          },
+          "quantity": "1",
+          "unit": "tsp"
+        },
+        {
+          "productId": "заварной-крем-boiled-cream-1779189292971-6307",
+          "name": {
+            "ru": "заварной крем",
+            "en": "boiled cream"
+          },
+          "quantity": "12",
+          "unit": "TBsp"
+        }
+      ]
+    },
+    "syrniki": {
+      "name": {
+        "ru": "Syrniki",
+        "en": "Syrniki"
+      },
+      "category": "desserts",
+      "icon": "🍽️",
+      "portions": "5",
+      "shelfLife": {
+        "ru": "4",
+        "en": "4"
+      },
+      "ingredients": [
+        {
+          "productId": "творог-tvorog-1779002770549-8597",
+          "name": {
+            "ru": "творог",
+            "en": "tvorog"
+          },
+          "quantity": "500",
+          "unit": "gr"
+        },
+        {
+          "productId": "яйца-eggs-1779001457262-7957",
+          "name": {
+            "ru": "яйца",
+            "en": "eggs"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "манка-semolina-1779189523652-6758",
+          "name": {
+            "ru": "манка",
+            "en": "semolina"
+          },
+          "quantity": "2.5",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "сахар-sugar-1779001457262-9152",
+          "name": {
+            "ru": "сахар",
+            "en": "sugar"
+          },
+          "quantity": "1.5",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "соль-проходка-salt-times-1779089453384-5408",
+          "name": {
+            "ru": "соль (проходка)",
+            "en": "salt (times)"
+          },
+          "quantity": "3",
+          "unit": "times"
+        },
+        {
+          "productId": "мука-flour-1779089958844-4263",
+          "name": {
+            "ru": "мука",
+            "en": "flour"
+          },
+          "quantity": "100",
+          "unit": "gr"
+        }
+      ]
+    },
+    "tvorog_honey_jam": {
+      "name": {
+        "ru": "Tvorog",
+        "en": "Tvorog"
+      },
+      "category": "desserts",
+      "icon": "🍽",
+      "portions": "",
+      "shelfLife": {
+        "ru": "3",
+        "en": "3"
+      },
+      "ingredients": [
+        {
+          "productId": "молоко-milk-1779001457262-214",
+          "name": {
+            "ru": "молоко",
+            "en": "milk"
+          },
+          "quantity": "7000",
+          "unit": "ml"
+        },
+        {
+          "productId": "йогурт-yoghurt-1779189793509-6901",
+          "name": {
+            "ru": "йогурт",
+            "en": "yoghurt"
+          },
+          "quantity": "1850",
+          "unit": "gr"
+        }
+      ]
+    },
+    "пельмени_начинка_pelmeni_filling": {
+      "name": {
+        "ru": "Пельмени (начинка)",
+        "en": "Pelmeni (filling)"
+      },
+      "category": "pelmeni_vareniki",
+      "icon": "🍽",
+      "portions": "170 pc",
+      "shelfLife": {
+        "ru": "long",
+        "en": "long"
+      },
+      "ingredients": [
+        {
+          "productId": "говядина-beef-1779001457263-8415",
+          "name": {
+            "ru": "говядина",
+            "en": "beef"
+          },
+          "quantity": "600",
+          "unit": "gr"
+        },
+        {
+          "productId": "куриная-грудка-chicken-breast-1779177478392-7263",
+          "name": {
+            "ru": "куриная грудка",
+            "en": "chicken breast"
+          },
+          "quantity": "400",
+          "unit": "gr"
+        },
+        {
+          "productId": "salt-tsp-соль-чл-1779031238593-6528",
+          "name": {
+            "ru": "соль (чл)",
+            "en": "salt (tsp)"
+          },
+          "quantity": "1",
+          "unit": "tsp"
+        },
+        {
+          "productId": "белый-лук-white-onion-1779088748670-6346",
+          "name": {
+            "ru": "белый лук",
+            "en": "white onion"
+          },
+          "quantity": "350",
+          "unit": "gr"
+        },
+        {
+          "productId": "чеснок-garlic-1779001457262-6913",
+          "name": {
+            "ru": "чеснок (шт)",
+            "en": "garlic (pc)"
+          },
+          "quantity": "4",
+          "unit": "pc"
+        },
+        {
+          "productId": "перец-pepper-1779001457262-2872",
+          "name": {
+            "ru": "черный перец (раз)",
+            "en": "black pepper (turn)"
+          },
+          "quantity": "30",
+          "unit": "turn"
+        }
+      ]
+    },
+    "вареники_карт_грибы_начинка_vareniki_pot_mush_filling": {
+      "name": {
+        "ru": "Вареники карт-грибы (начинка)",
+        "en": "Vareniki pot-mush (filling)"
+      },
+      "category": "pelmeni_vareniki",
+      "icon": "🍽",
+      "portions": "70 pc",
+      "shelfLife": {
+        "ru": "long",
+        "en": "long"
+      },
+      "ingredients": [
+        {
+          "productId": "грибы-mushrooms-1779001457262-137",
+          "name": {
+            "ru": "грибы",
+            "en": "mushrooms"
+          },
+          "quantity": "1",
+          "unit": "box"
+        },
+        {
+          "productId": "salt-tsp-соль-чл-1779031238593-6528",
+          "name": {
+            "ru": "соль (чл)",
+            "en": "salt (tsp)"
+          },
+          "quantity": "1",
+          "unit": "tsp"
+        },
+        {
+          "productId": "черный-перец-black-pepper-1779001457263-1015",
+          "name": {
+            "ru": "черный перец",
+            "en": "black pepper"
+          },
+          "quantity": "25",
+          "unit": "turn"
+        },
+        {
+          "productId": "пюре-картофельное-mashed-potatoes-1779179423188-1114",
+          "name": {
+            "ru": "пюре картофельное",
+            "en": "mashed potatoes"
+          },
+          "quantity": "1500",
+          "unit": "gr"
+        }
+      ]
+    },
+    "вареники_капуста_начинка_vareniki_cabbage_filling": {
+      "name": {
+        "ru": "Вареники капуста (начинка)",
+        "en": "Vareniki cabbage (filling)"
+      },
+      "category": "pelmeni_vareniki",
+      "icon": "🍽",
+      "portions": "80 pc",
+      "shelfLife": {
+        "ru": "long",
+        "en": "long"
+      },
+      "ingredients": [
+        {
+          "productId": "капуста-cabbage-1779001457262-6318",
+          "name": {
+            "ru": "капуста",
+            "en": "cabbage"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "морковь-carrot-1779006591843-2044",
+          "name": {
+            "ru": "морковь (шт)",
+            "en": "carrot (pc)"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "сахар-sugar-1779001457262-9152",
+          "name": {
+            "ru": "сахар",
+            "en": "sugar"
+          },
+          "quantity": "1",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "salt-tsp-соль-чл-1779031238593-6528",
+          "name": {
+            "ru": "соль (чл)",
+            "en": "salt (tsp)"
+          },
+          "quantity": "1",
+          "unit": "tsp"
+        },
+        {
+          "productId": "черный-перец-black-pepper-1779001457263-1015",
+          "name": {
+            "ru": "черный перец",
+            "en": "black pepper"
+          },
+          "quantity": "8",
+          "unit": "turn"
+        }
+      ]
+    },
+    "вареники_творог_начинка_vareniki_tvorog_filling": {
+      "name": {
+        "ru": "Вареники творог (начинка)",
+        "en": "Vareniki tvorog (filling)"
+      },
+      "category": "pelmeni_vareniki",
+      "icon": "🍽",
+      "portions": "40 pc",
+      "shelfLife": {
+        "ru": "long",
+        "en": "long"
+      },
+      "ingredients": [
+        {
+          "productId": "творог-tvorog-1779002770549-8597",
+          "name": {
+            "ru": "творог",
+            "en": "tvorog"
+          },
+          "quantity": "400",
+          "unit": "gr"
+        },
+        {
+          "productId": "яйца-eggs-1779001457262-7957",
+          "name": {
+            "ru": "яйца",
+            "en": "eggs"
+          },
+          "quantity": "1",
+          "unit": "pc"
+        },
+        {
+          "productId": "сахар-sugar-1779001457262-9152",
+          "name": {
+            "ru": "сахар",
+            "en": "sugar"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "соль-проходка-salt-times-1779089453384-5408",
+          "name": {
+            "ru": "соль (проходка)",
+            "en": "salt (times)"
+          },
+          "quantity": "3",
+          "unit": "times"
+        }
+      ]
+    },
+    "вареники_картошка_начинка_vareniki_potato_filling": {
+      "name": {
+        "ru": "Вареники картошка (начинка)",
+        "en": "Vareniki potato (filling)"
+      },
+      "category": "pelmeni_vareniki",
+      "icon": "🍽",
+      "portions": "60 pc",
+      "shelfLife": {
+        "ru": "long",
+        "en": "long"
+      },
+      "ingredients": [
+        {
+          "productId": "молоко-milk-1779001457262-214",
+          "name": {
+            "ru": "молоко",
+            "en": "milk"
+          },
+          "quantity": "300",
+          "unit": "ml"
+        },
+        {
+          "productId": "масло-сливочное-butter-1779001457262-7233",
+          "name": {
+            "ru": "масло сливочное",
+            "en": "butter"
+          },
+          "quantity": "80",
+          "unit": "gr"
+        },
+        {
+          "productId": "соль-гр-salt-gr-1779089692736-2356",
+          "name": {
+            "ru": "соль (гр)",
+            "en": "salt (gr)"
+          },
+          "quantity": "12",
+          "unit": "gr"
+        },
+        {
+          "productId": "пюре-картофельное-mashed-potatoes-1779179423188-1114",
+          "name": {
+            "ru": "пюре картофельное",
+            "en": "mashed potatoes"
+          },
+          "quantity": "2000",
+          "unit": "gr"
+        }
+      ]
+    },
+    "тесто_пельм_вар_dough_palm_var": {
+      "name": {
+        "ru": "Тесто (пельм-вар)",
+        "en": "Dough (pelm-var)"
+      },
+      "category": "pelmeni_vareniki",
+      "icon": "🍽",
+      "portions": "",
+      "shelfLife": {
+        "ru": "1",
+        "en": "1"
+      },
+      "ingredients": [
+        {
+          "productId": "кипяток-hot-water-1779089977763-5470",
+          "name": {
+            "ru": "кипяток",
+            "en": "hot water"
+          },
+          "quantity": "190",
+          "unit": "ml"
+        },
+        {
+          "productId": "подсолнечное-масло-sunflower-oil-1779001457262-2658",
+          "name": {
+            "ru": "подсолнечное масло",
+            "en": "sunflower oil"
+          },
+          "quantity": "60",
+          "unit": "gr"
+        },
+        {
+          "productId": "мука-flour-1779089958844-4263",
+          "name": {
+            "ru": "мука",
+            "en": "flour"
+          },
+          "quantity": "450",
+          "unit": "gr"
+        },
+        {
+          "productId": "яйца-eggs-1779001457262-7957",
+          "name": {
+            "ru": "яйца",
+            "en": "eggs"
+          },
+          "quantity": "2",
+          "unit": "pc"
+        }
+      ]
+    },
+    "овощной_салат_1_порция_vegetable_salad_1_por_n": {
+      "name": {
+        "ru": "овощной салат (1 порция)",
+        "en": "vegetable salad (1 por-n)"
+      },
+      "category": "salads",
+      "icon": "🍽",
+      "portions": "1",
+      "shelfLife": {
+        "ru": "1",
+        "en": "1"
+      },
+      "ingredients": [
+        {
+          "productId": "огурец-cucumber-1779001457262-2249",
+          "name": {
+            "ru": "огурец",
+            "en": "cucumber"
+          },
+          "quantity": "2",
+          "unit": "pc"
+        },
+        {
+          "productId": "мал-помидоры-small-tomato-1779178818247-2351",
+          "name": {
+            "ru": "мал.помидоры",
+            "en": "small tomato"
+          },
+          "quantity": "9",
+          "unit": "pc"
+        },
+        {
+          "productId": "соль-проходка-salt-times-1779089453384-5408",
+          "name": {
+            "ru": "соль (проходка)",
+            "en": "salt (times)"
+          },
+          "quantity": "2",
+          "unit": "times"
+        },
+        {
+          "productId": "черный-перец-на-порцию-black-pepper-for-1-por-n-1779177963172-136",
+          "name": {
+            "ru": "черный перец (на порцию)",
+            "en": "black pepper (for 1 por-n)"
+          },
+          "quantity": "3",
+          "unit": "turn"
+        },
+        {
+          "productId": "сметана-sour-cream-1779001457262-3707",
+          "name": {
+            "ru": "сметана",
+            "en": "sour cream"
+          },
+          "quantity": "1",
+          "unit": "tsp"
+        },
+        {
+          "productId": "подсолнечное-масло-sunflower-oil-1779001457262-2658",
+          "name": {
+            "ru": "подсолнечное масло",
+            "en": "sunflower oil"
+          },
+          "quantity": "0.5",
+          "unit": "tsp"
+        }
+      ]
+    },
+    "жульен_julienne_crepe": {
+      "name": {
+        "ru": "Жульен",
+        "en": "Julienne Crepe"
+      },
+      "category": "crepes",
+      "icon": "🥞",
+      "portions": "1",
+      "shelfLife": {
+        "ru": "1",
+        "en": "1"
+      },
+      "ingredients": [
+        {
+          "productId": "сыр-cheese-1779001457262-9887",
+          "name": {
+            "ru": "сыр",
+            "en": "cheese"
+          },
+          "quantity": "50",
+          "unit": "gr"
+        },
+        {
+          "productId": "грибы-стл-mushrooms-tbsp-1779180378372-4588",
+          "name": {
+            "ru": "грибы (стл)",
+            "en": "mushrooms (TBsp)"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "куриная-грудка-стл-chicken-breast-tbsp-1779180522216-7314",
+          "name": {
+            "ru": "куриная грудка (стл)",
+            "en": "chicken breast (TBsp)"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "бешамель-стл-bechamel-tbsp-1779180943039-6791",
+          "name": {
+            "ru": "бешамель (стл)",
+            "en": "bechamel (TBsp)"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        }
+      ]
+    },
+    "mush_sauce_mush_sauce": {
+      "name": {
+        "ru": "Cheese&Sauce Crepe",
+        "en": "Cheese&Sauce Crepe"
+      },
+      "category": "crepes",
+      "icon": "🥞",
+      "portions": "1",
+      "shelfLife": {
+        "ru": "1",
+        "en": "1"
+      },
+      "ingredients": [
+        {
+          "productId": "бешамель-стл-bechamel-tbsp-1779180943039-6791",
+          "name": {
+            "ru": "бешамель (стл)",
+            "en": "bechamel (TBsp)"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "сыр-cheese-1779001457262-9887",
+          "name": {
+            "ru": "сыр",
+            "en": "cheese"
+          },
+          "quantity": "70",
+          "unit": "gr"
+        }
+      ]
+    },
+    "mush_sauce_crepe_mush_sauce_crepe": {
+      "name": {
+        "ru": "Mush&Sauce Crepe",
+        "en": "Mush&Sauce Crepe"
+      },
+      "category": "crepes",
+      "icon": "🥞",
+      "portions": "1",
+      "shelfLife": {
+        "ru": "1",
+        "en": "1"
+      },
+      "ingredients": [
+        {
+          "productId": "грибы-стл-mushrooms-tbsp-1779180378372-4588",
+          "name": {
+            "ru": "грибы (стл)",
+            "en": "mushrooms (TBsp)"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "бешамель-стл-bechamel-tbsp-1779180943039-6791",
+          "name": {
+            "ru": "бешамель (стл)",
+            "en": "bechamel (TBsp)"
+          },
+          "quantity": "2",
+          "unit": "TBsp"
+        }
+      ]
+    },
+    "crepe_tvorog_crepe_tvorog": {
+      "name": {
+        "ru": "Crepe&Tvorog",
+        "en": "Crepe&Tvorog"
+      },
+      "category": "crepes",
+      "icon": "🥞",
+      "portions": "1",
+      "shelfLife": {
+        "ru": "1",
+        "en": "1"
+      },
+      "ingredients": [
+        {
+          "productId": "творог-tvorog-1779002770549-8597",
+          "name": {
+            "ru": "творог",
+            "en": "tvorog"
+          },
+          "quantity": "100",
+          "unit": "gr"
+        },
+        {
+          "productId": "сахар-sugar-1779001457262-9152",
+          "name": {
+            "ru": "сахар",
+            "en": "sugar"
+          },
+          "quantity": "2",
+          "unit": "tsp"
+        },
+        {
+          "productId": "сметана-sour-cream-1779001457262-3707",
+          "name": {
+            "ru": "сметана",
+            "en": "sour cream"
+          },
+          "quantity": "1",
+          "unit": "tsp"
+        },
+        {
+          "productId": "сгущенка-на-1-пор-ю-sgushenka-for-1-por-n-1779181250282-8490",
+          "name": {
+            "ru": "сгущенка (на 1 пор-ю)",
+            "en": "sgushenka (for 1 por-n)"
+          },
+          "quantity": "40",
+          "unit": "gr"
+        }
+      ]
+    },
+    "crepe_dough_crepe_dough": {
+      "name": {
+        "ru": "Crepe Dough",
+        "en": "Crepe Dough"
+      },
+      "category": "crepes",
+      "icon": "🍽",
+      "portions": "30",
+      "shelfLife": {
+        "ru": "2",
+        "en": "2"
+      },
+      "ingredients": [
+        {
+          "productId": "масло-сливочное-butter-1779001457262-7233",
+          "name": {
+            "ru": "масло сливочное",
+            "en": "butter"
+          },
+          "quantity": "500",
+          "unit": "gr"
+        },
+        {
+          "productId": "молоко-milk-1779001457262-214",
+          "name": {
+            "ru": "молоко",
+            "en": "milk"
+          },
+          "quantity": "2000",
+          "unit": "ml"
+        },
+        {
+          "productId": "яйца-eggs-1779001457262-7957",
+          "name": {
+            "ru": "яйца",
+            "en": "eggs"
+          },
+          "quantity": "24",
+          "unit": "pc"
+        },
+        {
+          "productId": "мука-flour-1779089958844-4263",
+          "name": {
+            "ru": "мука",
+            "en": "flour"
+          },
+          "quantity": "800",
+          "unit": "gr"
+        },
+        {
+          "productId": "сахар-sugar-1779001457262-9152",
+          "name": {
+            "ru": "сахар",
+            "en": "sugar"
+          },
+          "quantity": "8",
+          "unit": "TBsp"
+        },
+        {
+          "productId": "соль-гр-salt-gr-1779089692736-2356",
+          "name": {
+            "ru": "соль (гр)",
+            "en": "salt (gr)"
+          },
+          "quantity": "26",
+          "unit": "gr"
+        }
+      ]
+    },
+    "морс_mors": {
+      "name": {
+        "ru": "морс",
+        "en": "mors"
+      },
+      "category": "drinks",
+      "icon": "🍽",
+      "portions": "",
+      "shelfLife": {
+        "ru": "4",
+        "en": "4"
+      },
+      "ingredients": [
+        {
+          "productId": "клюква-мороженая-cranberry-frozen-1779189932498-3965",
+          "name": {
+            "ru": "клюква мороженая",
+            "en": "cranberry frozen"
+          },
+          "quantity": "300",
+          "unit": "gr"
+        },
+        {
+          "productId": "микс-ягод-заморозка-berry-mix-frozen-1779189959233-2409",
+          "name": {
+            "ru": "микс ягод заморозка",
+            "en": "berry mix frozen"
+          },
+          "quantity": "300",
+          "unit": "gr"
+        },
+        {
+          "productId": "сахар-sugar-1779001457262-9152",
+          "name": {
+            "ru": "сахар",
+            "en": "sugar"
+          },
+          "quantity": "550",
+          "unit": "gr"
+        },
+        {
+          "productId": "вода-water-1779190148131-9034",
+          "name": {
+            "ru": "вода",
+            "en": "water"
+          },
+          "quantity": "8200",
+          "unit": "ml"
+        }
+      ]
+    }
+  }
+}
