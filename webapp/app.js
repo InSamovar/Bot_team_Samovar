@@ -1,4 +1,4 @@
-const recipes = {
+let recipes = {
   chicken_soup: {
     name: { ru: "Куриный суп", en: "Chicken soup" },
     category: "hot",
@@ -277,7 +277,7 @@ const recipes = {
   },
 };
 
-const categories = [
+let categories = [
   { key: "crepes", legacyKeys: ["pancakes"], label: { ru: "Crepes", en: "Crepes" }, icon: "🥞" },
   { key: "soup_hot", legacyKeys: ["hot"], label: { ru: "Soup&hot", en: "Soup&hot" }, icon: "🔥" },
   { key: "salads", legacyKeys: [], label: { ru: "Salads", en: "Salads" }, icon: "🥗" },
@@ -341,6 +341,7 @@ const unitAliases = {
 const productStorageKey = "samovarProducts";
 const dishStorageKey = "samovarDishes";
 const recipeStorageKey = "samovarRecipeLinks";
+let productsFromJson = [];
 
 const i18n = {
   ru: {
@@ -491,9 +492,9 @@ const state = {
   plans: {},
   stockByProduct: {},
   activeCategory: "soup_hot",
-  products: loadProducts(),
-  dishes: loadDishes(),
-  recipeLinks: loadRecipeLinks(),
+  products: [],
+  dishes: {},
+  recipeLinks: {},
   editingProductId: null,
   editingRecipeKey: "chicken_soup",
   selectedRecipeKey: "chicken_soup",
@@ -541,9 +542,13 @@ const recipeCancelButton = document.querySelector("#recipeCancelButton");
 
 init();
 
-function init() {
+async function init() {
   tg?.ready();
   tg?.expand();
+  await loadSharedData();
+  state.products = loadProducts();
+  state.dishes = loadDishes();
+  state.recipeLinks = loadRecipeLinks();
   applyLanguage();
   if (view === "recipes") {
     enableProtectedRecipeMode();
@@ -559,6 +564,33 @@ function init() {
   renderAll();
   saveButton.addEventListener("click", savePlan);
   resetButton.addEventListener("click", resetPlan);
+}
+
+async function loadSharedData() {
+  const version = params.get("v") || Date.now();
+  const [recipePayload, productPayload] = await Promise.all([
+    fetchJson(`data/recipes.json?v=${encodeURIComponent(version)}`),
+    fetchJson(`data/products.json?v=${encodeURIComponent(version)}`),
+  ]);
+
+  if (recipePayload?.recipes && typeof recipePayload.recipes === "object") {
+    recipes = recipePayload.recipes;
+  }
+  if (Array.isArray(recipePayload?.categories)) {
+    categories = recipePayload.categories;
+  }
+  if (Array.isArray(productPayload?.products)) {
+    productsFromJson = productPayload.products;
+  }
+}
+
+async function fetchJson(path) {
+  try {
+    const response = await fetch(path, { cache: "no-store" });
+    return response.ok ? response.json() : null;
+  } catch (error) {
+    return null;
+  }
 }
 
 function applyLanguage() {
@@ -1191,7 +1223,7 @@ function loadProducts() {
     }
   }
 
-  const seededProducts = buildSeedProductsFromRecipes();
+  const seededProducts = productsFromJson.length ? normalizeProducts(productsFromJson) : buildSeedProductsFromRecipes();
   localStorage.setItem(productStorageKey, JSON.stringify(seededProducts));
   return seededProducts;
 }
