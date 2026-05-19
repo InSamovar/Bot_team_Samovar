@@ -1209,7 +1209,11 @@ function buildSeedProductsFromRecipes() {
           id: makeProductId(ru, en),
           ru,
           en,
-          unit: normalizeProductUnit(localizeLanguage(ingredient.unit, "ru") || localizeLanguage(ingredient.unit, "en")),
+          unit: normalizeProductUnitForName(
+            ru,
+            en,
+            localizeLanguage(ingredient.unit, "ru") || localizeLanguage(ingredient.unit, "en")
+          ),
         });
       }
     });
@@ -1221,7 +1225,7 @@ function buildSeedProductsFromRecipes() {
 function saveProductFromForm() {
   const ru = productRuInput.value.trim();
   const en = productEnInput.value.trim();
-  const unit = productUnitSelect.value;
+  const unit = normalizeProductUnitForName(ru, en, productUnitSelect.value);
   if (!ru || !en || !productUnitOptions.includes(unit)) {
     alert(tt("productRequired"));
     return;
@@ -1304,7 +1308,7 @@ function normalizeProductUnit(unit) {
 
 function normalizeProductUnitForName(ru, en, unit) {
   const name = `${ru} ${en}`.toLocaleLowerCase("en");
-  if (name.includes("карто") || name.includes("potato")) {
+  if (name.includes("карто") || name.includes("potato") || name.includes("свек") || name.includes("beet")) {
     return "gr";
   }
   return normalizeProductUnit(unit);
