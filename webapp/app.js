@@ -949,23 +949,27 @@ function addRecipeEditorRow(ingredient = null) {
   const node = template.content.cloneNode(true);
   const productSelect = node.querySelector(".recipe-product-select");
   const quantityInput = node.querySelector(".recipe-quantity-input");
-  const unitDisplay = node.querySelector(".recipe-unit-display");
+  const unitSelect = node.querySelector(".recipe-unit-display");
   const removeButton = node.querySelector(".recipe-remove-button");
   const productId = resolveIngredientProductId(ingredient) || state.products[0]?.id || "";
 
   productSelect.innerHTML = state.products
     .map((product) => `<option value="${escapeHtml(product.id)}">${escapeHtml(productLabel(product))}</option>`)
     .join("");
+  unitSelect.innerHTML = productUnitOptions
+    .map((unit) => `<option value="${escapeHtml(unit)}">${escapeHtml(unit)}</option>`)
+    .join("");
   productSelect.value = productId;
   quantityInput.value = ingredient?.quantity ?? "";
-  const updateUnit = () => {
+  const defaultUnitForSelectedProduct = () => {
     const product = state.products.find((item) => item.id === productSelect.value);
-    unitDisplay.textContent = product?.unit || "gr";
-    unitDisplay.dataset.unit = product?.unit || "gr";
+    return product?.unit || "gr";
   };
-  updateUnit();
+  unitSelect.value = normalizeProductUnit(localize(ingredient?.unit) || defaultUnitForSelectedProduct());
   removeButton.textContent = tt("recipeDelete");
-  productSelect.addEventListener("change", updateUnit);
+  productSelect.addEventListener("change", () => {
+    unitSelect.value = defaultUnitForSelectedProduct();
+  });
   removeButton.addEventListener("click", () => {
     removeButton.closest(".recipe-editor-row").remove();
   });
@@ -984,8 +988,9 @@ function saveRecipeEditor() {
     .map((row) => ({
       productId: row.querySelector(".recipe-product-select").value,
       quantity: normalizeInput(row.querySelector(".recipe-quantity-input").value),
+      unit: row.querySelector(".recipe-unit-display").value,
     }))
-    .filter((ingredient) => ingredient.productId && ingredient.quantity);
+    .filter((ingredient) => ingredient.productId && ingredient.quantity && productUnitOptions.includes(ingredient.unit));
 
   if (
     !nameRu ||
@@ -1111,7 +1116,7 @@ function getEditableRecipe(recipeKey) {
         productId,
         name: { ru: product?.ru || "", en: product?.en || "" },
         quantity: ingredient.quantity,
-        unit: { ru: product?.unit || "", en: product?.unit || "" },
+        unit: normalizeProductUnit(localize(ingredient.unit) || product?.unit || ""),
       };
     }).filter((ingredient) => ingredient.productId),
   };
@@ -1188,7 +1193,7 @@ function normalizeProducts(products) {
       id: String(product.id || makeProductId(product.ru || "", product.en || "")),
       ru: String(product.ru || "").trim(),
       en: String(product.en || "").trim(),
-      unit: normalizeProductUnitForName(product.ru || "", product.en || "", product.unit),
+      unit: normalizeProductUnit(product.unit),
     }))
     .filter((product) => product.ru && product.en)
     .sort(sortProducts);
@@ -1209,11 +1214,7 @@ function buildSeedProductsFromRecipes() {
           id: makeProductId(ru, en),
           ru,
           en,
-          unit: normalizeProductUnitForName(
-            ru,
-            en,
-            localizeLanguage(ingredient.unit, "ru") || localizeLanguage(ingredient.unit, "en")
-          ),
+          unit: normalizeProductUnit(localizeLanguage(ingredient.unit, "ru") || localizeLanguage(ingredient.unit, "en")),
         });
       }
     });
@@ -1225,7 +1226,7 @@ function buildSeedProductsFromRecipes() {
 function saveProductFromForm() {
   const ru = productRuInput.value.trim();
   const en = productEnInput.value.trim();
-  const unit = normalizeProductUnitForName(ru, en, productUnitSelect.value);
+  const unit = normalizeProductUnit(productUnitSelect.value);
   if (!ru || !en || !productUnitOptions.includes(unit)) {
     alert(tt("productRequired"));
     return;
@@ -1304,14 +1305,6 @@ function makeProductId(ru, en) {
 function normalizeProductUnit(unit) {
   const normalized = unitAliases[String(unit || "").trim().toLowerCase()];
   return productUnitOptions.includes(normalized) ? normalized : "pc";
-}
-
-function normalizeProductUnitForName(ru, en, unit) {
-  const name = `${ru} ${en}`.toLocaleLowerCase("en");
-  if (name.includes("карто") || name.includes("potato") || name.includes("свек") || name.includes("beet")) {
-    return "gr";
-  }
-  return normalizeProductUnit(unit);
 }
 
 function renderRecipes() {

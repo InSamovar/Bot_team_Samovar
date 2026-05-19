@@ -43,7 +43,7 @@ SHOPPING_LIST_FILE = DATA_DIR / "shopping_list.json"
 HISTORY_FILE = DATA_DIR / "history.json"
 USER_SETTINGS_FILE = DATA_DIR / "user_settings.json"
 DEFAULT_TIMEZONE = "Asia/Bangkok"
-WEBAPP_VERSION = "20260519-beetroot-unit"
+WEBAPP_VERSION = "20260519-recipe-item-units"
 
 
 @dataclass
@@ -588,10 +588,6 @@ UNIT_ALIASES = {
 
 
 def normalize_item_unit(name: str, unit: str) -> str:
-    name_key = name.casefold()
-    if any(token in name_key for token in ("карто", "potato", "свек", "beet")):
-        return "gr"
-
     return UNIT_ALIASES.get(str(unit).strip().casefold(), str(unit).strip())
 
 
