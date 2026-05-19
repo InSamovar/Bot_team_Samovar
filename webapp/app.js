@@ -298,6 +298,10 @@ const productUnitOptions = ["kg", "gr", "TBsp", "tsp", "times", "turn", "pc", "b
 const unitAliases = {
   г: "gr",
   g: "gr",
+  gr: "gr",
+  гр: "gr",
+  грамм: "gr",
+  граммов: "gr",
   кг: "kg",
   kg: "kg",
   шт: "pc",
