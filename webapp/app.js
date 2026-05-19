@@ -293,7 +293,7 @@ const scaleLabels = {
   0.25: { ru: "75% меньше", en: "75% less" },
 };
 
-const productUnitOptions = ["kg", "gr", "TBsp", "tsp", "times", "turn", "pc", "box", "ladle", "litr", "ml"];
+const productUnitOptions = ["kg", "gr", "TBsp", "tsp", "times", "turn", "pc", "box", "ladle", "scoop", "drops", "litr", "ml"];
 
 const unitAliases = {
   г: "gr",
@@ -318,6 +318,8 @@ const unitAliases = {
   бокс: "box",
   box: "box",
   ladle: "ladle",
+  scoop: "scoop",
+  drops: "drops",
   "ст. ложка": "TBsp",
   "ст. ложки": "TBsp",
   "ст. ложек": "TBsp",
